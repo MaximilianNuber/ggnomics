@@ -21,7 +21,7 @@ def heatmap_long(
     y: str,
     value: str,
     low: str = "#F7FBFF",
-    high: str = "#08306B",
+    high: str = "#082B6B",
     title: Optional[str] = None,
     x_text_angle: int = 90,
 ):
