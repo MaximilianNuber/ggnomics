@@ -1,0 +1,31 @@
+[project]
+name = "gg-singlecell"
+version = "0.1.0"
+description = "Modular plotnine-based plotting utilities for single-cell and genomics"
+authors = [{ name = "Your Name" }]
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+keywords = ["single-cell", "plotnine", "ggplot", "genomics", "biocpy"]
+dependencies = [
+  "numpy",
+  "pandas",
+  "plotnine>=0.12",
+  "scikit-learn",
+  "scipy",
+]
+
+[project.optional-dependencies]
+test = [
+  "pytest",
+]
+docs = [
+  "mkdocs",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourname/gg_singlecell"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["gg_singlecell*"]

@@ -1,0 +1,7 @@
+site_name: gg-singlecell
+site_url: https://example.com/gg-singlecell
+nav:
+  - Home: index.md
+  - Plots: plots.md
+theme:
+  name: mkdocs
