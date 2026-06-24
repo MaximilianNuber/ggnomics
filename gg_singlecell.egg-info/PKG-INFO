@@ -1,0 +1,119 @@
+Metadata-Version: 2.4
+Name: gg-singlecell
+Version: 0.1.0
+Summary: Modular plotnine-based plotting utilities for single-cell and genomics
+Author: Your Name
+License: MIT
+Project-URL: Homepage, https://github.com/yourname/gg_singlecell
+Keywords: single-cell,plotnine,ggplot,genomics,biocpy
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy
+Requires-Dist: pandas
+Requires-Dist: plotnine>=0.12
+Requires-Dist: scikit-learn
+Requires-Dist: scipy
+Provides-Extra: test
+Requires-Dist: pytest; extra == "test"
+Provides-Extra: docs
+Requires-Dist: mkdocs; extra == "docs"
+Dynamic: license-file
+
+# gg-singlecell
+
+Plotnine-based plotting utilities for single-cell and genomics analyses.
+
+## Install
+
+```bash
+pip install -e .
+```
+
+## Quick start
+
+```python
+import pandas as pd
+from gg_singlecell import plot_reduced_dim
+
+# DataFrame with embeddings
+df = pd.DataFrame({"umap_1": [0,1,2], "umap_2": [0.1,0.2,0.3], "cluster": ["A","B","A"]})
+p = plot_reduced_dim(df, x="umap_1", y="umap_2", color="cluster")
+print(p)
+```
+
+## BiocPy SingleCellExperiment
+
+```python
+from gg_singlecell import build_plot_df_from_sce, plot_reduced_dim_sce
+plot_df = build_plot_df_from_sce(sce, dim_name="UMAP", prefix="umap")
+p = plot_reduced_dim_sce(sce, dim_name="UMAP", color="cluster")
+```
+
+## SummarizedExperiment
+SummarizedExperiment does not store reduced dimensions. Use PCA to derive scores and plot:
+
+```python
+from gg_singlecell import build_plot_df_from_se_and_pca, plot_pca_from_se
+plot_df = build_plot_df_from_se_and_pca(se, pca_res, n_comps=2, prefix="pca")
+p = plot_pca_from_se(se, pca_res, color="condition")
+```
+
+## Suggested plots to add
+- Gene expression overlay on embeddings
+- Violin plots of expression (Seurat-like)
+- Marker gene dot-plot (genes × clusters)
+- Volcano plots for DE results
+- Heatmaps from long-form data or matrices
+- QC scatter/histograms and cluster composition barplots
+
+Contributions welcome!
+
+## New APIs
+
+### Expression violin
+```python
+from gg_singlecell import expression_violin
+# DataFrame API
+p = expression_violin(df, value="expr", group="cluster", log1p=True)
+
+# SCE/SE convenience
+# expression_violin(sce, "MS4A1", group_col="cluster", assay="logcounts")
+```
+
+### Volcano plot
+```python
+from gg_singlecell import volcano_plot
+p = volcano_plot(de_df, log2fc="log2FC", padj="FDR", fdr_thresh=0.05, lfc_thresh=1.0)
+```
+
+### Heatmap
+```python
+from gg_singlecell import heatmap_from_matrix
+p = heatmap_from_matrix(matrix, row_names=genes, col_names=clusters, zscore_rows=True)
+```
+
+### Marker dot-plot
+```python
+from gg_singlecell import marker_dotplot_from_matrix
+p = marker_dotplot_from_matrix(expr_matrix, groups=cluster_series, genes=["CD3D","MS4A1"])
+```
+
+### Ridge density
+```python
+from gg_singlecell import ridge_density
+p = ridge_density(df, value="expr", group="cluster", bandwidth=None)
+```
+
+### QC plots
+```python
+from gg_singlecell import qc_scatter, qc_histogram, cluster_composition_barplot
+p = qc_scatter(df, x="n_counts", y="n_genes", color="mito_frac")
+p = qc_histogram(df, value="mito_frac")
+p = cluster_composition_barplot(df, cluster_col="cluster", group_col="condition", normalize=True)
+```
+
+## Run tests
+```bash
+python -m pytest -q
+```

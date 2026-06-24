@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from plotnine.ggplot import ggplot as ggplot_class
 
-from gg_singlecell import (
+from ggnomics import (
     plot_reduced_dim,
     expression_violin,
     volcano_plot,
@@ -16,8 +16,9 @@ from gg_singlecell import (
 
 
 def test_plot_reduced_dim_returns_plot():
-    df = pd.DataFrame({"x": [0, 1], "y": [0.1, 0.2], "cluster": ["A", "B"]})
-    p = plot_reduced_dim(df, x="x", y="y", color="cluster", size=None)
+    # New API: dimred selects embedding columns by prefix
+    df = pd.DataFrame({"x_umap_1": [0.0, 1.0], "x_umap_2": [0.1, 0.2], "cluster": ["A", "B"]})
+    p = plot_reduced_dim(df, dimred="umap", color="cluster")
     assert isinstance(p, ggplot_class)
 
 

@@ -1,0 +1,67 @@
+---
+title: "Immune repertoire plots"
+format: html
+---
+
+```{python}
+import sys
+sys.path.insert(0, "..")
+
+import importlib.util
+_spec = importlib.util.spec_from_file_location("mock_data", "00_mock_data.py")
+_m = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(_m)
+
+rep_df  = _m.make_mock_repertoire(n_cells=600, n_clonotypes=80, n_samples=4, seed=42)
+adata   = _m.make_mock_anndata(n_cells=500, n_genes=50, seed=42)
+```
+
+## `plot_clonotype_abundance` — per sample
+
+```{python}
+from ggnomics import plot_clonotype_abundance
+
+p_abund = plot_clonotype_abundance(
+    rep_df, clonotype_col="clonotype_id",
+    sample_col="sample", top_n=20,
+    title="Top-20 clonotypes by abundance",
+)
+p_abund
+```
+
+## `plot_clonotype_overlap` — Jaccard heatmap
+
+```{python}
+from ggnomics import plot_clonotype_overlap
+
+result = plot_clonotype_overlap(
+    rep_df, clonotype_col="clonotype_id", sample_col="sample",
+    method="jaccard", title="Jaccard clonotype overlap",
+)
+result.plot
+```
+
+The overlap matrix (diagonal = 1, symmetric):
+
+```{python}
+result.matrix.round(3)
+```
+
+## `plot_clonotype_embedding` alongside `plot_umap`
+
+```{python}
+from ggnomics import plot_umap
+
+# Plain UMAP for comparison
+p_umap = plot_umap(adata, color="cluster", title="UMAP — cluster")
+p_umap
+```
+
+```{python}
+from ggnomics import plot_clonotype_embedding
+
+p_clono = plot_clonotype_embedding(
+    adata, clonotype_col="clonotype_id", dimred="X_umap",
+    title="UMAP — clonotype expansion",
+)
+p_clono
+```

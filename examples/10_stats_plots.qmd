@@ -1,0 +1,121 @@
+---
+title: "Statistical plots"
+format: html
+---
+
+```{python}
+import sys
+sys.path.insert(0, "..")
+
+import importlib.util
+_spec = importlib.util.spec_from_file_location("mock_data", "00_mock_data.py")
+_m = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(_m)
+
+adata = _m.make_mock_anndata(n_cells=500, n_genes=50, seed=42)
+df    = _m.make_mock_df(n_cells=500, n_genes=50, seed=42)
+```
+
+## `plot_violin_stats` — annotation modes
+
+### Stars (default)
+
+```{python}
+from ggnomics import plot_violin_stats
+
+p_stars = plot_violin_stats(
+    adata, feature="Gene0001", group_by="cluster",
+    comparisons=[("C0", "C1"), ("C0", "C2")],
+    sig_only=False,
+    annotation="stars",
+    title="Violin: stars annotation",
+)
+p_stars
+```
+
+### Raw p-value
+
+```{python}
+p_pval = plot_violin_stats(
+    adata, feature="Gene0001", group_by="cluster",
+    comparisons=[("C0", "C1")],
+    sig_only=False,
+    annotation="pvalue",
+    title="Violin: p-value annotation",
+)
+p_pval
+```
+
+### Adjusted p-value
+
+```{python}
+p_padj = plot_violin_stats(
+    adata, feature="Gene0001", group_by="cluster",
+    comparisons=[("C0", "C1"), ("C1", "C2")],
+    sig_only=False,
+    annotation="padj",
+    p_adjust="bonferroni",
+    title="Violin: adjusted p-value annotation",
+)
+p_padj
+```
+
+### No boxplot overlay, with jitter
+
+```{python}
+p_jitter = plot_violin_stats(
+    adata, feature="Gene0001", group_by="cluster",
+    add_boxplot=False, add_points=True,
+    sig_only=False,
+    title="Violin: jitter, no boxplot",
+)
+p_jitter
+```
+
+## `plot_box_stats` — comparison
+
+```{python}
+from ggnomics import plot_box_stats
+
+p_box = plot_box_stats(
+    adata, feature="Gene0001", group_by="cluster",
+    comparisons=[("C0", "C1"), ("C0", "C2")],
+    sig_only=False,
+    annotation="stars",
+    title="Box plot with significance",
+)
+p_box
+```
+
+## `plot_scatter_marginal` — QC metrics
+
+```{python}
+from ggnomics import plot_scatter_marginal
+# Returns a plotnine Compose (no extra dependencies required)
+comp = plot_scatter_marginal(
+    adata, x="n_counts", y="n_genes_detected",
+    color="cluster",
+    marginal="density",
+    title="QC scatter with marginal densities",
+)
+comp
+```
+
+## `plot_embedding_panel` — 6 features, shared scale
+
+```{python}
+from ggnomics import plot_embedding_panel
+features = [f"Gene{i+1:04d}" for i in range(6)]
+comp_shared = plot_embedding_panel(
+    adata, features=features, ncol=3, shared_scale=True,
+)
+comp_shared
+```
+
+### Unshared scale (each panel independent)
+
+```{python}
+comp_free = plot_embedding_panel(
+    adata, features=features, ncol=3, shared_scale=False,
+)
+comp_free
+```

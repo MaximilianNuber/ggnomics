@@ -1,0 +1,139 @@
+---
+title: "Scatter plot hierarchy"
+format: html
+---
+
+## Overview
+
+`ggnomics` exposes a four-level scatter hierarchy:
+
+```
+_scatter_ggplot   (private: pure plotnine, no data extraction)
+   └─ plot_scatter        (public: resolves obs columns or gene expression)
+         └─ plot_reduced_dim   (extracts embedding + calls plot_scatter)
+               └─ plot_umap / plot_pca / plot_tsne   (convenience wrappers)
+```
+
+```{python}
+import sys
+sys.path.insert(0, "..")
+
+import importlib.util, os
+_spec = importlib.util.spec_from_file_location("mock_data", "00_mock_data.py")
+_m = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(_m)
+
+adata = _m.make_mock_anndata(n_cells=500, n_genes=50, seed=42)
+df    = _m.make_mock_df(n_cells=500, n_genes=50, seed=42)
+```
+
+## Layer 1 — `_scatter_ggplot` (internal)
+
+The innermost layer works on a pre-assembled flat DataFrame.
+
+```{python}
+import pandas as pd
+from ggnomics.scatter import _scatter_ggplot
+
+flat_df = pd.DataFrame({
+    "x": adata.obsm["X_umap"][:, 0],
+    "y": adata.obsm["X_umap"][:, 1],
+    "color": adata.obs["cluster"].values,
+})
+
+p = _scatter_ggplot(flat_df, x="x", y="y", color="color",
+                    color_is_continuous=False, size=0.5, alpha=0.8,
+                    color_label="Cluster", x_label="UMAP 1", y_label="UMAP 2",
+                    title="Layer 1: _scatter_ggplot")
+p
+```
+
+## Layer 2 — `plot_scatter`
+
+Accepts DataFrame, AnnData, or SCE. Resolves obs columns and gene names.
+
+### Obs columns on both axes
+
+```{python}
+from ggnomics import plot_scatter
+
+# Both x and y are obs columns; color is an obs column
+p1 = plot_scatter(adata, x="n_counts", y="n_genes_detected", color="cluster",
+                  title="Obs cols on both axes")
+p1
+```
+
+### Gene expression on x-axis
+
+```{python}
+# x resolved as gene expression (var_name); y is an obs column
+p2 = plot_scatter(adata, x="Gene0001", y="n_counts",
+                  title="Gene expression vs n_counts")
+p2
+```
+
+### Gene color, obs x/y
+
+```{python}
+p3 = plot_scatter(adata, x="n_counts", y="n_genes_detected",
+                  color="Gene0001", cmap="plasma",
+                  title="Gene expression as color")
+p3
+```
+
+## Layer 3 — `plot_reduced_dim`
+
+Extracts embedding dimensions and calls `plot_scatter`.
+
+```{python}
+from ggnomics import plot_reduced_dim
+
+# Categorical color
+p4 = plot_reduced_dim(adata, dimred="X_umap", color="cluster",
+                      title="UMAP — cluster")
+p4
+```
+
+```{python}
+# Continuous color (gene expression)
+p5 = plot_reduced_dim(adata, dimred="X_umap", color="Gene0001",
+                      cmap="viridis", title="UMAP — Gene0001")
+p5
+```
+
+```{python}
+# PCA components 1 & 2
+p6 = plot_reduced_dim(adata, dimred="X_pca", components=(1, 2),
+                      color="cluster", title="PCA 1 vs 2")
+p6
+```
+
+```{python}
+# Facet by batch
+p7 = plot_reduced_dim(adata, dimred="X_umap", color="cluster",
+                      facet_by="batch", title="UMAP faceted by batch")
+p7
+```
+
+## Layer 4 — Convenience wrappers
+
+```{python}
+from ggnomics import plot_umap, plot_pca
+
+p8 = plot_umap(adata, color="cluster", title="plot_umap")
+p9 = plot_pca(adata, color="cluster", components=(1, 2), title="plot_pca")
+p8
+```
+
+```{python}
+p9
+```
+
+## DataFrame input
+
+`plot_scatter` and `plot_reduced_dim` also work on plain DataFrames.
+
+```{python}
+p_df = plot_reduced_dim(df, dimred="UMAP", color="cluster",
+                        title="DataFrame UMAP")
+p_df
+```
