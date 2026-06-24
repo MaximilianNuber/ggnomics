@@ -1,0 +1,50 @@
+name: Regenerate README plots
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ggnomics/**'
+      - 'examples/00_mock_data.py'
+      - 'docs/generate_readme_plots.py'
+  workflow_dispatch:
+
+jobs:
+  generate-plots:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install system dependencies for matplotlib
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libgl1 libglib2.0-0
+
+      - name: Install ggnomics and dependencies
+        run: |
+          pip install -e ".[all]"
+          pip install mudata
+          # Try plotnine 0.16 alpha for plot_layout support; fall back silently
+          pip install --pre "plotnine>=0.16.0a0" || echo "0.16 alpha not available, using stable"
+
+      - name: Generate README plots
+        run: python docs/generate_readme_plots.py
+        env:
+          MPLBACKEND: Agg
+
+      - name: Commit and push updated plots
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/img/
+          git diff --cached --quiet && echo "No changes" && exit 0
+          git commit -m "ci: regenerate README plots [skip ci]"
+          git push

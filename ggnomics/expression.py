@@ -178,19 +178,17 @@ def plot_dot(
     stats = pd.concat(records, ignore_index=True)
 
     if scale:
-        # Scale mean_expr per feature to [col_min, col_max]
-        def _scale_group(g):
-            mn, mx = g["mean_expr"].min(), g["mean_expr"].max()
+        # Scale mean_expr per feature to [col_min, col_max].
+        # Use transform so the "feature" column is not dropped.
+        def _scale_vals(vals: pd.Series) -> pd.Series:
+            mn, mx = vals.min(), vals.max()
             rng = mx - mn
             if rng == 0:
-                g = g.copy()
-                g["mean_expr"] = 0.0
-                return g
-            g = g.copy()
-            g["mean_expr"] = (g["mean_expr"] - mn) / rng * (col_max - col_min) + col_min
-            return g
+                return pd.Series(0.0, index=vals.index)
+            return (vals - mn) / rng * (col_max - col_min) + col_min
 
-        stats = stats.groupby("feature", group_keys=False).apply(_scale_group, include_groups=False).reset_index(drop=False)
+        stats = stats.copy()
+        stats["mean_expr"] = stats.groupby("feature")["mean_expr"].transform(_scale_vals)
         stats["mean_expr"] = stats["mean_expr"].clip(col_min, col_max)
 
     # Clip fraction
