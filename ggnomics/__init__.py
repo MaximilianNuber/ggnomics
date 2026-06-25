@@ -1,6 +1,10 @@
 """ggnomics — plotnine-based genomics / single-cell plotting library."""
 
 __all__ = [
+    # Significance brackets
+    "geom_signif",
+    "run_comparisons",
+    "map_pvalue_to_stars",
     # Scatter hierarchy
     "plot_scatter",
     "plot_reduced_dim",
@@ -61,6 +65,9 @@ __all__ = [
     "cluster_composition_barplot",
     "ridge_density",
 ]
+
+# Significance brackets
+from .signif import geom_signif, run_comparisons, map_pvalue_to_stars
 
 # New scatter hierarchy
 from .scatter import plot_scatter, plot_reduced_dim, plot_umap, plot_pca, plot_tsne

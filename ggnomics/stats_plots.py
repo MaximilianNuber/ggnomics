@@ -13,8 +13,6 @@ from plotnine import (
     geom_violin,
     geom_boxplot,
     geom_jitter,
-    geom_segment,
-    geom_text,
     theme_classic,
     theme,
     element_text,
@@ -22,10 +20,12 @@ from plotnine import (
     labs,
     scale_fill_manual,
     scale_fill_brewer,
+    scale_y_continuous,
 )
 
 from ._accessor import DataAccessor
 from ._utils import adaptive_size, HeatmapResult
+from .signif._geom import _DeferredSignif, geom_signif
 
 
 # ---------------------------------------------------------------------------
@@ -33,166 +33,17 @@ from ._utils import adaptive_size, HeatmapResult
 # ---------------------------------------------------------------------------
 
 
-def _run_stat_tests(
-    df: pd.DataFrame,
-    feature_col: str,
-    group_col: str,
-    comparisons: List[Tuple],
-    test: str,
-) -> pd.DataFrame:
-    """Run pairwise statistical tests and return a DataFrame with pval column."""
-    try:
-        from scipy import stats as spstats
-    except ImportError as e:
-        raise ImportError(
-            "scipy is required for statistical annotations. "
-            "Install with: pip install scipy"
-        ) from e
-
-    rows = []
-    for g1, g2 in comparisons:
-        v1 = df[df[group_col] == g1][feature_col].dropna().values
-        v2 = df[df[group_col] == g2][feature_col].dropna().values
-        if len(v1) < 2 or len(v2) < 2:
-            continue
-        try:
-            if test == "mannwhitney":
-                _, pval = spstats.mannwhitneyu(v1, v2, alternative="two-sided")
-            elif test == "wilcoxon":
-                n = min(len(v1), len(v2))
-                _, pval = spstats.wilcoxon(v1[:n], v2[:n])
-            elif test == "ttest":
-                _, pval = spstats.ttest_ind(v1, v2)
-            elif test == "kruskal":
-                _, pval = spstats.kruskal(v1, v2)
-            else:
-                raise ValueError(f"Unknown test: {test}")
-            rows.append({"g1": g1, "g2": g2, "pval": float(pval)})
-        except Exception:
-            continue
-    return pd.DataFrame(rows) if rows else pd.DataFrame(columns=["g1", "g2", "pval"])
-
-
-def _add_stat_annotations(
-    p: ggplot,
-    df: pd.DataFrame,
-    feature_col: str,
-    group_col: str,
-    groups_order: List,
-    comparisons: List[Tuple],
-    test: str,
-    p_adjust: str,
-    sig_only: bool,
-    annotation: str,
-) -> ggplot:
-    """Compute stats, filter, and add geom_segment + geom_text annotation layers."""
-    stats_df = _run_stat_tests(df, feature_col, group_col, comparisons, test)
-
-    if stats_df.empty:
-        return p
-
-    # Multiple-testing correction
-    if p_adjust.lower() != "none" and len(stats_df) > 1:
-        try:
-            from statsmodels.stats.multitest import multipletests
-            method = "bonferroni" if p_adjust == "bonferroni" else "fdr_bh"
-            _, padj_arr, _, _ = multipletests(stats_df["pval"].values, method=method)
-            stats_df = stats_df.copy()
-            stats_df["padj"] = padj_arr
-        except ImportError:
-            stats_df = stats_df.copy()
-            stats_df["padj"] = stats_df["pval"]
-    else:
-        stats_df = stats_df.copy()
-        stats_df["padj"] = stats_df["pval"]
-
-    if sig_only:
-        stats_df = stats_df[stats_df["padj"] < 0.05].reset_index(drop=True)
-
-    if stats_df.empty:
-        return p
-
-    # Annotation label
-    def _fmt(row: pd.Series) -> str:
-        if annotation == "stars":
-            pv = row["padj"]
-            if pv >= 0.05:
-                return "ns"
-            if pv >= 0.01:
-                return "*"
-            if pv >= 0.001:
-                return "**"
-            if pv >= 0.0001:
-                return "***"
-            return "****"
-        if annotation == "pvalue":
-            return f"p={row['pval']:.3f}"
-        return f"p={row['padj']:.3f}"
-
-    stats_df["label"] = stats_df.apply(_fmt, axis=1)
-
-    # Group -> 1-indexed numeric x position (matching plotnine discrete scale)
-    g2x = {g: i + 1 for i, g in enumerate(groups_order)}
-
-    # Max y per group (for bar base height)
-    g_max: Dict[str, float] = {}
-    for g in groups_order:
-        vals = df[df[group_col] == g][feature_col].dropna().values
-        g_max[g] = float(vals.max()) if len(vals) > 0 else 0.0
-
-    y_range = df[feature_col].max() - df[feature_col].min()
-    y_step = max(y_range * 0.10, abs(df[feature_col].max()) * 0.05 + 1e-9)
-
-    occupied: Dict[Tuple, float] = {}
-    seg_rows: List[dict] = []
-    lab_rows: List[dict] = []
-
-    for _, row in stats_df.iterrows():
-        x1 = g2x.get(str(row["g1"]), g2x.get(row["g1"], 1))
-        x2 = g2x.get(str(row["g2"]), g2x.get(row["g2"], 2))
-        if x1 > x2:
-            x1, x2 = x2, x1
-        g1, g2 = row["g1"], row["g2"]
-
-        base_y = max(g_max.get(g1, 0.0), g_max.get(g2, 0.0)) * 1.05
-        key = (x1, x2)
-        bar_y = max(occupied.get(key, base_y), base_y)
-        occupied[key] = bar_y + y_step
-
-        y_left = g_max.get(g1, 0.0) * 1.02
-        y_right = g_max.get(g2, 0.0) * 1.02
-
-        seg_rows.extend([
-            {"x": x1, "xend": x1, "y": y_left, "yend": bar_y},
-            {"x": x1, "xend": x2, "y": bar_y, "yend": bar_y},
-            {"x": x2, "xend": x2, "y": y_right, "yend": bar_y},
-        ])
-        lab_rows.append({
-            "x": (x1 + x2) / 2.0,
-            "y": bar_y + y_step * 0.2,
-            "label": row["label"],
-        })
-
-    if seg_rows:
-        seg_df = pd.DataFrame(seg_rows)
-        lab_df = pd.DataFrame(lab_rows)
-
-        p = p + geom_segment(
-            data=seg_df,
-            mapping=aes(x="x", y="y", xend="xend", yend="yend"),
-            inherit_aes=False,
-            color="black",
-            size=0.4,
-        )
-        p = p + geom_text(
-            data=lab_df,
-            mapping=aes(x="x", y="y", label="label"),
-            inherit_aes=False,
-            size=8,
-            va="bottom",
-        )
-
-    return p
+def _resolve_annotation_mode(annotation):
+    """Translate plot_violin_stats annotation string into map_signif_level value."""
+    if annotation == "stars":
+        return True
+    if annotation == "pvalue":
+        return lambda p: f"p={p:.3f}"
+    if annotation == "padj":
+        return lambda p: f"padj={p:.3f}"
+    if callable(annotation):
+        return annotation
+    raise ValueError(f"Unknown annotation mode: {annotation!r}")
 
 
 def _build_violin_data(
@@ -263,7 +114,9 @@ def plot_violin_stats(
     Resolves ``feature`` via DataAccessor (obs column or gene expression).
     Runs pairwise tests between groups defined by ``comparisons`` (or all
     pairs when *n_groups* ≤ 5 and ``comparisons`` is None).
-    Draws significance bars as ``geom_segment`` + ``geom_text`` layers.
+    Draws significance brackets as ``geom_segment`` + ``geom_text`` layers
+    using proportional spacing (fractions of y-range) so brackets always
+    look correct regardless of data scale.
     """
     df, groups_order = _build_violin_data(data, feature, group_by, layer, order)
 
@@ -297,7 +150,6 @@ def plot_violin_stats(
     if title is not None:
         p = p + ggtitle(title)
 
-    # Determine comparisons
     actual_comps: List[Tuple] = []
     if comparisons is not None:
         actual_comps = [c for c in comparisons if len(c) == 2]
@@ -305,10 +157,27 @@ def plot_violin_stats(
         actual_comps = list(combinations(groups_order, 2))
 
     if actual_comps:
-        p = _add_stat_annotations(
-            p, df, "__feature__", "__group__", groups_order,
-            actual_comps, test, p_adjust, sig_only, annotation,
+        deferred = geom_signif(
+            comparisons=actual_comps,
+            test=test,
+            map_signif_level=_resolve_annotation_mode(annotation),
+            p_adjust=p_adjust,
+            sig_only=sig_only,
+            margin_top=0.05,
+            step_increase=0.12,
+            tip_length=0.03,
         )
+        signif_layers = deferred.resolve(df, x_col="__group__", y_col="__feature__")
+        for layer_ in signif_layers:
+            p = p + layer_
+
+        if deferred._last_brackets:
+            y_data_min = float(df["__feature__"].min())
+            y_data_max = float(df["__feature__"].max())
+            y_data_range = y_data_max - y_data_min or 1.0
+            y_upper = max(b.y_bracket for b in deferred._last_brackets) + y_data_range * 0.08
+            y_lower = y_data_min - y_data_range * 0.02
+            p = p + scale_y_continuous(limits=(y_lower, y_upper))
 
     return p
 
@@ -378,10 +247,27 @@ def plot_box_stats(
         actual_comps = list(combinations(groups_order, 2))
 
     if actual_comps:
-        p = _add_stat_annotations(
-            p, df, "__feature__", "__group__", groups_order,
-            actual_comps, test, p_adjust, sig_only, annotation,
+        deferred = geom_signif(
+            comparisons=actual_comps,
+            test=test,
+            map_signif_level=_resolve_annotation_mode(annotation),
+            p_adjust=p_adjust,
+            sig_only=sig_only,
+            margin_top=0.05,
+            step_increase=0.12,
+            tip_length=0.03,
         )
+        signif_layers = deferred.resolve(df, x_col="__group__", y_col="__feature__")
+        for layer_ in signif_layers:
+            p = p + layer_
+
+        if deferred._last_brackets:
+            y_data_min = float(df["__feature__"].min())
+            y_data_max = float(df["__feature__"].max())
+            y_data_range = y_data_max - y_data_min or 1.0
+            y_upper = max(b.y_bracket for b in deferred._last_brackets) + y_data_range * 0.08
+            y_lower = y_data_min - y_data_range * 0.02
+            p = p + scale_y_continuous(limits=(y_lower, y_upper))
 
     return p
 

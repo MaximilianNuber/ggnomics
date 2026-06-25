@@ -1,0 +1,207 @@
+---
+title: "ggnomics: Significance brackets (geom_signif)"
+format: html
+execute:
+  echo: true
+  warning: false
+---
+
+```{python}
+import numpy as np
+import pandas as pd
+import matplotlib
+matplotlib.use("Agg")
+
+np.random.seed(42)
+
+# Three-group dataset: C is clearly different from A
+df = pd.DataFrame({
+    "group": ["A"] * 60 + ["B"] * 60 + ["C"] * 60,
+    "value": np.concatenate([
+        np.random.normal(0, 1, 60),
+        np.random.normal(1, 1, 60),
+        np.random.normal(3, 1, 60),
+    ]),
+})
+```
+
+## 1. Automatic mode — star annotations on violin
+
+```{python}
+from ggnomics import plot_violin_stats
+
+p = plot_violin_stats(
+    df, "value", group_by="group",
+    comparisons=[("A", "B"), ("A", "C"), ("B", "C")],
+    annotation="stars",
+    sig_only=False,
+)
+p
+```
+
+## 2. Automatic mode — raw p-value labels
+
+```{python}
+p = plot_violin_stats(
+    df, "value", group_by="group",
+    comparisons=[("A", "C")],
+    annotation="pvalue",
+    sig_only=False,
+)
+p
+```
+
+## 3. Automatic mode — adjusted p-value labels
+
+```{python}
+p = plot_violin_stats(
+    df, "value", group_by="group",
+    comparisons=[("A", "B"), ("A", "C"), ("B", "C")],
+    annotation="padj",
+    sig_only=False,
+    p_adjust="bonferroni",
+)
+p
+```
+
+## 4. sig_only=True — hide non-significant pairs
+
+```{python}
+p = plot_violin_stats(
+    df, "value", group_by="group",
+    comparisons=[("A", "B"), ("A", "C")],
+    annotation="stars",
+    sig_only=True,
+)
+p
+```
+
+## 5. Automatic mode on boxplot
+
+```{python}
+from ggnomics import plot_box_stats
+
+p = plot_box_stats(
+    df, "value", group_by="group",
+    annotation="stars",
+    sig_only=False,
+)
+p
+```
+
+## 6. Custom annotation function
+
+```{python}
+p = plot_violin_stats(
+    df, "value", group_by="group",
+    comparisons=[("A", "C")],
+    annotation=lambda p: f"p={p:.2e}",
+    sig_only=False,
+)
+p
+```
+
+## 7. Manual mode — user-built ggplot with pre-computed labels
+
+```{python}
+from plotnine import ggplot, aes, geom_boxplot, theme_classic, labs
+from ggnomics import geom_signif
+
+p = (
+    ggplot(df, aes("group", "value", fill="group"))
+    + geom_boxplot()
+    + theme_classic()
+    + labs(x="Group", y="Value")
+)
+
+layers = geom_signif(
+    annotations=["***", "ns"],
+    y_position=[6.0, 7.5],
+    xmin=[1, 1],
+    xmax=[3, 2],
+)
+for layer in layers:
+    p = p + layer
+
+p
+```
+
+## 8. Asymmetric tip lengths
+
+```{python}
+from ggnomics.signif._geom import _DeferredSignif
+
+deferred = geom_signif(
+    comparisons=[("A", "C")],
+    test="mannwhitney",
+    tip_length=[0.08, 0.02],   # left tip longer than right
+    map_signif_level=True,
+)
+layers = deferred.resolve(df, x_col="group", y_col="value")
+
+p = (
+    ggplot(df, aes("group", "value", fill="group"))
+    + geom_boxplot()
+    + theme_classic()
+)
+for layer in layers:
+    p = p + layer
+p
+```
+
+## 9. Many comparisons — five groups, all pairwise, step_increase visible
+
+```{python}
+np.random.seed(7)
+df5 = pd.DataFrame({
+    "group": [g for g in "ABCDE" for _ in range(40)],
+    "value": np.concatenate([
+        np.random.normal(i * 0.8, 1, 40) for i in range(5)
+    ]),
+})
+
+deferred = geom_signif(
+    comparisons=[("A", "B"), ("A", "C"), ("A", "D"), ("A", "E")],
+    test="mannwhitney",
+    step_increase=0.15,
+    margin_top=0.05,
+    map_signif_level=True,
+    sig_only=False,
+)
+layers = deferred.resolve(df5, x_col="group", y_col="value")
+
+from plotnine import scale_y_continuous
+
+y_max = max(b.y_bracket for b in deferred._last_brackets) if deferred._last_brackets else df5["value"].max()
+
+p = (
+    ggplot(df5, aes("group", "value", fill="group"))
+    + geom_boxplot()
+    + theme_classic()
+    + scale_y_continuous(limits=(df5["value"].min() - 0.5, y_max + 0.5))
+)
+for layer in layers:
+    p = p + layer
+p
+```
+
+## 10. Custom map_signif_level with dict threshold mapping
+
+```{python}
+deferred = geom_signif(
+    comparisons=[("A", "B"), ("A", "C")],
+    test="mannwhitney",
+    map_signif_level={0.001: "***", 0.01: "**", 0.05: "*"},
+    sig_only=False,
+)
+layers = deferred.resolve(df, x_col="group", y_col="value")
+
+p = (
+    ggplot(df, aes("group", "value", fill="group"))
+    + geom_boxplot()
+    + theme_classic()
+)
+for layer in layers:
+    p = p + layer
+p
+```
