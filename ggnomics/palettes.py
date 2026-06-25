@@ -66,17 +66,50 @@ BIOC_COLORS: Dict[str, str] = {
     "19": "#BEBADA",
 }
 
+# ── IGV palettes ──────────────────────────────────────────────────────────────
+# Source: Integrative Genomics Viewer chromosome colors, via ggsci R package
+# Robinson et al., Nature Biotechnology 29, 24–26 (2011)
+
+IGV_DEFAULT = {
+    "chr1":  "#5050FF", "chr2":  "#CE3D32", "chr3":  "#749B58",
+    "chr4":  "#F0E685", "chr5":  "#466983", "chr6":  "#BA6338",
+    "chr7":  "#5DB1DD", "chr8":  "#802268", "chr9":  "#6BD76B",
+    "chr10": "#D595A7", "chr11": "#924822", "chr12": "#837B8D",
+    "chr13": "#C75127", "chr14": "#D58F5C", "chr15": "#7A65A5",
+    "chr16": "#E4AF69", "chr17": "#3B1B53", "chr18": "#CDDEB7",
+    "chr19": "#612A79", "chr20": "#AE1F63", "chr21": "#E7C76F",
+    "chr22": "#5A655E", "chrX":  "#CC9900", "chrY":  "#99CC00",
+    "chrUn": "#A9A9A9", "chr23": "#CC9900", "chr24": "#99CC00",
+    "chr25": "#33CC00", "chr26": "#00CC33", "chr27": "#00CC99",
+    "chr28": "#0099CC", "chr29": "#0A47FF", "chr30": "#4775FF",
+    "chr31": "#FFC20A", "chr32": "#FFD147", "chr33": "#990033",
+    "chr34": "#991A00", "chr35": "#996600", "chr36": "#809900",
+    "chr37": "#339900", "chr38": "#00991A", "chr39": "#009966",
+    "chr40": "#008099", "chr41": "#003399", "chr42": "#1A0099",
+    "chr43": "#660099", "chr44": "#990080", "chr45": "#D60047",
+    "chr46": "#FF1463", "chr47": "#00D68F", "chr48": "#14FFB1",
+}
+
+IGV_ALTERNATING = {
+    "even": "#5773CC",  # Indigo
+    "odd":  "#FFB900",  # Selective Yellow
+}
+
 _NAMED_PALETTES = {
     "tableau10": TABLEAU_10,
     "tableau": TABLEAU_10,
     "tableau20": TABLEAU_20,
     "bioc": BIOC_COLORS,
+    "igv_default": IGV_DEFAULT,
+    "igv_alternating": IGV_ALTERNATING,
 }
 
 # Ordered list of colors for numeric indexing
 _TABLEAU_10_LIST = list(TABLEAU_10.values())
 _TABLEAU_20_LIST = list(TABLEAU_20.values())
 _BIOC_LIST = list(BIOC_COLORS.values())
+_IGV_DEFAULT_LIST = list(IGV_DEFAULT.values())
+_IGV_ALTERNATING_LIST = list(IGV_ALTERNATING.values())
 
 
 def get_palette(n: int, name: str = "tableau") -> Dict[int, str]:
