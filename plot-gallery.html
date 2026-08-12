@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Plot gallery – ggnomics</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-7f2a73b4744d2b3fe1b4d8e76c164443.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">ggnomics</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./getting-started.html"> 
+<span class="menu-text">Getting started</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./single-cell-scranpy.html"> 
+<span class="menu-text">Single-cell (scranpy)</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./bulk-rnaseq.html"> 
+<span class="menu-text">Bulk RNA-seq</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./multimodal.html"> 
+<span class="menu-text">Multimodal</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./specialized-plots.html"> 
+<span class="menu-text">Specialized plots</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./plot-gallery.html" aria-current="page"> 
+<span class="menu-text">Plot gallery</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#reduced-dimensions" id="toc-reduced-dimensions" class="nav-link active" data-scroll-target="#reduced-dimensions">Reduced dimensions</a></li>
+  <li><a href="#expression-distributions" id="toc-expression-distributions" class="nav-link" data-scroll-target="#expression-distributions">Expression distributions</a></li>
+  <li><a href="#metadata-plots" id="toc-metadata-plots" class="nav-link" data-scroll-target="#metadata-plots">Metadata plots</a></li>
+  <li><a href="#scatter-plots" id="toc-scatter-plots" class="nav-link" data-scroll-target="#scatter-plots">Scatter plots</a></li>
+  <li><a href="#abundance-and-composition" id="toc-abundance-and-composition" class="nav-link" data-scroll-target="#abundance-and-composition">Abundance and composition</a></li>
+  <li><a href="#qc" id="toc-qc" class="nav-link" data-scroll-target="#qc">QC</a></li>
+  <li><a href="#dot-plots" id="toc-dot-plots" class="nav-link" data-scroll-target="#dot-plots">Dot plots</a></li>
+  <li><a href="#highest-expressed-features" id="toc-highest-expressed-features" class="nav-link" data-scroll-target="#highest-expressed-features">Highest-expressed features</a></li>
+  <li><a href="#heatmaps" id="toc-heatmaps" class="nav-link" data-scroll-target="#heatmaps">Heatmaps</a></li>
+  <li><a href="#differential-expression" id="toc-differential-expression" class="nav-link" data-scroll-target="#differential-expression">Differential expression</a></li>
+  <li><a href="#pseudobulk" id="toc-pseudobulk" class="nav-link" data-scroll-target="#pseudobulk">Pseudobulk</a></li>
+  <li><a href="#multimodal" id="toc-multimodal" class="nav-link" data-scroll-target="#multimodal">Multimodal</a></li>
+  <li><a href="#repertoire" id="toc-repertoire" class="nav-link" data-scroll-target="#repertoire">Repertoire</a></li>
+  <li><a href="#significance-brackets-ggnomics.signif" id="toc-significance-brackets-ggnomics.signif" class="nav-link" data-scroll-target="#significance-brackets-ggnomics.signif">Significance brackets (<code>ggnomics.signif</code>)</a></li>
+  <li><a href="#palettes-and-themes" id="toc-palettes-and-themes" class="nav-link" data-scroll-target="#palettes-and-themes">Palettes and themes</a></li>
+  <li><a href="#composed-panels" id="toc-composed-panels" class="nav-link" data-scroll-target="#composed-panels">Composed panels</a></li>
+  <li><a href="#additional-api-notes" id="toc-additional-api-notes" class="nav-link" data-scroll-target="#additional-api-notes">Additional API notes</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Plot gallery</h1>
+<p class="subtitle lead">Plot functions organized by analysis task</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Use this gallery to find a plot by analysis task. Each section gives the relevant functions, the input type used in the example, and a compact code example. Links point to the workflow pages when more biological or technical context is useful.</p>
+<div id="d887df67" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys, pathlib</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>sys.path.insert(<span class="dv">0</span>, <span class="bu">str</span>(pathlib.Path(<span class="st">"_includes"</span>).resolve()))</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> setup <span class="im">import</span> configure_warnings, ensure_matplotlib_initialized</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>ensure_matplotlib_initialized()</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>configure_warnings()</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> ggnomics <span class="im">as</span> gg</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> plotnine <span class="im">import</span> theme_bw, theme, labs, element_text</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="9025776f" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> data <span class="im">import</span> (</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    load_zeisel_subset, run_scranpy_pipeline_on_zeisel, load_baron,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    run_deseq2_on_emtab1625, load_pbmc_cite_seq, run_scranpy_pipeline_on_cite_seq_rna,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    load_tcr_repertoire,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>zeisel_subset <span class="op">=</span> load_zeisel_subset()</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>zeisel_final <span class="op">=</span> run_scranpy_pipeline_on_zeisel()</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>baron <span class="op">=</span> load_baron()</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>baron_cd <span class="op">=</span> baron.get_column_data().to_pandas()</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>bulk_fit <span class="op">=</span> run_deseq2_on_emtab1625()</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>mods, _note <span class="op">=</span> load_pbmc_cite_seq()</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>cite_final <span class="op">=</span> run_scranpy_pipeline_on_cite_seq_rna()</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>tcr <span class="op">=</span> load_tcr_repertoire()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Package 'multiassayexperiment' is not installed.</code></pre>
+</div>
+</div>
+<section id="reduced-dimensions" class="level2">
+<h2 class="anchored" data-anchor-id="reduced-dimensions">Reduced dimensions</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+<th>Type used</th>
+<th>Dataset</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>plot_umap</code></td>
+<td>UMAP scatter</td>
+<td><code>SingleCellExperiment</code></td>
+<td>Zeisel</td>
+</tr>
+<tr class="even">
+<td><code>plot_pca</code></td>
+<td>PCA scatter</td>
+<td><code>SingleCellExperiment</code></td>
+<td>Zeisel</td>
+</tr>
+<tr class="odd">
+<td><code>plot_reduced_dim</code> / <code>dim_plot</code></td>
+<td>Generic embedding plot (any key)</td>
+<td><code>SingleCellExperiment</code></td>
+<td>Zeisel</td>
+</tr>
+<tr class="even">
+<td><code>sc_pca.run_pca</code> / <code>sc_pca.plot_pca</code></td>
+<td>Single-cell PCA computed via scikit-learn (no scranpy)</td>
+<td><code>SingleCellExperiment</code></td>
+<td>Zeisel subset</td>
+</tr>
+<tr class="odd">
+<td><code>sc_umap.run_umap</code> / <code>sc_umap.plot_umap</code></td>
+<td>Single-cell UMAP via <code>umap-learn</code></td>
+<td><code>SingleCellExperiment</code></td>
+<td>Zeisel subset</td>
+</tr>
+<tr class="even">
+<td><code>bulk_pca.plot_pca</code></td>
+<td>Bulk/SE PCA</td>
+<td><code>SummarizedExperiment</code></td>
+<td>E-MTAB-1625 (VST)</td>
+</tr>
+</tbody>
+</table>
+<div id="0f4fbd67" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>gg.plot_umap(zeisel_final, color<span class="op">=</span><span class="st">"clusters"</span>) <span class="op">+</span> theme_bw() <span class="op">+</span> labs(title<span class="op">=</span><span class="st">"plot_umap — full workflow: single-cell-scranpy.qmd"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<div>
+<figure class="figure">
+<p><img src="plot-gallery_files/figure-html/cell-4-output-1.png" width="525" height="375" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><code>plot_reduced_dim</code> and <code>dim_plot</code> are aliases of <code>plot_embedding</code>. <code>plot_tsne</code> selects <code>X_tsne</code>; here those coordinates were calculated by <code>run_all_neighbor_steps_se</code> together with PCA and UMAP:</p>
+<div id="f4848ae5" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>p_reduced <span class="op">=</span> gg.plot_reduced_dim(zeisel_final, dimred<span class="op">=</span><span class="st">"X_pca"</span>, color<span class="op">=</span><span class="st">"clusters"</span>) <span class="op">+</span> theme_bw() <span class="op">+</span> labs(title<span class="op">=</span><span class="st">"plot_reduced_dim"</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>p_dim <span class="op">=</span> gg.dim_plot(zeisel_final, dimred<span class="op">=</span><span class="st">"X_umap"</span>, color<span class="op">=</span><span class="st">"clusters"</span>) <span class="op">+</span> theme_bw() <span class="op">+</span> labs(title<span class="op">=</span><span class="st">"dim_plot (alias)"</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>p_tsne <span class="op">=</span> gg.plot_tsne(zeisel_final, color<span class="op">=</span><span class="st">"clusters"</span>) <span class="op">+</span> theme_bw() <span class="op">+</span> labs(title<span class="op">=</span><span class="st">"plot_tsne"</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>p_reduced <span class="op">/</span> p_dim <span class="op">/</span> p_tsne</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<div>
+<figure class="figure">
+<p><img src="plot-gallery_files/figure-html/cell-5-output-1.png" width="525" height="375" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><code>ggnomics.sc_pca</code> and <code>ggnomics.sc_umap</code> provide PCA and UMAP through scikit-learn and umap-learn, without a scranpy dependency. The top-level <code>ggnomics.plot_pca</code> only displays coordinates already stored in the input object.</p>
+<div id="455038cb" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>sub2 <span class="op">=</span> load_zeisel_subset()</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>gg.sc_pca.run_pca(sub2, assay_name<span class="op">=</span><span class="st">"counts"</span>, dest_key<span class="op">=</span><span class="st">"PCA"</span>, n_components<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>gg.sc_umap.run_umap(sub2, assay_name<span class="op">=</span><span class="st">"counts"</span>, dest_key<span class="op">=</span><span class="st">"UMAP"</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>p_pca <span class="op">=</span> gg.sc_pca.plot_pca(sub2, color<span class="op">=</span><span class="st">"level1class"</span>) <span class="op">+</span> theme_bw() <span class="op">+</span> labs(title<span class="op">=</span><span class="st">"sc_pca (sklearn)"</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>p_umap <span class="op">=</span> gg.sc_umap.plot_umap(sub2, color<span class="op">=</span><span class="st">"level1class"</span>) <span class="op">+</span> theme_bw() <span class="op">+</span> labs(title<span class="op">=</span><span class="st">"sc_umap (umap-learn)"</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>p_pca <span class="op">|</span> p_umap</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<div>
+<figure class="figure">
+<p><img src="plot-gallery_files/figure-html/cell-6-output-1.png" width="525" height="375" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><code>bulk_pca.plot_pca</code> is demonstrated in full in <a href="./bulk-rnaseq.html#7-pca-on-the-vst-transformed-expression">Bulk RNA-seq §7</a>.</p>
+</section>
+<section id="expression-distributions" class="level2">
+<h2 class="anchored" data-anchor-id="expression-distributions">Expression distributions</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+<th>Type used</th>
+<th>Dataset</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>plot_expression</code></td>
+<td>Faceted violin per feature/group</td>
+<td><code>SingleCellExperiment</code></td>
+<td>Zeisel</td>
+</tr>
+<tr class="even">
+<td><code>plot_violin_stats</code></td>
+<td>Violin + automatic significance brackets</td>
+<td><code>pd.DataFrame</code></td>
+<td>Zeisel</td>
+</tr>
+<tr class="odd">
+<td><code>plot_box_stats</code></td>
+<td>Box + automatic significance brackets</td>
+<td><code>pd.DataFrame</code></td>
+<td>Zeisel</td>
+</tr>
+<tr class="even">
+<td><code>expression_violin</code> (legacy)</td>
+<td>Predecessor of <code>plot_expression</code></td>
+<td><code>pd.DataFrame</code></td>
+<td>Zeisel</td>
+</tr>
+<tr class="odd">
+<td><code>ridge_density</code> (legacy, no modern replacement)</td>
+<td>KDE ridge plot per group</td>
+<td><code>pd.DataFrame</code></td>
+<td>Zeisel</td>
+</tr>
+</tbody>
+</table>
+<p>See <a href="./specialized-plots.html#zeisel-statistics-significance-brackets-dot-plots-palettes">Specialized plots</a> for statistical annotations and significance brackets.</p>
+<div id="08abebc4" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>cd <span class="op">=</span> zeisel_final.column_data.to_pandas()</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>gg.expression_violin(cd.assign(Snap25<span class="op">=</span>np.asarray(zeisel_final.get_assay(<span class="st">"logcounts"</span>)[<span class="bu">list</span>(zeisel_final.get_row_names()).index(<span class="st">"Snap25"</span>), :]).ravel()), value<span class="op">=</span><span class="st">"Snap25"</span>, group<span class="op">=</span><span class="st">"level1class"</span>) <span class="op">+</span> theme_bw() <span class="op">+</span> theme(axis_text_x<span class="op">=</span>element_text(rotation<span class="op">=</span><span class="dv">45</span>, hjust<span class="op">=</span><span class="dv">1</span>)) <span class="op">+</span> labs(title<span class="op">=</span><span class="st">"expression_violin (legacy API)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<div>
+<figure class="figure">
+<p><img src="plot-gallery_files/figure-html/cell-7-output-1.png" width="525" height="375" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="988caed5" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>gg.ridge_density(cd, value<span class="op">=</span><span class="st">"detected"</span>, group<span class="op">=</span><span class="st">"level1class"</span>) <span class="op">+</span> theme_bw() <span class="op">+</span> theme(axis_text_x<span class="op">=</span>element_text(rotation<span class="op">=</span><span class="dv">45</span>, hjust<span class="op">=</span><span class="dv">1</span>)) <span class="op">+</span> labs(title<span class="op">=</span><span class="st">"ridge_density — genes detected per class"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<div>
+<figure class="figure">
+<p><img src="plot-gallery_files/figure-html/cell-8-output-1.png" width="525" height="375" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="metadata-plots" class="level2">
+<h2 class="anchored" data-anchor-id="metadata-plots">Metadata plots</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+<th>Type used</th>
+<th>Dataset</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>plot_coldata</code></td>
+<td>obs/colData scatter, violin, box, bar, strip</td>
+<td><code>SingleCellExperiment</code></td>
+<td>Zeisel</td>
+</tr>
+<tr class="even">
+<td><code>plot_rowdata</code></td>
+<td>var/rowData scatter</td>
+<td><code>SingleCellExperiment</code></td>
+<td>Zeisel (HVG stats)</td>
+</tr>
+<tr class="odd">
+<td><code>qc_scatter</code> (legacy)</td>
+<td>Simple QC scatter</td>
+<td><code>pd.DataFrame</code></td>
+<td>Zeisel</td>
+</tr>
+<tr class="even">
+<td><code>qc_histogram</code> (legacy)</td>
+<td>Histogram of one column</td>
+<td><code>pd.DataFrame</code></td>
+<td>Zeisel</td>
+</tr>
+</tbody>
+</table>
+<div id="ba165c55" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>gg.plot_rowdata(zeisel_final, x<span class="op">=</span><span class="st">"mean"</span>, y<span class="op">=</span><span class="st">"variance"</span>) <span class="op">+</span> theme_bw() <span class="op">+</span> labs(title<span class="op">=</span><span class="st">"plot_rowdata — HVG mean-variance trend (row_data)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<div>
+<figure class="figure">
+<p><img src="plot-gallery_files/figure-html/cell-9-output-1.png" width="525" height="375" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="53bfeae6" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>gg.qc_scatter(cd, x<span class="op">=</span><span class="st">"sum"</span>, y<span class="op">=</span><span class="st">"detected"</span>) <span class="op">+</span> theme_bw() <span class="op">+</span> labs(title<span class="op">=</span><span class="st">"qc_scatter (legacy)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<div>
+<figure class="figure">
+<p><img src="plot-gallery_files/figure-html/cell-10-output-1.png" width="525" height="375" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="988cd056" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>gg.qc_histogram(cd, value<span class="op">=</span><span class="st">"subset_proportion.mito"</span>, bins<span class="op">=</span><span class="dv">40</span>) <span class="op">+</span> theme_bw() <span class="op">+</span> labs(title<span class="op">=</span><span class="st">"qc_histogram (legacy) — mitochondrial proportion"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<div>
+<figure class="figure">
+<p><img src="plot-gallery_files/figure-html/cell-11-output-1.png" width="525" height="375" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="scatter-plots" class="level2">
+<h2 class="anchored" data-anchor-id="scatter-plots">Scatter plots</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+<th>Type used</th>
+<th>Dataset</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>plot_scatter</code></td>
+<td>General x/y scatter</td>
+<td><code>SingleCellExperiment</code></td>
+<td>Zeisel</td>
+</tr>
+<tr class="even">
+<td><code>plot_scatter_marginal</code></td>
+<td>Scatter + marginal densities (<code>Compose</code>)</td>
+<td><code>pd.DataFrame</code></td>
+<td>Zeisel</td>
+</tr>
+<tr class="odd">
+<td><code>plot_pairs</code></td>
+<td>Scatterplot matrix of embedding components</td>
+<td><code>SingleCellExperiment</code></td>
+<td>Zeisel subset</td>
+</tr>
+<tr class="even">
+<td><code>plot_embedding_panel</code></td>
+<td>Grid of embedding panels, one per feature (<code>Compose</code>)</td>
+<td><code>SingleCellExperiment</code></td>
+<td>Zeisel</td>
+</tr>
+</tbody>
+</table>
+<div id="9cb94079" class="cell" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>gg.plot_scatter(cd, x<span class="op">=</span><span class="st">"sum"</span>, y<span class="op">=</span><span class="st">"detected"</span>, color<span class="op">=</span><span class="st">"level1class"</span>) <span class="op">+</span> theme_bw() <span class="op">+</span> labs(title<span class="op">=</span><span class="st">"plot_scatter"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<div>
+<figure class="figure">
+<p><img src="plot-gallery_files/figure-html/cell-12-output-1.png" width="525" height="375" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="9b54253b" class="cell" data-execution_count="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>gg.plot_scatter_marginal(cd, x<span class="op">=</span><span class="st">"sum"</span>, y<span class="op">=</span><span class="st">"detected"</span>, color<span class="op">=</span><span class="st">"level1class"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<div>
+<figure class="figure">
+<p><img src="plot-gallery_files/figure-html/cell-13-output-1.png" width="525" height="375" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="64062a79" class="cell" data-execution_count="13">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>gg.plot_pairs(sub2, dimred<span class="op">=</span><span class="st">"X_pca"</span>, n_components<span class="op">=</span><span class="dv">4</span>, color_by<span class="op">=</span><span class="st">"level1class"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<div>
+<figure class="figure">
+<p><img src="plot-gallery_files/figure-html/cell-14-output-1.png" width="525" height="375" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="2cd685cd" class="cell" data-execution_count="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>gg.plot_embedding_panel(zeisel_final, features<span class="op">=</span>[<span class="st">"Gfap"</span>, <span class="st">"Mog"</span>, <span class="st">"Gad2"</span>, <span class="st">"Aif1"</span>], dimred<span class="op">=</span><span class="st">"X_umap"</span>, ncol<span class="op">=</span><span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<div>
+<figure class="figure">
+<p><img src="plot-gallery_files/figure-html/cell-15-output-1.png" width="525" height="375" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="abundance-and-composition" class="level2">
+<h2 class="anchored" data-anchor-id="abundance-and-composition">Abundance and composition</h2>
+<p>Counts, fractions, and donor-aware grouping are shown in <a href="./specialized-plots.html#baron-pancreas-abundance-composition-and-pseudobulk">Specialized plots</a>.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+<th>Type used</th>
+<th>Dataset</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>plot_abundance</code></td>
+<td>Stacked composition bar</td>
+<td><code>pd.DataFrame</code></td>
+<td>Baron</td>
+</tr>
+<tr class="even">
+<td><code>cluster_composition_barplot</code> (legacy)</td>
+<td>Predecessor of <code>plot_abundance</code></td>
+<td><code>pd.DataFrame</code></td>
+<td>Baron</td>
+</tr>
+</tbody>
+</table>
+<div id="51c6dada" class="cell" data-execution_count="15">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>gg.cluster_composition_barplot(baron_cd, cluster_col<span class="op">=</span><span class="st">"label"</span>, group_col<span class="op">=</span><span class="st">"donor"</span>) <span class="op">+</span> theme_bw() <span class="op">+</span> theme(axis_text_x<span class="op">=</span>element_text(rotation<span class="op">=</span><span class="dv">45</span>, hjust<span class="op">=</span><span class="dv">1</span>)) <span class="op">+</span> labs(title<span class="op">=</span><span class="st">"cluster_composition_barplot (legacy)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="15">
+<div>
+<figure class="figure">
+<p><img src="plot-gallery_files/figure-html/cell-16-output-1.png" width="525" height="375" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="qc" class="level2">
+<h2 class="anchored" data-anchor-id="qc">QC</h2>
+<p><code>plot_pseudobulk_qc</code> is demonstrated with the four Baron donors in <a href="./specialized-plots.html#donor-aware-grouping-and-pseudobulk-qc">Specialized plots</a>. RNA and ADT quality-control plots are covered separately in <a href="./multimodal.html#5-rna-qc-and-adt-qc">Multimodal</a>.</p>
+</section>
+<section id="dot-plots" class="level2">
+<h2 class="anchored" data-anchor-id="dot-plots">Dot plots</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+<th>Type used</th>
+<th>Dataset</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>plot_dot</code></td>
+<td>Mean expression x fraction expressing</td>
+<td><code>SingleCellExperiment</code></td>
+<td>Zeisel</td>
+</tr>
+<tr class="even">
+<td><code>marker_dotplot</code> (legacy)</td>
+<td>Tidy-table dot plot</td>
+<td><code>pd.DataFrame</code></td>
+<td>Zeisel</td>
+</tr>
+<tr class="odd">
+<td><code>marker_dotplot_from_matrix</code> (legacy)</td>
+<td>Matrix-in dot plot</td>
+<td><code>np.ndarray</code></td>
+<td>Zeisel</td>
+</tr>
+</tbody>
+</table>
+<div id="04b2f81f" class="cell" data-execution_count="16">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>markers <span class="op">=</span> [<span class="st">"Gfap"</span>, <span class="st">"Mog"</span>, <span class="st">"Gad2"</span>, <span class="st">"Snap25"</span>]</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>gfap_idx <span class="op">=</span> [<span class="bu">list</span>(zeisel_final.get_row_names()).index(g) <span class="cf">for</span> g <span class="kw">in</span> markers]</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>expr_mat <span class="op">=</span> np.asarray(zeisel_final.get_assay(<span class="st">"logcounts"</span>)[gfap_idx, :])</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>expr_df <span class="op">=</span> pd.DataFrame(expr_mat.T, columns<span class="op">=</span>markers)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> gg.marker_dotplot_from_matrix(expr_df, groups<span class="op">=</span>cd[<span class="st">"level1class"</span>].to_numpy(), genes<span class="op">=</span>markers, expr_threshold<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>p <span class="op">+</span> theme_bw() <span class="op">+</span> theme(axis_text_x<span class="op">=</span>element_text(rotation<span class="op">=</span><span class="dv">45</span>, hjust<span class="op">=</span><span class="dv">1</span>)) <span class="op">+</span> labs(title<span class="op">=</span><span class="st">"marker_dotplot_from_matrix (legacy)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<div>
+<figure class="figure">
+<p><img src="plot-gallery_files/figure-html/cell-17-output-1.png" width="525" height="375" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="highest-expressed-features" class="level2">
+<h2 class="anchored" data-anchor-id="highest-expressed-features">Highest-expressed features</h2>
+<div id="1714b0cd" class="cell" data-execution_count="17">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>gg.plot_highest_exprs(zeisel_final, n<span class="op">=</span><span class="dv">15</span>, layer<span class="op">=</span><span class="st">"counts"</span>) <span class="op">+</span> theme_bw() <span class="op">+</span> labs(title<span class="op">=</span><span class="st">"plot_highest_exprs — Zeisel"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<div>
+<figure class="figure">
+<p><img src="plot-gallery_files/figure-html/cell-18-output-1.png" width="525" height="375" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="heatmaps" class="level2">
+<h2 class="anchored" data-anchor-id="heatmaps">Heatmaps</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+<th>Type used</th>
+<th>Dataset</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>plot_heatmap</code></td>
+<td>Expression heatmap, optional clustering</td>
+<td><code>SingleCellExperiment</code>/<code>pd.DataFrame</code></td>
+<td>Zeisel, Baron, E-MTAB-1625</td>
+</tr>
+<tr class="even">
+<td><code>heatmap_from_matrix</code> (legacy)</td>
+<td>Matrix-in heatmap</td>
+<td><code>np.ndarray</code></td>
+<td>Zeisel</td>
+</tr>
+<tr class="odd">
+<td><code>heatmap_long</code> (legacy)</td>
+<td>Tidy long-format heatmap</td>
+<td><code>pd.DataFrame</code></td>
+<td>Zeisel</td>
+</tr>
+<tr class="even">
+<td>Marsilea (<code>ma.Heatmap</code>)</td>
+<td>Composable clustered heatmap (interop, not wrapped by ggnomics)</td>
+<td><code>np.ndarray</code></td>
+<td>E-MTAB-1625</td>
+</tr>
+</tbody>
+</table>
+<p>For grouped, bulk, and Marsilea heatmaps, see: <a href="./single-cell-scranpy.html#11-heatmap">Single-cell analysis §11</a>, <a href="./bulk-rnaseq.html#10-heatmap-of-top-differentially-expressed-genes">Bulk RNA-seq §10</a>, <a href="./specialized-plots.html#marsilea-backed-heatmap">Specialized plots</a>.</p>
+<div id="83456635" class="cell" data-execution_count="18">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>gg.heatmap_from_matrix(expr_mat, row_names<span class="op">=</span>markers, col_names<span class="op">=</span><span class="va">None</span>, zscore_rows<span class="op">=</span><span class="va">True</span>) <span class="op">+</span> theme(axis_text_x<span class="op">=</span>element_text(size<span class="op">=</span><span class="dv">3</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="18">
+<div>
+<figure class="figure">
+<p><img src="plot-gallery_files/figure-html/cell-19-output-1.png" width="525" height="375" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="differential-expression" class="level2">
+<h2 class="anchored" data-anchor-id="differential-expression">Differential expression</h2>
+<p>The complete analysis is shown in <a href="./bulk-rnaseq.html">Bulk RNA-seq</a>, with additional visualizations in <a href="./specialized-plots.html#e-mtab-1625-differential-expression-results">Specialized plots</a>.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+<th>Type used</th>
+<th>Dataset</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>plot_volcano</code></td>
+<td>Volcano plot</td>
+<td><code>pd.DataFrame</code> (PyDESeq2 results)</td>
+<td>E-MTAB-1625</td>
+</tr>
+<tr class="even">
+<td><code>plot_ma</code></td>
+<td>MA plot</td>
+<td><code>pd.DataFrame</code></td>
+<td>E-MTAB-1625</td>
+</tr>
+<tr class="odd">
+<td><code>plot_coef_lollipop</code></td>
+<td>Top-n coefficients, lollipop</td>
+<td><code>pd.Series</code>/<code>pd.DataFrame</code></td>
+<td>E-MTAB-1625</td>
+</tr>
+<tr class="even">
+<td><code>plot_coef_expression</code></td>
+<td>Expression of top-coefficient features</td>
+<td><code>pd.DataFrame</code></td>
+<td>E-MTAB-1625</td>
+</tr>
+<tr class="odd">
+<td><code>volcano_plot</code> (legacy)</td>
+<td>Predecessor of <code>plot_volcano</code></td>
+<td><code>pd.DataFrame</code></td>
+<td>E-MTAB-1625</td>
+</tr>
+</tbody>
+</table>
+<div id="357c80bb" class="cell" data-execution_count="19">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> bulk_fit[<span class="st">"results"</span>]</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>gg.volcano_plot(results.rename(columns<span class="op">=</span>{<span class="st">"log2FoldChange"</span>: <span class="st">"log2fc"</span>, <span class="st">"padj"</span>: <span class="st">"padj"</span>}), log2fc<span class="op">=</span><span class="st">"log2fc"</span>, padj<span class="op">=</span><span class="st">"padj"</span>) <span class="op">+</span> theme_bw() <span class="op">+</span> labs(title<span class="op">=</span><span class="st">"volcano_plot (legacy)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<div>
+<figure class="figure">
+<p><img src="plot-gallery_files/figure-html/cell-20-output-1.png" width="525" height="375" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="043cd108" class="cell" data-execution_count="20">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>coefs <span class="op">=</span> results[[<span class="st">"log2FoldChange"</span>]].rename(columns<span class="op">=</span>{<span class="st">"log2FoldChange"</span>: <span class="st">"coefficient"</span>}).dropna()</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> bulk_fit[<span class="st">"vst"</span>].copy()</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>data[<span class="st">"growth_condition"</span>] <span class="op">=</span> bulk_fit[<span class="st">"metadata"</span>][<span class="st">"growth_condition"</span>].to_numpy()</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>gg.plot_coef_expression(data, coefs, group_by<span class="op">=</span><span class="st">"growth_condition"</span>, top_n<span class="op">=</span><span class="dv">10</span>, plot_type<span class="op">=</span><span class="st">"dot"</span>) <span class="op">+</span> theme_bw() <span class="op">+</span> theme(axis_text_x<span class="op">=</span>element_text(rotation<span class="op">=</span><span class="dv">45</span>, hjust<span class="op">=</span><span class="dv">1</span>)) <span class="op">+</span> labs(title<span class="op">=</span><span class="st">"plot_coef_expression"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="20">
+<div>
+<figure class="figure">
+<p><img src="plot-gallery_files/figure-html/cell-21-output-1.png" width="525" height="375" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="pseudobulk" class="level2">
+<h2 class="anchored" data-anchor-id="pseudobulk">Pseudobulk</h2>
+<p><code>plot_pseudobulk_qc</code> is fully covered on Baron in <a href="./specialized-plots.html#donor-aware-grouping-and-pseudobulk-qc">Specialized plots</a>. <code>plot_pseudobulk_de</code> accepts a <code>dict[str, DataFrame]</code> of differential- expression results. Here the keys identify the three E-MTAB-1625 time points:</p>
+<div id="1bbbdfa9" class="cell" data-execution_count="21">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>per_timepoint <span class="op">=</span> {tp: run_deseq2_on_emtab1625(tp)[<span class="st">"results"</span>] <span class="cf">for</span> tp <span class="kw">in</span> [<span class="st">"1 hour"</span>, <span class="st">"5 hour"</span>, <span class="st">"24 hour"</span>]}</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>results_by_tp <span class="op">=</span> {tp.replace(<span class="st">" "</span>, <span class="st">"_"</span>): df <span class="cf">for</span> tp, df <span class="kw">in</span> per_timepoint.items()}</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>{k: <span class="bu">int</span>((df[<span class="st">"padj"</span>] <span class="op">&lt;</span> <span class="fl">0.05</span>).<span class="bu">sum</span>()) <span class="cf">for</span> k, df <span class="kw">in</span> results_by_tp.items()}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="21">
+<pre><code>{'1_hour': 14, '5_hour': 8, '24_hour': 832}</code></pre>
+</div>
+</div>
+<div id="94754417" class="cell" data-execution_count="22">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>gg.plot_pseudobulk_de(results_by_tp, mode<span class="op">=</span><span class="st">"volcano"</span>, ncol<span class="op">=</span><span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="22">
+<div>
+<figure class="figure">
+<p><img src="plot-gallery_files/figure-html/cell-23-output-1.png" width="525" height="375" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="f952d106" class="cell" data-execution_count="23">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>gg.plot_pseudobulk_de(results_by_tp, mode<span class="op">=</span><span class="st">"summary_bar"</span>) <span class="op">+</span> theme_bw()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="23">
+<div>
+<figure class="figure">
+<p><img src="plot-gallery_files/figure-html/cell-24-output-1.png" width="525" height="375" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><code>mode="upset"</code> (requires the <code>upsetplot</code> extra) returns a matplotlib <code>Figure</code> directly, showing which significant genes are shared across timepoints:</p>
+<div id="fd5c4168" class="cell" data-execution_count="24">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>gg.plot_pseudobulk_de(results_by_tp, mode<span class="op">=</span><span class="st">"upset"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="24">
+<div>
+<figure class="figure">
+<p><img src="plot-gallery_files/figure-html/cell-25-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="multimodal" class="level2">
+<h2 class="anchored" data-anchor-id="multimodal">Multimodal</h2>
+<p>See <a href="./multimodal.html">Multimodal</a> for the RNA/ADT workflow and the input requirements of <code>plot_adt_qc</code>.</p>
+<div id="69ef7cba" class="cell" data-execution_count="25">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> mudata <span class="im">as</span> mu</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>mu.set_options(pull_on_update<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>mdata <span class="op">=</span> mu.MuData({<span class="st">"rna"</span>: mods[<span class="st">"rna"</span>], <span class="st">"prot"</span>: mods[<span class="st">"adt"</span>]})</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>gg.plot_bimodal_scatter(mdata, x_feature<span class="op">=</span><span class="st">"CD3E"</span>, y_feature<span class="op">=</span><span class="st">"CD3"</span>, x_mod<span class="op">=</span><span class="st">"rna"</span>, y_mod<span class="op">=</span><span class="st">"prot"</span>) <span class="op">+</span> theme_bw() <span class="op">+</span> labs(title<span class="op">=</span><span class="st">"plot_bimodal_scatter — reused from multimodal.qmd"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="25">
+<div>
+<figure class="figure">
+<p><img src="plot-gallery_files/figure-html/cell-26-output-1.png" width="525" height="375" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="repertoire" class="level2">
+<h2 class="anchored" data-anchor-id="repertoire">Repertoire</h2>
+<p>The repertoire workflow is described in <a href="./specialized-plots.html#eccite-seq-tcr-repertoire-eh4616-ctcl-eh4621-control">Specialized plots</a>.</p>
+<div id="0fba0c27" class="cell" data-execution_count="26">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>trb <span class="op">=</span> tcr[(tcr[<span class="st">"chain"</span>] <span class="op">==</span> <span class="st">"TRB"</span>) <span class="op">&amp;</span> (tcr[<span class="st">"raw_clonotype_id"</span>] <span class="op">!=</span> <span class="st">"None"</span>)].dropna(subset<span class="op">=</span>[<span class="st">"v_gene"</span>, <span class="st">"j_gene"</span>])</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>cell_level <span class="op">=</span> trb.drop_duplicates(subset<span class="op">=</span>[<span class="st">"barcode"</span>, <span class="st">"condition"</span>])</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>gg.plot_clonotype_abundance(cell_level, clonotype_col<span class="op">=</span><span class="st">"clonotype_id"</span>, sample_col<span class="op">=</span><span class="st">"condition"</span>, top_n<span class="op">=</span><span class="dv">10</span>) <span class="op">+</span> theme_bw() <span class="op">+</span> theme(axis_text_x<span class="op">=</span>element_text(rotation<span class="op">=</span><span class="dv">45</span>, hjust<span class="op">=</span><span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="26">
+<div>
+<figure class="figure">
+<p><img src="plot-gallery_files/figure-html/cell-27-output-1.png" width="525" height="375" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="significance-brackets-ggnomics.signif" class="level2">
+<h2 class="anchored" data-anchor-id="significance-brackets-ggnomics.signif">Significance brackets (<code>ggnomics.signif</code>)</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>geom_signif</code></td>
+<td>ggsignif-style bracket layer/geom</td>
+</tr>
+<tr class="even">
+<td><code>run_comparisons</code></td>
+<td>Pairwise statistical tests</td>
+</tr>
+<tr class="odd">
+<td><code>map_pvalue_to_stars</code></td>
+<td>p-value -&gt; star label</td>
+</tr>
+</tbody>
+</table>
+<div id="c15bd9ff" class="cell" data-execution_count="27">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ggnomics <span class="im">import</span> run_comparisons, map_pvalue_to_stars</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>two_classes <span class="op">=</span> cd[cd[<span class="st">"level1class"</span>].isin([<span class="st">"astrocytes_ependymal"</span>, <span class="st">"oligodendrocytes"</span>])].copy()</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>gfap_idx <span class="op">=</span> <span class="bu">list</span>(zeisel_final.get_row_names()).index(<span class="st">"Gfap"</span>)</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>two_classes[<span class="st">"Gfap"</span>] <span class="op">=</span> np.asarray(zeisel_final.get_assay(<span class="st">"logcounts"</span>)[gfap_idx, :])[cd[<span class="st">"level1class"</span>].isin([<span class="st">"astrocytes_ependymal"</span>, <span class="st">"oligodendrocytes"</span>]).to_numpy()]</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>stats_table <span class="op">=</span> run_comparisons(two_classes[<span class="st">"Gfap"</span>], two_classes[<span class="st">"level1class"</span>], comparisons<span class="op">=</span>[(<span class="st">"astrocytes_ependymal"</span>, <span class="st">"oligodendrocytes"</span>)])</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>stats_table</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="27">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">group1</th>
+<th data-quarto-table-cell-role="th">group2</th>
+<th data-quarto-table-cell-role="th">statistic</th>
+<th data-quarto-table-cell-role="th">pvalue</th>
+<th data-quarto-table-cell-role="th">padj</th>
+<th data-quarto-table-cell-role="th">n1</th>
+<th data-quarto-table-cell-role="th">n2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>astrocytes_ependymal</td>
+<td>oligodendrocytes</td>
+<td>102597.0</td>
+<td>2.935794e-56</td>
+<td>2.935794e-56</td>
+<td>187</td>
+<td>796</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="37affd8c" class="cell" data-execution_count="28">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>[map_pvalue_to_stars(p) <span class="cf">for</span> p <span class="kw">in</span> [<span class="fl">0.5</span>, <span class="fl">0.03</span>, <span class="fl">0.005</span>, <span class="fl">0.0005</span>, <span class="fl">0.00001</span>]]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="28">
+<pre><code>['ns', '*', '**', '***', '****']</code></pre>
+</div>
+</div>
+<p>Brackets remain compatible with facets and themes, as shown in <a href="./specialized-plots.html#grouped-statistics-with-automatic-significance-brackets">Specialized plots</a>.</p>
+</section>
+<section id="palettes-and-themes" class="level2">
+<h2 class="anchored" data-anchor-id="palettes-and-themes">Palettes and themes</h2>
+<p>Palette examples and IGV attribution are provided in <a href="./specialized-plots.html#custom-palettes-and-the-igv-palette">Specialized plots</a>.</p>
+<div id="ba1164f1" class="cell" data-execution_count="29">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>tableau <span class="op">=</span> gg.get_palette(<span class="dv">8</span>, name<span class="op">=</span><span class="st">"tableau"</span>)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>bioc <span class="op">=</span> gg.get_palette(<span class="dv">8</span>, name<span class="op">=</span><span class="st">"bioc"</span>)</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>preview <span class="op">=</span> pd.DataFrame({<span class="st">"i"</span>: [<span class="ss">f"c</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">8</span>)] <span class="op">*</span> <span class="dv">2</span>, <span class="st">"pal"</span>: [<span class="st">"tableau"</span>] <span class="op">*</span> <span class="dv">8</span> <span class="op">+</span> [<span class="st">"bioc"</span>] <span class="op">*</span> <span class="dv">8</span>, <span class="st">"v"</span>: <span class="dv">1</span>})</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>preview[<span class="st">"color"</span>] <span class="op">=</span> [tableau[i] <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">8</span>)] <span class="op">+</span> [bioc[i] <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">8</span>)]</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>gg.plot_coldata(preview, x<span class="op">=</span><span class="st">"i"</span>, y<span class="op">=</span><span class="st">"pal"</span>, color_by<span class="op">=</span><span class="st">"i"</span>, shape<span class="op">=</span><span class="st">"point"</span>, size<span class="op">=</span><span class="dv">8</span>, palette<span class="op">=</span>{<span class="ss">f"c</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span>: tableau[i] <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">8</span>)}) <span class="op">+</span> theme_bw() <span class="op">+</span> theme(legend_position<span class="op">=</span><span class="st">"none"</span>) <span class="op">+</span> labs(title<span class="op">=</span><span class="st">"Tableau-10 palette preview"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="29">
+<div>
+<figure class="figure">
+<p><img src="plot-gallery_files/figure-html/cell-30-output-1.png" width="525" height="375" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="fddb4ec0" class="cell" data-execution_count="30">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>categories <span class="op">=</span> pd.Series([<span class="st">"astrocytes_ependymal"</span>, <span class="st">"oligodendrocytes"</span>, <span class="st">"microglia"</span>])</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>gg.resolve_palette(categories, palette<span class="op">=</span>{<span class="st">"microglia"</span>: <span class="st">"#000000"</span>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="30">
+<pre><code>{'microglia': '#000000',
+ 'astrocytes_ependymal': '#4E79A7',
+ 'oligodendrocytes': '#F28E2B'}</code></pre>
+</div>
+</div>
+</section>
+<section id="composed-panels" class="level2">
+<h2 class="anchored" data-anchor-id="composed-panels">Composed panels</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>hstack</code></td>
+<td>Side-by-side composition</td>
+</tr>
+<tr class="even">
+<td><code>vstack</code></td>
+<td>Vertical composition</td>
+</tr>
+<tr class="odd">
+<td><code>grid</code></td>
+<td>Grid layout</td>
+</tr>
+<tr class="even">
+<td><code>annotate_composition</code></td>
+<td>Title/subtitle/caption on a composition</td>
+</tr>
+<tr class="odd">
+<td><code>save_composition</code></td>
+<td>Save any composition to a file</td>
+</tr>
+</tbody>
+</table>
+<div id="bfee8f1f" class="cell" data-execution_count="31">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ggnomics <span class="im">import</span> hstack, vstack, grid, annotate_composition, save_composition</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>umap_p <span class="op">=</span> gg.plot_umap(zeisel_final, color<span class="op">=</span><span class="st">"clusters"</span>) <span class="op">+</span> theme_bw()</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>violin_p <span class="op">=</span> gg.plot_expression(zeisel_final, features<span class="op">=</span>[<span class="st">"Gfap"</span>], group_by<span class="op">=</span><span class="st">"level1class"</span>, layer<span class="op">=</span><span class="st">"logcounts"</span>) <span class="op">+</span> theme_bw() <span class="op">+</span> theme(axis_text_x<span class="op">=</span>element_text(rotation<span class="op">=</span><span class="dv">45</span>, hjust<span class="op">=</span><span class="dv">1</span>))</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>hstack(umap_p, violin_p)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="31">
+<div>
+<figure class="figure">
+<p><img src="plot-gallery_files/figure-html/cell-32-output-1.png" width="525" height="375" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="79d04d55" class="cell" data-execution_count="32">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>composed <span class="op">=</span> grid([umap_p, violin_p, gg.plot_dot(zeisel_final, features<span class="op">=</span>markers, group_by<span class="op">=</span><span class="st">"level1class"</span>, layer<span class="op">=</span><span class="st">"logcounts"</span>)], ncol<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>annotated <span class="op">=</span> annotate_composition(composed, title<span class="op">=</span><span class="st">"Figure 1"</span>, caption<span class="op">=</span><span class="st">"Zeisel mouse brain, ggnomics + scranpy"</span>)</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>annotated</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="32">
+<div>
+<figure class="figure">
+<p><img src="plot-gallery_files/figure-html/cell-33-output-1.png" width="525" height="375" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="f2ff7c22" class="cell" data-execution_count="33">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>save_composition(annotated, <span class="bu">str</span>(pathlib.Path(<span class="st">"_freeze_assets"</span>) <span class="op">/</span> <span class="st">"composed_figure_1.png"</span>), dpi<span class="op">=</span><span class="dv">100</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="additional-api-notes" class="level2">
+<h2 class="anchored" data-anchor-id="additional-api-notes">Additional API notes</h2>
+<ul>
+<li><code>plot_adt_qc</code> requires annotated isotype controls. The CITE-seq panel used here does not contain them; <a href="./multimodal.html#5-rna-qc-and-adt-qc">Multimodal §5</a> shows the validation behaviour and a control-free ADT QC plot.</li>
+<li>The generic <code>ggnomics.pca</code> layer (<code>run_pca_sklearn</code>, <code>run_pca_svd</code>, and <code>PcaResult</code>) is used internally by <code>bulk_pca.run_pca</code> and <code>sc_pca.run_pca</code>. It is not re-exported from the top-level namespace.</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
