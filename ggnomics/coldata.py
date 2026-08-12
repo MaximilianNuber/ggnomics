@@ -1,31 +1,54 @@
-"""plot_coldata and plot_rowdata — obs/var metadata scatter / violin / box / bar."""
+"""Plots for observation- and feature-level metadata."""
 
 from __future__ import annotations
 
+from functools import singledispatch
 from typing import Dict, Optional
 
 import pandas as pd
 from plotnine import (
-    ggplot,
     aes,
+    element_text,
+    facet_wrap,
+    geom_bar,
+    geom_boxplot,
+    geom_jitter,
     geom_point,
     geom_violin,
-    geom_boxplot,
-    geom_bar,
-    theme_classic,
-    theme,
-    element_text,
+    ggplot,
     ggtitle,
-    labs,
-    facet_wrap,
+    theme,
+    theme_classic,
 )
 
-from ._accessor import DataAccessor
 from ._utils import adaptive_size, color_scale
 
 
+def _unsupported_type(function_name: str, data: object) -> TypeError:
+    return TypeError(
+        f"{function_name} does not support {type(data).__module__}."
+        f"{type(data).__qualname__}. Pass a pandas.DataFrame or install the "
+        "optional dependency for a supported genomics container."
+    )
+
+
+def _require_columns(
+    data: pd.DataFrame,
+    columns: tuple[str, ...],
+    *,
+    location: str,
+) -> None:
+    missing = [column for column in columns if column not in data.columns]
+    if missing:
+        raise KeyError(
+            f"Column(s) {missing} not found in {location}. "
+            f"Available: {list(data.columns)}"
+        )
+
+
+@singledispatch
 def plot_coldata(
-    data,
+    data: pd.DataFrame,
     x: str,
     y: str,
     color_by: Optional[str] = None,
@@ -35,41 +58,50 @@ def plot_coldata(
     facet_by: Optional[str] = None,
     title: Optional[str] = None,
 ) -> ggplot:
-    """Plot cell-level (obs / colData) metadata.
+    """Plot columns from a cell- or sample-metadata DataFrame.
 
-    Chooses the geometry based on column dtypes and the ``shape`` argument:
-
-    - Both ``x`` and ``y`` numeric → scatter plot.
-    - ``x`` categorical + ``shape="violin"`` → violin plot of ``y`` per ``x``.
-    - ``x`` categorical + ``shape="box"``    → box plot of ``y`` per ``x``.
-    - ``x`` categorical + ``shape="bar"``    → bar chart of mean ``y`` per ``x``.
-    - ``x`` categorical + ``shape="point"``  → jittered strip plot.
+    Both numeric columns produce a scatter plot. With a categorical ``x``,
+    ``shape`` selects a point, violin, box, or bar geometry. Container-specific
+    implementations convert their column metadata to a DataFrame and then use
+    this implementation.
 
     Args:
-        data: ``pd.DataFrame``, ``anndata.AnnData``, or
-            ``SingleCellExperiment``.
-        x: Obs column for the x-axis.
-        y: Obs column for the y-axis.
-        color_by: Obs column to map to color.
-        size: Point size (scatter / strip plots).  ``None`` → adaptive.
-        shape: Geometry type — ``"point"``, ``"violin"``, ``"box"``,
-            or ``"bar"``.
-        palette: ``{category: hex}`` color mapping.
-        facet_by: Obs column used as a faceting variable.
-        title: Plot title.
+        data: DataFrame whose rows are observations and columns are metadata.
+        x: Column mapped to the x-axis.
+        y: Column mapped to the y-axis.
+        color_by: Optional column mapped to color or fill.
+        size: Point size. ``None`` chooses a size from the number of rows.
+        shape: One of ``"point"``, ``"violin"``, ``"box"``, or ``"bar"``.
+        palette: Optional ``{category: color}`` mapping.
+        facet_by: Optional column used to facet the plot.
+        title: Optional plot title.
 
     Returns:
         A ``plotnine.ggplot`` object.
+
+    Raises:
+        TypeError: If no implementation is registered for ``type(data)``.
+        KeyError: If a requested column is absent.
     """
-    acc = DataAccessor(data)
-    obs_df = acc.obs().reset_index(drop=True)
+    raise _unsupported_type("plot_coldata", data)
 
-    for col in (x, y):
-        if col not in obs_df.columns:
-            raise KeyError(f"Column '{col}' not found in obs. Available: {list(obs_df.columns)}")
 
-    if color_by is not None and color_by not in obs_df.columns:
-        raise KeyError(f"color_by '{color_by}' not found in obs.")
+@plot_coldata.register(pd.DataFrame)
+def _plot_coldata_dataframe(
+    data: pd.DataFrame,
+    x: str,
+    y: str,
+    color_by: Optional[str] = None,
+    size: Optional[float] = None,
+    shape: str = "point",
+    palette: Optional[Dict] = None,
+    facet_by: Optional[str] = None,
+    title: Optional[str] = None,
+) -> ggplot:
+    obs_df = data.copy().reset_index(drop=True)
+    requested = (x, y) + ((color_by,) if color_by is not None else ())
+    requested += ((facet_by,) if facet_by is not None else ())
+    _require_columns(obs_df, requested, location="the metadata DataFrame")
 
     x_numeric = pd.api.types.is_numeric_dtype(obs_df[x])
     y_numeric = pd.api.types.is_numeric_dtype(obs_df[y])
@@ -79,144 +111,141 @@ def plot_coldata(
         aes_kwargs["color"] = color_by
 
     if x_numeric and y_numeric:
-        # Scatter plot
         if size is None:
             size = adaptive_size(len(obs_df))
-        p = (
+        plot = (
             ggplot(obs_df)
             + aes(**aes_kwargs)
             + geom_point(size=size, alpha=0.7)
             + theme_classic()
         )
         if color_by is not None:
-            p = p + color_scale(obs_df[color_by], palette=palette, type_="color")
+            plot += color_scale(obs_df[color_by], palette=palette, type_="color")
     else:
-        # Categorical x
-        shape_lc = shape.lower()
-        fill_col = color_by if color_by is not None else x
-        aes_fill = {**{"x": x, "y": y}, "fill": fill_col}
+        shape = shape.lower()
+        if shape not in {"point", "violin", "box", "bar"}:
+            raise ValueError(
+                "shape must be one of 'point', 'violin', 'box', or 'bar'."
+            )
 
-        if shape_lc == "violin":
-            p = (
+        fill_column = color_by if color_by is not None else x
+        fill_aes = {"x": x, "y": y, "fill": fill_column}
+        rotated_labels = theme(
+            axis_text_x=element_text(rotation=45, ha="right")
+        )
+
+        if shape == "violin":
+            plot = (
                 ggplot(obs_df)
-                + aes(**aes_fill)
+                + aes(**fill_aes)
                 + geom_violin(scale="width", trim=True)
                 + theme_classic()
-                + theme(axis_text_x=element_text(rotation=45, ha="right"))
+                + rotated_labels
             )
-        elif shape_lc == "box":
-            p = (
+        elif shape == "box":
+            plot = (
                 ggplot(obs_df)
-                + aes(**aes_fill)
+                + aes(**fill_aes)
                 + geom_boxplot(outlier_alpha=0.5)
                 + theme_classic()
-                + theme(axis_text_x=element_text(rotation=45, ha="right"))
+                + rotated_labels
             )
-        elif shape_lc == "bar":
-            # Compute mean y per x group
-            grp_means = obs_df.groupby(x, as_index=False)[y].mean()
-            if fill_col == x:
-                aes_bar = {"x": x, "y": y, "fill": fill_col}
-                bar_df = grp_means.rename(columns={y: y})  # keep same name
-                bar_df[fill_col] = bar_df[x]
-            else:
-                bar_df = obs_df
-                aes_bar = {"x": x, "y": y, "fill": fill_col}
-            p = (
-                ggplot(grp_means)
-                + aes(x=x, y=y)
+        elif shape == "bar":
+            group_columns = [x]
+            if color_by is not None and color_by != x:
+                group_columns.append(color_by)
+            means = (
+                obs_df.groupby(group_columns, observed=True, as_index=False)[y]
+                .mean()
+            )
+            bar_aes = {"x": x, "y": y, "fill": fill_column}
+            plot = (
+                ggplot(means)
+                + aes(**bar_aes)
                 + geom_bar(stat="identity", alpha=0.85)
                 + theme_classic()
-                + theme(axis_text_x=element_text(rotation=45, ha="right"))
+                + rotated_labels
             )
         else:
-            # strip / jitter
             if size is None:
                 size = adaptive_size(len(obs_df), size_max=1.0)
-            from plotnine import geom_jitter, position_jitter
-            p = (
+            plot = (
                 ggplot(obs_df)
-                + aes(**aes_fill)
+                + aes(**fill_aes)
                 + geom_jitter(width=0.2, height=0.0, size=size, alpha=0.6)
                 + theme_classic()
-                + theme(axis_text_x=element_text(rotation=45, ha="right"))
+                + rotated_labels
             )
 
-        if shape_lc != "bar":
-            p = p + color_scale(obs_df[fill_col], palette=palette, type_="fill")
+        plot += color_scale(obs_df[fill_column], palette=palette, type_="fill")
 
     if facet_by is not None:
-        p = p + facet_wrap(facet_by)
-
+        plot += facet_wrap(facet_by)
     if title is not None:
-        p = p + ggtitle(title)
+        plot += ggtitle(title)
+    return plot
 
-    return p
 
-
+@singledispatch
 def plot_rowdata(
-    data,
+    data: pd.DataFrame,
     x: str,
     y: str,
     color_by: Optional[str] = None,
     size: Optional[float] = None,
     title: Optional[str] = None,
 ) -> ggplot:
-    """Scatter plot of feature-level (var / rowData) metadata.
+    """Scatter-plot columns from a feature-metadata DataFrame.
 
     Args:
-        data: ``pd.DataFrame``, ``anndata.AnnData``, or
-            ``SingleCellExperiment``.
-        x: Var/rowData column for the x-axis.
-        y: Var/rowData column for the y-axis.
-        color_by: Var column to map to color.
-        size: Point size.  ``None`` → adaptive.
-        title: Plot title.
+        data: DataFrame whose rows are features and columns are metadata.
+        x: Column mapped to the x-axis.
+        y: Column mapped to the y-axis.
+        color_by: Optional column mapped to color.
+        size: Point size. ``None`` chooses a size from the number of rows.
+        title: Optional plot title.
 
     Returns:
         A ``plotnine.ggplot`` object.
+
+    Raises:
+        TypeError: If no implementation is registered for ``type(data)``.
+        KeyError: If a requested column is absent.
     """
-    acc = DataAccessor(data)
+    raise _unsupported_type("plot_rowdata", data)
 
-    # Extract rowData / var
-    if acc.object_type() == "dataframe":
-        # For DataFrames we treat the DataFrame itself as row metadata
-        var_df = acc.obs().reset_index(drop=True)
-    elif acc.object_type() == "anndata":
-        var_df = acc._data.var.copy().reset_index(drop=True)
-    else:
-        # SCE
-        rd = acc._data.row_data
-        if hasattr(rd, "to_pandas"):
-            var_df = rd.to_pandas().copy().reset_index(drop=True)
-        else:
-            var_df = pd.DataFrame(rd).copy().reset_index(drop=True)
 
-    for col in (x, y):
-        if col not in var_df.columns:
-            raise KeyError(f"Column '{col}' not found in var/rowData. Available: {list(var_df.columns)}")
+@plot_rowdata.register(pd.DataFrame)
+def _plot_rowdata_dataframe(
+    data: pd.DataFrame,
+    x: str,
+    y: str,
+    color_by: Optional[str] = None,
+    size: Optional[float] = None,
+    title: Optional[str] = None,
+) -> ggplot:
+    var_df = data.copy().reset_index(drop=True)
+    requested = (x, y) + ((color_by,) if color_by is not None else ())
+    _require_columns(var_df, requested, location="the feature-metadata DataFrame")
 
-    n = len(var_df)
     if size is None:
-        size = adaptive_size(n)
+        size = adaptive_size(len(var_df))
 
     aes_kwargs: dict = {"x": x, "y": y}
     if color_by is not None:
         aes_kwargs["color"] = color_by
 
-    p = (
+    plot = (
         ggplot(var_df)
         + aes(**aes_kwargs)
         + geom_point(size=size, alpha=0.7)
         + theme_classic()
     )
-
     if color_by is not None:
-        if color_by not in var_df.columns:
-            raise KeyError(f"color_by '{color_by}' not found in var.")
-        p = p + color_scale(var_df[color_by], palette=None, type_="color")
-
+        plot += color_scale(var_df[color_by], palette=None, type_="color")
     if title is not None:
-        p = p + ggtitle(title)
+        plot += ggtitle(title)
+    return plot
 
-    return p
+
+__all__ = ["plot_coldata", "plot_rowdata"]

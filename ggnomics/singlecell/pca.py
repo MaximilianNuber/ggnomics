@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from ..pca.methods import run_pca_sklearn, run_pca_svd
 from ..pca.result import PcaResult
-from ..plotting.utils import plot_reduced_dim
+from ..scatter import plot_embedding as _plot_reduced_dim
 
 def run_pca(
     sce,
@@ -103,12 +103,13 @@ def plot_pca(
         pca_res = run_pca(sce, dest_key=dim_name)
         
     plot_df = build_plot_df_from_sce(sce, dim_name=dim_name, prefix="pca")
-    
-    x = f"pca_{x_comp}"
-    y = f"pca_{y_comp}"
-    
-    p = plot_reduced_dim(plot_df, x=x, y=y, color=color, size=size, **kwargs)
-    
+
+    # Delegate to the canonical DataFrame plot_embedding/plot_reduced_dim
+    # generic; plot_df's "pca_<n>" columns match its naming convention.
+    p = _plot_reduced_dim(
+        plot_df, dimred="pca", components=(x_comp, y_comp), color=color, size=size, **kwargs
+    )
+
     if return_result:
         return p, pca_res
     return p

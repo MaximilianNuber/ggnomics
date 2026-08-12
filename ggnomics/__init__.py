@@ -7,7 +7,9 @@ __all__ = [
     "map_pvalue_to_stars",
     # Scatter hierarchy
     "plot_scatter",
+    "plot_embedding",
     "plot_reduced_dim",
+    "dim_plot",
     "plot_umap",
     "plot_pca",
     "plot_tsne",
@@ -42,8 +44,12 @@ __all__ = [
     "plot_clonotype_embedding",
     # Palettes / utilities
     "get_palette",
+    "resolve_palette",
     "TABLEAU_10",
     "TABLEAU_20",
+    "BIOC_COLORS",
+    "IGV_DEFAULT",
+    "IGV_ALTERNATING",
     "HeatmapResult",
     # Composition helpers
     "hstack",
@@ -70,7 +76,15 @@ __all__ = [
 from .signif import geom_signif, run_comparisons, map_pvalue_to_stars
 
 # New scatter hierarchy
-from .scatter import plot_scatter, plot_reduced_dim, plot_umap, plot_pca, plot_tsne
+from .scatter import (
+    dim_plot,
+    plot_embedding,
+    plot_pca,
+    plot_reduced_dim,
+    plot_scatter,
+    plot_tsne,
+    plot_umap,
+)
 
 # Expression / annotation
 from .expression import plot_expression, plot_dot, plot_heatmap
@@ -78,7 +92,15 @@ from .coldata import plot_coldata, plot_rowdata
 from .highest_exprs import plot_highest_exprs
 from .pairs import plot_pairs
 from .abundance import plot_abundance
-from .palettes import get_palette, TABLEAU_10, TABLEAU_20
+from .palettes import (
+    get_palette,
+    resolve_palette,
+    TABLEAU_10,
+    TABLEAU_20,
+    BIOC_COLORS,
+    IGV_DEFAULT,
+    IGV_ALTERNATING,
+)
 from ._utils import HeatmapResult
 from ._compose import hstack, vstack, grid, annotate_composition, save_composition
 
@@ -123,3 +145,10 @@ from .ridge import ridge_density
 from .bulk import pca as bulk_pca
 from .singlecell import pca as sc_pca
 from .singlecell import umap as sc_umap
+
+# Register only the optional container packages that are actually installed.
+# This must happen after the public generic functions have been imported.
+from ._backends import register_installed_backends as _register_installed_backends
+
+_register_installed_backends()
+del _register_installed_backends

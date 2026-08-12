@@ -119,8 +119,7 @@ def test_coef_lollipop_title(mock_coefs):
 def test_coef_expression_dot(mock_adata, mock_coefs):
     coef_series = mock_coefs["coefficient"]
     # Use only features that exist in the AnnData var_names
-    from ggnomics._accessor import DataAccessor
-    var_names = DataAccessor(mock_adata).var_names()
+    var_names = list(mock_adata.var_names)
     coef_filtered = coef_series[coef_series.index.isin(var_names)]
     if coef_filtered.empty:
         pytest.skip("No coefficient features overlap with AnnData var_names")
@@ -130,8 +129,7 @@ def test_coef_expression_dot(mock_adata, mock_coefs):
 
 def test_coef_expression_violin(mock_adata, mock_coefs):
     coef_series = mock_coefs["coefficient"]
-    from ggnomics._accessor import DataAccessor
-    var_names = DataAccessor(mock_adata).var_names()
+    var_names = list(mock_adata.var_names)
     coef_filtered = coef_series[coef_series.index.isin(var_names)]
     if coef_filtered.empty:
         pytest.skip("No coefficient features overlap with AnnData var_names")
@@ -141,8 +139,7 @@ def test_coef_expression_violin(mock_adata, mock_coefs):
 
 def test_coef_expression_heatmap(mock_adata, mock_coefs):
     coef_series = mock_coefs["coefficient"]
-    from ggnomics._accessor import DataAccessor
-    var_names = DataAccessor(mock_adata).var_names()
+    var_names = list(mock_adata.var_names)
     coef_filtered = coef_series[coef_series.index.isin(var_names)]
     if coef_filtered.empty:
         pytest.skip("No coefficient features overlap with AnnData var_names")

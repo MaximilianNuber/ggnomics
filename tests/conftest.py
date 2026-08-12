@@ -15,6 +15,7 @@ _spec.loader.exec_module(_mock_data)
 make_mock_df = _mock_data.make_mock_df
 make_mock_anndata = _mock_data.make_mock_anndata
 make_mock_sce = _mock_data.make_mock_sce
+make_mock_se = _mock_data.make_mock_se
 make_small_df = _mock_data.make_small_df
 make_large_df = _mock_data.make_large_df
 make_mock_de_results = _mock_data.make_mock_de_results
@@ -44,6 +45,7 @@ def large_df():
 @pytest.fixture(scope="session")
 def mock_adata():
     """500-cell AnnData."""
+    pytest.importorskip("anndata", reason="anndata not installed")
     return make_mock_anndata(n_cells=500, n_genes=50, seed=42)
 
 
@@ -55,6 +57,17 @@ def mock_sce():
         reason="singlecellexperiment not installed",
     )
     return make_mock_sce(n_cells=500, n_genes=50, seed=42)
+
+
+@pytest.fixture(scope="session")
+def mock_se():
+    """24-sample SummarizedExperiment (skipped if package is unavailable)."""
+    pytest.importorskip(
+        "summarizedexperiment",
+        reason="summarizedexperiment not installed",
+    )
+    pytest.importorskip("biocframe", reason="biocframe not installed")
+    return make_mock_se(n_samples=24, n_genes=50, seed=42)
 
 
 @pytest.fixture(scope="session")

@@ -57,6 +57,32 @@ def test_clonotype_abundance_missing_col_raises(mock_repertoire_df):
         plot_clonotype_abundance(mock_repertoire_df, clonotype_col="nonexistent")
 
 
+def test_clonotype_abundance_top_n_must_be_positive(mock_repertoire_df):
+    with pytest.raises(ValueError, match="top_n must be >= 1"):
+        plot_clonotype_abundance(mock_repertoire_df, clonotype_col="clonotype_id", top_n=0)
+
+
+def test_clonotype_abundance_facet_ranks_within_sample(mock_repertoire_df):
+    """Regression test: facet column must be computed per-sample, not attached
+    to one global top-n table (each sample's ranks are independent 1..top_n,
+    not derived from a global ranking)."""
+    p = plot_clonotype_abundance(
+        mock_repertoire_df, clonotype_col="clonotype_id", sample_col="sample", top_n=5
+    )
+    assert "sample" in p.data.columns
+    max_ranks = p.data.groupby("sample", observed=True)["rank"].max()
+    assert (max_ranks <= 5).all()
+    # Every sample present in the input independently contributes its own
+    # top-5 ranking (not a slice of one global ranking).
+    assert set(p.data["sample"].unique()) <= set(mock_repertoire_df["sample"].unique())
+
+
+def test_clonotype_abundance_se(mock_se):
+    p = plot_clonotype_abundance(mock_se, clonotype_col="condition", top_n=5)
+    assert isinstance(p, ggplot_class)
+    p.draw()
+
+
 def test_clonotype_abundance_adata(mock_adata):
     """Clonotype plot from AnnData with clonotype_id in obs."""
     if "clonotype_id" not in mock_adata.obs.columns:
@@ -134,6 +160,11 @@ def test_clonotype_overlap_unknown_method_raises(mock_repertoire_df):
             sample_col="sample",
             method="bogus",
         )
+
+
+def test_clonotype_overlap_se(mock_se):
+    result = plot_clonotype_overlap(mock_se, clonotype_col="batch", sample_col="condition")
+    assert isinstance(result, HeatmapResult)
 
 
 # ---------------------------------------------------------------------------

@@ -111,10 +111,16 @@ def color_scale(
             return scale_fill_cmap(cmap_name="viridis")
         return scale_color_cmap(cmap_name="viridis")
 
-    # Categorical path
+    # Categorical path: an explicit palette is resolved against the column's
+    # own observed categories (declared order for a pandas Categorical,
+    # first-appearance order otherwise), filling any gaps rather than
+    # silently producing a broken legend for uncovered categories.
     if palette is not None:
-        breaks = list(palette.keys())
-        values = list(palette.values())
+        from .palettes import resolve_palette
+
+        resolved = resolve_palette(col, palette=palette)
+        breaks = list(resolved.keys())
+        values = list(resolved.values())
         if type_ == "fill":
             return scale_fill_manual(breaks=breaks, values=values)
         return scale_color_manual(breaks=breaks, values=values)

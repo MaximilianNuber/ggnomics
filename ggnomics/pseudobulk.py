@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional
+from functools import singledispatch
+from typing import TYPE_CHECKING, Dict, List, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -20,54 +21,116 @@ from plotnine import (
     labs,
     position_stack,
     scale_fill_brewer,
+    scale_fill_manual,
 )
 
-from ._accessor import DataAccessor
 from ._compose import annotate_composition
-from ._utils import HeatmapResult
+
+if TYPE_CHECKING:
+    from matplotlib.figure import Figure
+    from plotnine.composition import Compose
+
+
+def _unsupported_type(function_name: str, data: object) -> TypeError:
+    return TypeError(
+        f"{function_name} does not support {type(data).__module__}."
+        f"{type(data).__qualname__}. Pass a pandas.DataFrame or install the "
+        "optional dependency for a supported genomics container."
+    )
 
 
 # ---------------------------------------------------------------------------
-# plot_pseudobulk_qc
+# Shared data-preparation and plot-construction helpers
+#
+# These are intentionally small and independently testable, and are reused
+# by every container adapter to avoid duplicating plot construction.
 # ---------------------------------------------------------------------------
 
 
-def plot_pseudobulk_qc(
-    data,
-    sample_by: str,
-    group_by: str,
-    condition_by: Optional[str] = None,
-    min_cells: int = 10,
-    palette: Optional[Dict] = None,
-    ncol: int = 2,
-):
-    """Three-panel QC figure for pseudobulk analysis setup.
+def _sparse_row_sums(matrix) -> np.ndarray:
+    """Row-wise sum of a dense array or any SciPy sparse matrix, no densifying."""
 
-    Panel 1 — Cells per sample-group combination (barplot, fill = *group_by*).
-    Panel 2 — Library size distribution (violin of log10 total counts per sample).
-    Panel 3 — Pseudobulk sample PCA (PC1 vs PC2 scatter colored by *condition_by*).
+    return np.asarray(matrix.sum(axis=1)).reshape(-1)
 
-    Composed with plotnine's native composition system (requires plotnine ≥ 0.15).
-    Returns a ``plotnine.composition.Compose`` object.
+
+def _pseudobulk_aggregate(
+    matrix,
+    sample_ids: np.ndarray,
+    unique_samples: np.ndarray,
+) -> np.ndarray:
+    """Per-sample mean expression (obs x features -> samples x features).
+
+    ``matrix`` may be dense or any SciPy sparse matrix. Aggregation is done
+    via a sparse indicator-matrix product, so the complete single-cell
+    matrix is never densified — only the small ``(n_samples, n_features)``
+    result is.
     """
 
-    acc = DataAccessor(data)
-    obs_df = acc.obs().reset_index(drop=True)
+    sample_index = {sample: i for i, sample in enumerate(unique_samples)}
+    n_samples = len(unique_samples)
+    n_obs = matrix.shape[0]
+    rows = np.fromiter((sample_index[s] for s in sample_ids), dtype=int, count=n_obs)
+    cols = np.arange(n_obs)
+    counts_per_sample = np.bincount(rows, minlength=n_samples).reshape(-1, 1).astype(float)
 
-    for col in (sample_by, group_by):
-        if col not in obs_df.columns:
-            raise KeyError(f"'{col}' not found in obs columns.")
-    if condition_by is not None and condition_by not in obs_df.columns:
-        raise KeyError(f"condition_by '{condition_by}' not found in obs columns.")
+    if hasattr(matrix, "tocsr"):
+        from scipy import sparse
 
-    # ---- Panel 1: cells per sample-group ----
-    counts_df = (
+        indicator = sparse.csr_matrix(
+            (np.ones(n_obs), (rows, cols)), shape=(n_samples, n_obs)
+        )
+        summed = indicator @ matrix
+        summed = np.asarray(summed.todense()) if hasattr(summed, "todense") else np.asarray(summed)
+    else:
+        dense = np.asarray(matrix, dtype=float)
+        summed = np.zeros((n_samples, dense.shape[1]))
+        for sample, index in sample_index.items():
+            summed[index] = dense[sample_ids == sample].sum(axis=0)
+
+    return summed / counts_per_sample
+
+
+def _sample_condition_map(
+    obs_df: pd.DataFrame,
+    sample_by: str,
+    condition_by: str,
+    unique_samples: np.ndarray,
+) -> Dict:
+    """Map each sample to its single condition value.
+
+    Raises:
+        ValueError: If any sample maps to more than one distinct condition.
+    """
+
+    condition_map: Dict = {}
+    for sample in unique_samples:
+        values = obs_df.loc[obs_df[sample_by].to_numpy() == sample, condition_by].unique()
+        if len(values) > 1:
+            raise ValueError(
+                f"Sample {sample!r} maps to multiple {condition_by!r} values: "
+                f"{list(values)}. condition_by must be constant within each sample."
+            )
+        condition_map[sample] = values[0] if len(values) == 1 else None
+    return condition_map
+
+
+def _counts_panel_data(obs_df: pd.DataFrame, sample_by: str, group_by: str) -> pd.DataFrame:
+    return (
         obs_df.groupby([sample_by, group_by], observed=True)
         .size()
         .rename("n_cells")
         .reset_index()
     )
-    p1 = (
+
+
+def _counts_panel_plot(
+    counts_df: pd.DataFrame,
+    sample_by: str,
+    group_by: str,
+    min_cells: int,
+    palette: Optional[Dict],
+) -> ggplot:
+    p = (
         ggplot(counts_df)
         + aes(x=sample_by, y="n_cells", fill=group_by)
         + geom_bar(stat="identity", position=position_stack())
@@ -77,39 +140,38 @@ def plot_pseudobulk_qc(
         + labs(x="Sample", y="Cell count", fill=group_by, title="Cells per sample-group")
     )
     if palette is not None:
-        from plotnine import scale_fill_manual
-        p1 = p1 + scale_fill_manual(breaks=list(palette.keys()), values=list(palette.values()))
+        p = p + scale_fill_manual(breaks=list(palette.keys()), values=list(palette.values()))
     else:
-        p1 = p1 + scale_fill_brewer(type="qual", palette="Set2")
+        p = p + scale_fill_brewer(type="qual", palette="Set2")
+    return p
 
-    # ---- Panel 2: library size distribution ----
-    # Total counts per cell (use first assay / X)
-    try:
-        if acc.object_type() == "anndata":
-            import scipy.sparse as sp
-            X = data.X
-            total_counts = np.asarray(X.sum(axis=1)).ravel() if sp.issparse(X) else X.sum(axis=1)
-        elif acc.object_type() in ("sce", "se"):
-            mat = data.assay("counts")
-            total_counts = np.asarray(mat.sum(axis=0)).ravel()
-        else:
-            gene_cols = [c for c in obs_df.columns if c not in (sample_by, group_by, condition_by or "")]
-            total_counts = obs_df.get("n_counts", obs_df[gene_cols].sum(axis=1) if gene_cols else pd.Series(np.ones(len(obs_df)))).values
-    except Exception:
-        total_counts = np.ones(len(obs_df))
 
-    libsize_df = pd.DataFrame({
-        sample_by: obs_df[sample_by].values,
-        "__log_lib__": np.log10(np.maximum(total_counts, 1)),
+def _libsize_panel_data(
+    sample_ids: np.ndarray,
+    library_sizes: np.ndarray,
+    sample_by: str,
+    condition_by: Optional[str],
+    condition_values: Optional[np.ndarray],
+) -> pd.DataFrame:
+    df = pd.DataFrame({
+        sample_by: sample_ids,
+        "__log_lib__": np.log10(np.maximum(library_sizes, 1)),
     })
     if condition_by is not None:
-        libsize_df[condition_by] = obs_df[condition_by].values
+        df[condition_by] = condition_values
+    return df
 
+
+def _libsize_panel_plot(
+    libsize_df: pd.DataFrame,
+    sample_by: str,
+    condition_by: Optional[str],
+    palette: Optional[Dict],
+) -> ggplot:
     fill_col = condition_by if condition_by is not None else sample_by
-    p2_aes = aes(x=sample_by, y="__log_lib__", fill=fill_col)
-    p2 = (
+    p = (
         ggplot(libsize_df)
-        + p2_aes
+        + aes(x=sample_by, y="__log_lib__", fill=fill_col)
         + geom_violin(scale="width", trim=True, alpha=0.7)
         + geom_boxplot(width=0.1, fill="white", outlier_alpha=0.3)
         + theme_classic()
@@ -117,73 +179,181 @@ def plot_pseudobulk_qc(
         + labs(x="Sample", y="log10(total counts)", title="Library size per sample")
     )
     if palette is not None and condition_by is not None:
-        from plotnine import scale_fill_manual
-        p2 = p2 + scale_fill_manual(breaks=list(palette.keys()), values=list(palette.values()))
+        p = p + scale_fill_manual(breaks=list(palette.keys()), values=list(palette.values()))
     else:
-        p2 = p2 + scale_fill_brewer(type="qual", palette="Set2")
+        p = p + scale_fill_brewer(type="qual", palette="Set2")
+    return p
 
-    # ---- Panel 3: pseudobulk PCA ----
+
+def _pca_panel_data(
+    pb_mat: np.ndarray,
+    unique_samples: np.ndarray,
+    sample_by: str,
+    condition_by: Optional[str],
+    condition_map: Optional[Dict],
+) -> pd.DataFrame:
+    n_samples = pb_mat.shape[0]
+    if n_samples < 2:
+        raise ValueError(
+            f"Pseudobulk PCA requires at least 2 samples; got {n_samples}."
+        )
+
     try:
         from sklearn.decomposition import PCA as SkPCA
+    except ImportError as exc:
+        raise ImportError(
+            "Pseudobulk PCA requires scikit-learn. "
+            "Install with: pip install 'ggnomics[pseudobulk]'"
+        ) from exc
 
-        if acc.object_type() == "anndata":
-            import scipy.sparse as sp
-            X_full = data.X
-            X_full = np.asarray(X_full.toarray() if sp.issparse(X_full) else X_full)
-            samples = obs_df[sample_by].values
-        elif acc.object_type() == "dataframe":
-            gene_cols = [c for c in obs_df.columns if c.startswith("Gene")]
-            X_full = obs_df[gene_cols].values if gene_cols else np.zeros((len(obs_df), 1))
-            samples = obs_df[sample_by].values
-        else:
-            mat = data.assay("counts")
-            X_full = np.asarray(mat).T  # cells × genes
-            samples = obs_df[sample_by].values
+    n_components = min(2, n_samples - 1, pb_mat.shape[1])
+    pca = SkPCA(n_components=n_components)
+    coords = pca.fit_transform(pb_mat)
+    pc2 = coords[:, 1] if coords.shape[1] > 1 else np.zeros(n_samples)
 
-        unique_samples = np.unique(samples)
-        pb_rows = []
-        for smp in unique_samples:
-            mask = samples == smp
-            pb_rows.append(X_full[mask].mean(axis=0))
-        pb_mat = np.array(pb_rows)  # samples × genes
+    df = pd.DataFrame({
+        "__pc1__": coords[:, 0],
+        "__pc2__": pc2,
+        sample_by: unique_samples,
+    })
+    if condition_by is not None and condition_map is not None:
+        df[condition_by] = [condition_map[s] for s in unique_samples]
+    return df
 
-        pca = SkPCA(n_components=min(2, pb_mat.shape[0] - 1, pb_mat.shape[1]))
-        coords = pca.fit_transform(pb_mat)
 
-        pca_df = pd.DataFrame({
-            "__pc1__": coords[:, 0],
-            "__pc2__": coords[:, 1] if coords.shape[1] > 1 else np.zeros(len(unique_samples)),
-            sample_by: unique_samples,
-        })
-        if condition_by is not None:
-            # Get condition for each sample (majority vote)
-            cond_map = {}
-            for smp in unique_samples:
-                mask = obs_df[sample_by].values == smp
-                vals = obs_df.loc[mask, condition_by].values
-                cond_map[smp] = pd.Series(vals).mode().iloc[0] if len(vals) > 0 else "unknown"
-            pca_df[condition_by] = pca_df[sample_by].map(cond_map)
+def _pca_panel_plot(
+    pca_df: pd.DataFrame,
+    sample_by: str,
+    condition_by: Optional[str],
+) -> ggplot:
+    from .scatter import plot_scatter
 
-        from .scatter import plot_scatter
-        color_col = condition_by if condition_by is not None else sample_by
-        p3 = plot_scatter(
-            pca_df,
-            x="__pc1__",
-            y="__pc2__",
-            color=color_col,
-            x_label="PC1",
-            y_label="PC2",
-            title="Pseudobulk PCA",
+    color_col = condition_by if condition_by is not None else sample_by
+    return plot_scatter(
+        pca_df, x="__pc1__", y="__pc2__", color=color_col,
+        x_label="PC1", y_label="PC2", title="Pseudobulk PCA",
+    )
+
+
+# ---------------------------------------------------------------------------
+# plot_pseudobulk_qc
+# ---------------------------------------------------------------------------
+
+
+@singledispatch
+def plot_pseudobulk_qc(
+    data: pd.DataFrame,
+    sample_by: str,
+    group_by: str,
+    condition_by: Optional[str] = None,
+    features: Optional[List[str]] = None,
+    min_cells: int = 10,
+    palette: Optional[Dict] = None,
+    ncol: int = 2,
+) -> "Compose":
+    """Three-panel QC figure for pseudobulk analysis setup.
+
+    Panel 1 -- Cells per sample-group combination (barplot, fill = ``group_by``).
+    Panel 2 -- Library size distribution (violin of log10 total counts per sample).
+    Panel 3 -- Pseudobulk sample PCA (PC1 vs PC2 scatter colored by ``condition_by``).
+
+    Composed with plotnine's native composition system (requires plotnine
+    >= 0.15). Returns a ``plotnine.composition.Compose`` object.
+
+    Args:
+        data: DataFrame whose rows are cells. ``sample_by``, ``group_by``,
+            and ``condition_by`` are metadata columns; ``features`` are
+            expression columns.
+        sample_by: Column identifying the pseudobulk sample each cell
+            belongs to.
+        group_by: Column used to color/stack cell counts within each sample.
+        condition_by: Optional column used to color the PCA panel and the
+            library-size panel. Must be constant within each sample.
+        features: Expression columns used for library size (when no
+            ``n_counts`` column is present) and for the pseudobulk PCA
+            matrix. Required for the PCA panel; metadata columns are never
+            guessed as expression.
+        min_cells: Dashed reference line in the cell-count panel.
+        palette: ``{category: hex}`` color mapping.
+        ncol: Present for cross-container signature consistency (the panel
+            layout is fixed at ``(p1 | p2) / p3``).
+
+    Returns:
+        A ``plotnine.composition.Compose`` object.
+
+    Raises:
+        TypeError: If no implementation is registered for ``type(data)``.
+        KeyError: If a requested column is absent.
+        ValueError: If library size or the PCA matrix cannot be determined,
+            if a sample maps to multiple ``condition_by`` values, or if
+            fewer than 2 samples are available for PCA.
+        ImportError: If scikit-learn is not installed.
+    """
+    raise _unsupported_type("plot_pseudobulk_qc", data)
+
+
+@plot_pseudobulk_qc.register(pd.DataFrame)
+def _plot_pseudobulk_qc_dataframe(
+    data: pd.DataFrame,
+    sample_by: str,
+    group_by: str,
+    condition_by: Optional[str] = None,
+    features: Optional[List[str]] = None,
+    min_cells: int = 10,
+    palette: Optional[Dict] = None,
+    ncol: int = 2,
+):
+    required = [sample_by, group_by] + ([condition_by] if condition_by is not None else [])
+    missing = [c for c in required if c not in data.columns]
+    if missing:
+        raise KeyError(
+            f"Column(s) {missing} not found in the DataFrame. "
+            f"Available: {list(data.columns)[:20]}"
         )
-    except Exception:
-        # Fallback: empty placeholder
-        p3 = (
-            ggplot(pd.DataFrame({"x": [0], "y": [0], "label": ["PCA unavailable"]}))
-            + aes(x="x", y="y")
-            + geom_point()
-            + theme_classic()
-            + ggtitle("Pseudobulk PCA (unavailable)")
+    if features is not None:
+        missing_f = [f for f in features if f not in data.columns]
+        if missing_f:
+            raise KeyError(
+                f"features not found in the DataFrame: {missing_f}. "
+                f"Available (first 20): {list(data.columns)[:20]}"
+            )
+
+    obs_df = data.reset_index(drop=True)
+
+    counts_df = _counts_panel_data(obs_df, sample_by, group_by)
+    p1 = _counts_panel_plot(counts_df, sample_by, group_by, min_cells, palette)
+
+    if "n_counts" in obs_df.columns:
+        library_sizes = obs_df["n_counts"].to_numpy(dtype=float)
+    elif features:
+        library_sizes = obs_df[features].to_numpy(dtype=float).sum(axis=1)
+    else:
+        raise ValueError(
+            "Cannot determine library size: no 'n_counts' column is present "
+            "and no `features` were given. Pass `features=[...]` explicitly."
         )
+
+    condition_values = obs_df[condition_by].to_numpy() if condition_by is not None else None
+    libsize_df = _libsize_panel_data(
+        obs_df[sample_by].to_numpy(), library_sizes, sample_by, condition_by, condition_values
+    )
+    p2 = _libsize_panel_plot(libsize_df, sample_by, condition_by, palette)
+
+    if not features:
+        raise ValueError(
+            "Cannot compute pseudobulk PCA: no `features` were given. Pass "
+            "`features=[...]` to select the expression columns to use."
+        )
+
+    sample_ids = obs_df[sample_by].to_numpy()
+    unique_samples = pd.unique(sample_ids)
+    pb_mat = _pseudobulk_aggregate(obs_df[features].to_numpy(dtype=float), sample_ids, unique_samples)
+    condition_map = (
+        _sample_condition_map(obs_df, sample_by, condition_by, unique_samples)
+        if condition_by is not None else None
+    )
+    pca_df = _pca_panel_data(pb_mat, unique_samples, sample_by, condition_by, condition_map)
+    p3 = _pca_panel_plot(pca_df, sample_by, condition_by)
 
     return (p1 | p2) / p3
 
@@ -204,18 +374,34 @@ def plot_pseudobulk_de(
     mode: str = "volcano",
     ncol: int = 3,
     title: Optional[str] = None,
-):
+) -> "Union[Compose, ggplot, Figure]":
     """Visualise DE results across multiple clusters or contrasts.
 
-    Parameters
-    ----------
-    results : dict
-        Mapping of cluster name → DE DataFrame (DESeq2-style).
-    mode : str
-        ``"volcano"`` — one volcano per cluster, arranged in a grid
-        (plotnine composition, requires plotnine ≥ 0.15).
-        ``"summary_bar"`` — barplot of n_up / n_down per cluster (ggplot).
-        ``"upset"`` — UpSet plot of shared significant genes (requires upsetplot).
+    Args:
+        results: Mapping of cluster/contrast name to a DESeq2-style DE
+            DataFrame. This function is DataFrame/result-table based and
+            does not need container dispatch.
+        logfc_col: Log2 fold-change column.
+        pval_col: Adjusted p-value column used for significance.
+        gene_col: Column with gene names (``None`` uses the index).
+        pval_threshold: Significance threshold on ``pval_col``.
+        logfc_threshold: Absolute log2FC threshold for "significant".
+        top_n_label: Number of top genes labeled per volcano panel.
+        mode: ``"volcano"`` -- one volcano panel per cluster, arranged in a
+            grid (plotnine composition, requires plotnine >= 0.15).
+            ``"summary_bar"`` -- barplot of n_up / n_down per cluster.
+            ``"upset"`` -- UpSet plot of shared significant genes (requires
+            the optional ``upsetplot`` dependency).
+        ncol: Grid columns for ``mode="volcano"``.
+        title: Overall title.
+
+    Returns:
+        A ``plotnine.composition.Compose`` (volcano), a ``plotnine.ggplot`` (summary_bar), or a Matplotlib figure (upset).
+
+    Raises:
+        ValueError: If ``results`` is empty, ``mode`` is unknown, or (for
+            ``mode="upset"``) no significant genes are found.
+        ImportError: If ``mode="upset"`` and ``upsetplot`` is not installed.
     """
     if mode == "volcano":
         from .de_plots import plot_volcano
@@ -256,7 +442,6 @@ def plot_pseudobulk_de(
             ])
         bar_df = pd.DataFrame(rows)
 
-        from plotnine import scale_fill_manual
         p = (
             ggplot(bar_df)
             + aes(x="cluster", y="n", fill="direction")
@@ -275,11 +460,11 @@ def plot_pseudobulk_de(
         try:
             from upsetplot import from_memberships, UpSet
             import matplotlib.pyplot as plt
-        except ImportError as e:
+        except ImportError as exc:
             raise ImportError(
                 "upsetplot is required for mode='upset'. "
                 "Install with: pip install upsetplot>=0.8"
-            ) from e
+            ) from exc
 
         sig_genes: Dict[str, set] = {}
         for name, df in results.items():
@@ -298,8 +483,6 @@ def plot_pseudobulk_de(
             membership = tuple(k for k, v in sig_genes.items() if gene in v)
             memberships.append(membership)
 
-        # from_memberships returns a non-unique Series; use subset_size="count"
-        # so UpSet counts elements per combination rather than summing values.
         upset_data = from_memberships(memberships)
         UpSet(upset_data, subset_size="count").plot()
         if title:
@@ -307,3 +490,6 @@ def plot_pseudobulk_de(
         return plt.gcf()
 
     raise ValueError(f"Unknown mode '{mode}'. Choose 'volcano', 'summary_bar', or 'upset'.")
+
+
+__all__ = ["plot_pseudobulk_qc", "plot_pseudobulk_de"]

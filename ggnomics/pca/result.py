@@ -1,8 +1,10 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 import numpy as np
 import pandas as pd
-from sklearn.decomposition import PCA
+
+if TYPE_CHECKING:
+    from sklearn.decomposition import PCA
 
 @dataclass
 class PcaResult:
@@ -11,7 +13,7 @@ class PcaResult:
     explained_variance_ratio: np.ndarray
     feature_names: Optional[np.ndarray] = None
     sample_names: Optional[np.ndarray] = None
-    model: Optional[PCA] = None
+    model: Optional["PCA"] = None
 
     def scores_to_pandas(self):
         scores_df = pd.DataFrame(self.scores)

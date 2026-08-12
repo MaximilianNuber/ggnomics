@@ -206,6 +206,13 @@ def make_mock_sce(
 
     obs_meta = df.drop(columns=gene_names + ["UMAP1", "UMAP2", "PCA1", "PCA2", "PCA3", "PCA4", "PCA5"])
     col_data = biocframe.BiocFrame(obs_meta.to_dict(orient="list"))
+    mean_expr = counts.mean(axis=1)
+    row_data = biocframe.BiocFrame(
+        {
+            "mean_expr": mean_expr,
+            "highly_variable": mean_expr > np.median(mean_expr),
+        }
+    )
 
     rng = np.random.default_rng(seed)
     pca_coords = rng.normal(0, 1, (n_cells, 50)).astype(np.float32)
@@ -215,10 +222,78 @@ def make_mock_sce(
         assays={"counts": counts, "logcounts": logcounts},
         row_names=gene_names,
         column_names=list(df.index),
+        row_data=row_data,
         column_data=col_data,
         reduced_dimensions={"PCA": pca_coords, "UMAP": umap_coords},
     )
     return sce
+
+
+# ---------------------------------------------------------------------------
+# SummarizedExperiment mock
+# ---------------------------------------------------------------------------
+
+
+def make_mock_se(
+    n_samples: int = 24,
+    n_genes: int = 200,
+    seed: int = 42,
+):
+    """Build a mock ``SummarizedExperiment`` without reduced dimensions.
+
+    Args:
+        n_samples: Number of samples (columns).
+        n_genes: Number of features (rows).
+        seed: Random seed.
+
+    Returns:
+        A ``summarizedexperiment.SummarizedExperiment`` object.
+
+    Raises:
+        ImportError: If the BiocPy dependencies are not installed.
+    """
+    try:
+        import biocframe
+        from summarizedexperiment import SummarizedExperiment
+    except ImportError as exc:
+        raise ImportError(
+            "summarizedexperiment and biocframe are required. "
+            "Install with: pip install summarizedexperiment biocframe"
+        ) from exc
+
+    rng = np.random.default_rng(seed)
+    counts = rng.negative_binomial(5, 0.4, size=(n_genes, n_samples)).astype(
+        np.float32
+    )
+    gene_names = [f"Gene{i + 1:04d}" for i in range(n_genes)]
+    sample_names = [f"sample{i + 1:03d}" for i in range(n_samples)]
+
+    condition = np.where(np.arange(n_samples) % 2 == 0, "control", "treated")
+    batch = np.array([f"batch{(i % 3) + 1}" for i in range(n_samples)])
+    library_size = counts.sum(axis=0)
+    column_data = biocframe.BiocFrame(
+        {
+            "condition": condition,
+            "batch": batch,
+            "library_size": library_size,
+        }
+    )
+
+    mean_expr = counts.mean(axis=1)
+    row_data = biocframe.BiocFrame(
+        {
+            "mean_expr": mean_expr,
+            "highly_variable": mean_expr > np.median(mean_expr),
+        }
+    )
+
+    return SummarizedExperiment(
+        assays={"counts": counts},
+        row_names=gene_names,
+        column_names=sample_names,
+        row_data=row_data,
+        column_data=column_data,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -326,6 +401,11 @@ def make_mock_mudata(
         adata_iso.obs[col] = adata_rna.obs[col].values
 
     mdata = mudata.MuData({"rna": adata_rna, "prot": adata_prot, "iso": adata_iso})
+    # Shared per-cell annotations assigned once across all modalities, as in
+    # a typical CITE-seq analysis, live directly on mdata.obs (not only
+    # under each modality's own obs).
+    mdata.obs["cluster"] = adata_rna.obs["cluster"].values
+    mdata.obs["batch"] = adata_rna.obs["batch"].values
     return mdata
 
 

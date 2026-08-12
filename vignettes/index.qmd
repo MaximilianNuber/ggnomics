@@ -1,0 +1,138 @@
+---
+title: "ggnomics"
+subtitle: "Composable, ggplot2-style genomics visualization for Python"
+---
+
+`ggnomics` provides ggplot2-style visualizations for bulk, single-cell, and
+multimodal genomics in Python. Its plotting functions work with tidy
+`pandas` data and common genomics containers, including AnnData and BiocPy's
+`SingleCellExperiment` and `SummarizedExperiment`.
+
+The result is a [plotnine](https://plotnine.org) plot that remains yours to
+adapt:
+
+```python
+import ggnomics as gg
+import plotnine as p9
+
+p = gg.plot_umap(adata, color="cluster")
+p + p9.theme_bw() + p9.labs(title="Cell populations")
+```
+
+Start with [Getting started](getting-started.qmd), follow one of the
+end-to-end workflows, or browse the [plot gallery](plot-gallery.qmd) for a
+particular figure.
+
+## Examples
+
+::: {layout="[[1,1], [1,1]]"}
+
+![[Cell classes in the Zeisel mouse brain dataset](single-cell-scranpy.qmd).](single-cell-scranpy_files/figure-html/cell-22-output-1.png)
+
+![[Differential expression after 24 hours of salt stress in rice](bulk-rnaseq.qmd).](bulk-rnaseq_files/figure-html/cell-16-output-1.png)
+
+![[Pancreatic cell-type composition across donors](specialized-plots.qmd).](specialized-plots_files/figure-html/cell-4-output-1.png)
+
+![[RNA and protein abundance on a shared CITE-seq embedding](multimodal.qmd).](multimodal_files/figure-html/cell-23-output-1.png)
+
+:::
+
+## Workflows
+
+* **[Getting started](getting-started.qmd)** introduces DataFrame, SCE, and
+  AnnData input and shows how to customize the returned plots.
+* **[Single-cell analysis with scranpy](single-cell-scranpy.qmd)** follows a
+  mouse brain dataset from quality control to clustering and UMAP.
+* **[Bulk RNA-seq](bulk-rnaseq.qmd)** uses PyDESeq2 to analyse a rice
+  salt-stress experiment.
+* **[Multimodal](multimodal.qmd)** combines RNA and ADT measurements from
+  CITE-seq data.
+* **[Specialized plots](specialized-plots.qmd)** covers abundance,
+  pseudobulk QC, statistics, significance brackets, palettes, heatmaps, and
+  immune repertoires.
+* **[Plot gallery](plot-gallery.qmd)** provides a compact reference organized
+  by plot family.
+
+## What's supported
+
+| Container | Package | Typical use |
+|---|---|---|
+| `pd.DataFrame` | pandas | Tidy plotting tables and model results |
+| `AnnData` | anndata / scverse | Single-cell data in scverse workflows |
+| `SingleCellExperiment` | BiocPy `singlecellexperiment` | Single-cell assays, metadata, and reduced dimensions |
+| `SummarizedExperiment` | BiocPy `summarizedexperiment` | Bulk assays and sample metadata |
+| `MuData` | mudata / scverse | Measurements across several modalities |
+
+Because `SummarizedExperiment` does not store reduced dimensions,
+embedding plots require either explicit coordinates or a richer container.
+For bulk assays, `ggnomics.bulk_pca` computes and plots PCA scores directly.
+The [Getting started](getting-started.qmd) guide shows the supported paths in
+more detail.
+
+## One plotting interface
+
+The public `plot_*` functions use Python's `singledispatch`: the function
+name and main arguments stay the same while the input container determines
+how data are extracted. The DataFrame implementation supplies the public
+docstring shown by `help()` and in Jupyter. Adapters for AnnData, BiocPy, and
+MuData register automatically when their corresponding packages are
+installed.
+
+[Getting started §7](getting-started.qmd#7-how-dispatch-works)
+explains the design and shows how to inspect the registered implementations.
+
+## Build on the returned plot
+
+Most functions return an ordinary `ggplot`, so plotnine layers, scales,
+themes, coordinates, and labels can be added directly. This keeps the
+convenient genomics defaults without limiting the final figure.
+
+```python
+p = gg.plot_umap(adata, color="cluster")
+p + p9.theme_bw() + p9.labs(title="My figure")
+```
+
+Multi-panel functions such as `plot_pseudobulk_qc`,
+`plot_scatter_marginal`, and `plot_embedding_panel` return a
+`plotnine.composition.Compose`. They can be arranged with plotnine's `|` and
+`/` operators or with ggnomics helpers such as `hstack`, `vstack`, and
+`grid`.
+
+## Datasets used in the guides
+
+The worked examples use publicly available bulk, single-cell, multimodal,
+and immune-repertoire datasets distributed through BiocPy data-access
+packages.
+
+```{python}
+import sys, pathlib
+sys.path.insert(0, str(pathlib.Path("_includes").resolve()))
+from provenance import provenance_markdown
+from IPython.display import Markdown
+
+Markdown(provenance_markdown())
+```
+
+Accessions, dataset versions, and resource notes are recorded in
+[`datasets.yml`](datasets.yml).
+
+## Optional backends
+
+The core installation provides the DataFrame interface. Container-specific
+support can be added through optional extras:
+
+```bash
+pip install "ggnomics[anndata]"    # AnnData / scverse
+pip install "ggnomics[sce]"        # SingleCellExperiment (BiocPy)
+pip install "ggnomics[se]"         # SummarizedExperiment (BiocPy)
+pip install "ggnomics[multimodal]" # MuData
+pip install "ggnomics[stats]"      # significance brackets (scipy, statsmodels)
+pip install "ggnomics[pca]"        # PCA utilities
+pip install "ggnomics[umap]"       # ggnomics.sc_umap
+pip install "ggnomics[all]"        # everything above
+```
+
+The workflow guides also use `scranpy`, PyDESeq2, Marsilea, `scrnaseq`,
+`pyexpressionatlas`, and `experimenthub`. These are analysis or data-access
+packages used alongside ggnomics rather than runtime dependencies of the
+plotting library.

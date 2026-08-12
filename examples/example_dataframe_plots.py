@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from gg_singlecell import (
+from ggnomics import (
     plot_reduced_dim,
     expression_violin,
     volcano_plot,
@@ -29,7 +29,7 @@ df = pd.DataFrame({
 })
 
 # 1) Reduced-dim plot
-p1 = plot_reduced_dim(df, x="umap_1", y="umap_2", color="cluster", title="Embedding")
+p1 = plot_reduced_dim(df, dimred="umap", color="cluster", title="Embedding")
 print(p1)
 
 # 2) QC scatter + histogram

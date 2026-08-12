@@ -330,8 +330,14 @@ except Exception as e:
 # ===========================================================================
 
 try:
+    # plot_pseudobulk_qc requires condition_by to be constant within each
+    # sample; the mock "batch" column is assigned per cell (not per sample),
+    # so derive a genuinely sample-level condition for this example.
+    _pb_adata = adata.copy()
+    _sample_to_condition = {"S1": "ctrl", "S2": "ctrl", "S3": "stim", "S4": "stim"}
+    _pb_adata.obs["condition"] = _pb_adata.obs["sample"].map(_sample_to_condition)
     _save_compose(
-        plot_pseudobulk_qc(adata, sample_by="sample", group_by="cluster", condition_by="batch"),
+        plot_pseudobulk_qc(_pb_adata, sample_by="sample", group_by="cluster", condition_by="condition"),
         "pseudobulk_qc.png", width=12, height=8,
     )
 except Exception as e:

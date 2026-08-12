@@ -31,7 +31,6 @@ jobs:
       - name: Install ggnomics and dependencies
         run: |
           pip install -e ".[all]"
-          pip install mudata
           # Try plotnine 0.16 alpha for plot_layout support; fall back silently
           pip install --pre "plotnine>=0.16.0a0" || echo "0.16 alpha not available, using stable"
 

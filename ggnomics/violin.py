@@ -78,12 +78,12 @@ def _get_assay_matrix(obj, assay: str):
     if hasattr(obj, "assay"):
         try:
             return obj.assay(assay)
-        except Exception:
+        except (KeyError, ValueError):
             pass
     if hasattr(obj, "assays"):
         try:
             return obj.assays[assay]
-        except Exception:
+        except (KeyError, IndexError):
             pass
     if hasattr(obj, "X"):
         return obj.X
@@ -115,8 +115,8 @@ def _extract_gene_vector(mat, genes, gene: str):
             idx = int(np.where(np.asarray(genes) == gene)[0][0])
         else:
             idx = genes.index(gene)  # fallback
-    except Exception:
-        raise KeyError(f"Gene '{gene}' not found in row names.")
+    except (IndexError, ValueError) as exc:
+        raise KeyError(f"Gene '{gene}' not found in row names.") from exc
     vec = mat[idx, :] if mat.shape[0] == len(genes) else mat[:, idx]
     if hasattr(vec, "toarray"):
         vec = vec.toarray()
@@ -158,21 +158,7 @@ def expression_violin_se(
     return expression_violin(df, value="expr", group=group_col, log1p=log1p, title=title or f"{gene} expression")
 
 
-# Try dynamic registration for BiocPy types if available
-try:  # pragma: no cover - optional dependency
-    from singlecellexperiment import SingleCellExperiment  # type: ignore
-
-    @expression_violin.register(SingleCellExperiment)
-    def _(sce, gene: str, group_col: str, *, assay: str = "logcounts", log1p: bool = False, title: Optional[str] = None):
-        return expression_violin_sce(sce, gene, group_col, assay=assay, log1p=log1p, title=title)
-except Exception:
-    pass
-
-try:  # pragma: no cover - optional dependency
-    from summarizedexperiment import SummarizedExperiment  # type: ignore
-
-    @expression_violin.register(SummarizedExperiment)
-    def _(se, gene: str, group_col: str, *, assay: str = "logcounts", log1p: bool = False, title: Optional[str] = None):
-        return expression_violin_se(se, gene, group_col, assay=assay, log1p=log1p, title=title)
-except Exception:
-    pass
+# SingleCellExperiment/SummarizedExperiment registrations for `expression_violin`
+# live in ggnomics/_backends/singlecellexperiment.py and
+# ggnomics/_backends/summarizedexperiment.py, which are only imported when the
+# corresponding optional package is installed.

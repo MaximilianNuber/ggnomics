@@ -5,26 +5,36 @@ from itertools import combinations
 
 import numpy as np
 import pandas as pd
-from scipy import stats as scipy_stats
+
+
+def _scipy_stats():
+    try:
+        from scipy import stats
+    except ImportError as exc:  # pragma: no cover - depends on installation
+        raise ImportError(
+            "Statistical comparisons require scipy. "
+            "Install ggnomics with the 'stats' extra."
+        ) from exc
+    return stats
 
 
 def _mannwhitney(x: np.ndarray, y: np.ndarray) -> tuple[float, float]:
-    result = scipy_stats.mannwhitneyu(x, y, alternative="two-sided")
+    result = _scipy_stats().mannwhitneyu(x, y, alternative="two-sided")
     return result.statistic, result.pvalue
 
 
 def _wilcoxon(x: np.ndarray, y: np.ndarray) -> tuple[float, float]:
-    result = scipy_stats.wilcoxon(x, y)
+    result = _scipy_stats().wilcoxon(x, y)
     return result.statistic, result.pvalue
 
 
 def _ttest(x: np.ndarray, y: np.ndarray) -> tuple[float, float]:
-    result = scipy_stats.ttest_ind(x, y, equal_var=False)  # Welch's t-test
+    result = _scipy_stats().ttest_ind(x, y, equal_var=False)  # Welch's t-test
     return result.statistic, result.pvalue
 
 
 def _kruskal(x: np.ndarray, y: np.ndarray) -> tuple[float, float]:
-    result = scipy_stats.kruskal(x, y)
+    result = _scipy_stats().kruskal(x, y)
     return result.statistic, result.pvalue
 
 
@@ -86,7 +96,9 @@ def run_comparisons(
             continue
         try:
             stat, pval = test_fn(x, y)
-        except Exception:
+        except ValueError:
+            # e.g. all-identical values or insufficient variation for the
+            # chosen test; skip this comparison rather than failing the plot.
             continue
         rows.append(
             {

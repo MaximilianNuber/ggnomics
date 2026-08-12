@@ -1,0 +1,35 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "ggnomics"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: getting-started.qmd
+        text: Getting started
+      - href: single-cell-scranpy.qmd
+        text: Single-cell (scranpy)
+      - href: bulk-rnaseq.qmd
+        text: Bulk RNA-seq
+      - href: multimodal.qmd
+        text: Multimodal
+      - href: specialized-plots.qmd
+        text: Specialized plots
+      - href: plot-gallery.qmd
+        text: Plot gallery
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    code-fold: false
+    fig-format: png
+    fig-dpi: 150
+
+execute:
+  freeze: auto
+  warning: false
+  echo: true

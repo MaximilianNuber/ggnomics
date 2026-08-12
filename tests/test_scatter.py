@@ -1,16 +1,40 @@
-"""Tests for the scatter plot hierarchy (scatter.py)."""
+"""Tests for the scatter and embedding dispatch hierarchy."""
 
+import inspect
 import pandas as pd
 import pytest
 from plotnine.ggplot import ggplot as ggplot_class
 
-from ggnomics import plot_scatter, plot_reduced_dim, plot_umap, plot_pca, plot_tsne
+from ggnomics import (
+    dim_plot,
+    plot_embedding,
+    plot_pca,
+    plot_reduced_dim,
+    plot_scatter,
+    plot_tsne,
+    plot_umap,
+)
 from ggnomics._utils import adaptive_size
 
 
 # ---------------------------------------------------------------------------
 # plot_scatter — DataFrame
 # ---------------------------------------------------------------------------
+
+
+def test_embedding_names_share_one_dispatcher():
+    assert plot_embedding is plot_reduced_dim
+    assert plot_embedding is dim_plot
+
+
+def test_dataframe_implementations_are_registered():
+    assert pd.DataFrame in plot_scatter.registry
+    assert pd.DataFrame in plot_embedding.registry
+
+
+def test_jupyter_docstrings_describe_dataframe_api():
+    assert "pandas DataFrame" in inspect.getdoc(plot_scatter)
+    assert "pandas DataFrame" in inspect.getdoc(plot_embedding)
 
 
 def test_scatter_df_basic(mock_df):

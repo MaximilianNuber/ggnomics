@@ -191,6 +191,25 @@ def test_run_comparisons_ttest(simple_df):
     assert result["pvalue"].iloc[0] < 0.001
 
 
+def test_run_comparisons_wilcoxon(simple_df):
+    # Wilcoxon signed-rank requires equal-length samples; A and B are both 50.
+    result = run_comparisons(
+        simple_df["value"], simple_df["group"],
+        comparisons=[("A", "B")], test="wilcoxon",
+    )
+    assert len(result) == 1
+    assert 0.0 <= result["pvalue"].iloc[0] <= 1.0
+
+
+def test_run_comparisons_kruskal(simple_df):
+    result = run_comparisons(
+        simple_df["value"], simple_df["group"],
+        comparisons=[("A", "C")], test="kruskal",
+    )
+    assert len(result) == 1
+    assert result["pvalue"].iloc[0] < 0.001
+
+
 def test_run_comparisons_empty_for_bad_groups(simple_df):
     result = run_comparisons(
         simple_df["value"], simple_df["group"],
@@ -404,3 +423,79 @@ def test_geom_signif_on_custom_plot(simple_df):
     for layer in layers:
         p = p + layer
     assert isinstance(p, ggplot_class)
+
+
+# ---------------------------------------------------------------------------
+# Facets / grouped plots
+# ---------------------------------------------------------------------------
+
+
+def test_geom_signif_layers_compatible_with_facets(simple_df):
+    """Significance layers must not break a plot that also facets."""
+    from plotnine import facet_wrap
+
+    df = simple_df.copy()
+    df["batch"] = (["b1"] * 25 + ["b2"] * 25) * 3
+
+    deferred = geom_signif(comparisons=[("A", "C")], test="mannwhitney")
+    layers = deferred.resolve(simple_df, x_col="group", y_col="value")
+
+    p = ggplot(df, aes("group", "value")) + geom_violin() + facet_wrap("batch")
+    for layer in layers:
+        p = p + layer
+    assert isinstance(p, ggplot_class)
+    p.draw()
+
+
+def test_plot_violin_stats_with_facet_like_grouping(mock_df):
+    """plot_expression facets by feature; verify it composes with the same
+    y-range logic significance annotations rely on (smoke test at the
+    package level rather than through plot_violin_stats, which has no
+    facet_by argument)."""
+    from ggnomics import plot_expression
+
+    p = plot_expression(mock_df, features=["Gene0001", "Gene0002"], group_by="cluster")
+    assert isinstance(p, ggplot_class)
+    p.draw()
+
+
+# ---------------------------------------------------------------------------
+# Transformed / expanded y-axis
+# ---------------------------------------------------------------------------
+
+
+def test_violin_stats_log_scale_y_axis_compatible(simple_df):
+    """Significance brackets must not prevent adding a log-scale y transform
+    on top of the returned (still-modifiable) plot."""
+    from plotnine import scale_y_log10
+
+    df = simple_df.copy()
+    df["value"] = df["value"] - df["value"].min() + 1.0  # keep values positive
+
+    p = plot_violin_stats(df, "value", group_by="group", comparisons=[("A", "C")])
+    p2 = p + scale_y_log10()
+    assert isinstance(p2, ggplot_class)
+    p2.draw()
+
+
+def test_plot_violin_stats_returns_modifiable_ggplot(simple_df):
+    """The returned plot must remain a normal, further-modifiable ggplot object."""
+    from plotnine import ggtitle, theme_dark
+
+    p = plot_violin_stats(simple_df, "value", group_by="group", comparisons=[("A", "C")])
+    p2 = p + ggtitle("Modified") + theme_dark()
+    assert isinstance(p2, ggplot_class)
+    p2.draw()
+
+
+def test_signif_module_does_not_import_container_backends():
+    import ggnomics.signif._geom as geom_mod
+    import ggnomics.signif._stats as stats_mod
+    import ggnomics.signif._brackets as brackets_mod
+
+    for module in (geom_mod, stats_mod, brackets_mod):
+        source_globals = set(vars(module).keys())
+        assert "AnnData" not in source_globals
+        assert "SingleCellExperiment" not in source_globals
+        assert "SummarizedExperiment" not in source_globals
+        assert "MuData" not in source_globals

@@ -1,12 +1,12 @@
 import numpy as np
-from sklearn.decomposition import PCA
-from scipy import linalg
 from .result import PcaResult
 
 def run_pca_sklearn(data: np.ndarray, n_components: int = 50, **kwargs) -> PcaResult:
     """
     Run PCA using scikit-learn.
     """
+    from sklearn.decomposition import PCA
+
     pca = PCA(n_components=n_components, **kwargs)
     scores = pca.fit_transform(data)
     loadings = pca.components_.T
@@ -29,6 +29,8 @@ def run_pca_svd(data: np.ndarray, n_components: int = 50) -> PcaResult:
     # Loadings = V^T (or V, depending on definition. sklearn components_ is V^T)
     # data is (n_samples, n_features)
     
+    from scipy import linalg
+
     U, s, Vt = linalg.svd(data, full_matrices=False)
     
     # helper to truncate

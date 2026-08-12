@@ -125,6 +125,38 @@ def test_box_stats_adata_gene(mock_adata):
     assert isinstance(p, ggplot_class)
 
 
+def test_violin_stats_sce_gene(mock_sce):
+    p = plot_violin_stats(mock_sce, feature="Gene0001", group_by="cluster")
+    assert isinstance(p, ggplot_class)
+
+
+def test_box_stats_sce_gene(mock_sce):
+    p = plot_box_stats(mock_sce, feature="Gene0001", group_by="cluster")
+    assert isinstance(p, ggplot_class)
+
+
+def test_violin_stats_se(mock_se):
+    p = plot_violin_stats(mock_se, feature="Gene0001", group_by="condition")
+    assert isinstance(p, ggplot_class)
+    p.draw()
+
+
+def test_box_stats_se(mock_se):
+    p = plot_box_stats(mock_se, feature="Gene0001", group_by="condition")
+    assert isinstance(p, ggplot_class)
+    p.draw()
+
+
+def test_violin_stats_missing_column_raises(mock_df):
+    with pytest.raises(KeyError):
+        plot_violin_stats(mock_df, feature="nonexistent", group_by="cluster")
+
+
+def test_violin_stats_unsupported_type_raises():
+    with pytest.raises(TypeError, match="plot_violin_stats does not support"):
+        plot_violin_stats(object(), feature="x", group_by="y")
+
+
 # ---------------------------------------------------------------------------
 # plot_scatter_marginal — now returns Compose (plotnine native composition)
 # ---------------------------------------------------------------------------
@@ -152,6 +184,26 @@ def test_scatter_marginal_adata(mock_adata):
 
 def test_scatter_marginal_with_title(mock_df):
     result = plot_scatter_marginal(mock_df, x="UMAP1", y="UMAP2", title="QC scatter")
+    assert isinstance(result, Compose)
+
+
+def test_scatter_marginal_boxplot_mode(mock_df):
+    result = plot_scatter_marginal(mock_df, x="UMAP1", y="UMAP2", marginal="boxplot")
+    assert isinstance(result, Compose)
+
+
+def test_scatter_marginal_invalid_mode_raises(mock_df):
+    with pytest.raises(ValueError, match="marginal must be one of"):
+        plot_scatter_marginal(mock_df, x="UMAP1", y="UMAP2", marginal="bogus")
+
+
+def test_scatter_marginal_sce(mock_sce):
+    result = plot_scatter_marginal(mock_sce, x="n_counts", y="n_genes_detected")
+    assert isinstance(result, Compose)
+
+
+def test_scatter_marginal_se(mock_se):
+    result = plot_scatter_marginal(mock_se, x="library_size", y="Gene0001")
     assert isinstance(result, Compose)
 
 
@@ -200,3 +252,29 @@ def test_embedding_panel_categorical_feature(mock_adata):
     from plotnine.ggplot import ggplot as ggplot_class
     result = plot_embedding_panel(mock_adata, features=["cluster"], ncol=1)
     assert isinstance(result, (ggplot_class, Compose))
+
+
+def test_embedding_panel_missing_features_reports_full_list(mock_adata):
+    """All missing features must be reported together, not silently skipped."""
+    with pytest.raises(ValueError) as exc_info:
+        plot_embedding_panel(
+            mock_adata, features=["Gene0001", "nonexistent1", "nonexistent2"], ncol=2
+        )
+    message = str(exc_info.value)
+    assert "nonexistent1" in message
+    assert "nonexistent2" in message
+
+
+def test_embedding_panel_empty_features_raises(mock_df):
+    with pytest.raises(ValueError, match="non-empty"):
+        plot_embedding_panel(mock_df, features=[], dimred="UMAP")
+
+
+def test_embedding_panel_se_unsupported(mock_se):
+    with pytest.raises(TypeError, match="plot_embedding_panel does not support"):
+        plot_embedding_panel(mock_se, features=["Gene0001"])
+
+
+def test_embedding_panel_sce(mock_sce):
+    result = plot_embedding_panel(mock_sce, features=["Gene0001", "Gene0002"], ncol=2)
+    assert isinstance(result, Compose)

@@ -90,31 +90,25 @@ def marker_dotplot_from_matrix(
     return marker_dotplot(df, title=title)
 
 
-# Optional dynamic SCE adapter for convenience
-try:  # pragma: no cover - optional
-    from singlecellexperiment import SingleCellExperiment  # type: ignore
+# SCE convenience wrapper. Duck-types on `sce` (via the shared helpers in
+# ggnomics.violin) rather than importing SingleCellExperiment, so it needs no
+# optional-dependency guard: it only touches the singlecellexperiment package
+# if and when a caller actually passes such an object.
+def marker_dotplot_sce(
+    sce,
+    genes: Sequence[str],
+    group_col: str,
+    *,
+    assay: str = "logcounts",
+    expr_threshold: float = 0.0,
+    title: Optional[str] = None,
+):
     from .violin import _get_assay_matrix, _get_row_names, _get_col_data
 
-    def marker_dotplot_sce(
-        sce: "SingleCellExperiment",
-        genes: Sequence[str],
-        group_col: str,
-        *,
-        assay: str = "logcounts",
-        expr_threshold: float = 0.0,
-        title: Optional[str] = None,
-    ):
-        mat = _get_assay_matrix(sce, assay)
-        if hasattr(mat, "toarray"):
-            mat = mat.toarray()
-        genes_all = list(_get_row_names(sce) or [])
-        if mat.shape[0] == len(genes_all):
-            X = mat.T  # cells × genes
-            genes_axis = genes_all
-        else:
-            X = mat
-            genes_axis = genes_all
-        meta = _get_col_data(sce)
-        return marker_dotplot_from_matrix(X, meta[group_col].values, genes, expr_threshold=expr_threshold, title=title)
-except Exception:
-    pass
+    mat = _get_assay_matrix(sce, assay)
+    if hasattr(mat, "toarray"):
+        mat = mat.toarray()
+    genes_all = list(_get_row_names(sce) or [])
+    X = mat.T if mat.shape[0] == len(genes_all) else mat
+    meta = _get_col_data(sce)
+    return marker_dotplot_from_matrix(X, meta[group_col].values, genes, expr_threshold=expr_threshold, title=title)

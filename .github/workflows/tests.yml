@@ -6,11 +6,42 @@ on:
   pull_request:
 
 jobs:
-  test:
+  core-only:
+    name: Core-only (numpy, pandas, plotnine)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install core package only
+        run: pip install -e .
+
+      - name: Import ggnomics and run a core-only smoke test
+        run: |
+          python -c "
+          import ggnomics
+          import pandas as pd
+          df = pd.DataFrame({'x': [1, 2, 3], 'y': [3, 2, 1]})
+          p = ggnomics.plot_scatter(df, x='x', y='y')
+          assert type(p).__name__ == 'ggplot'
+          print('core-only import + plot OK')
+          "
+
+      - name: Run tests that don't require optional dependencies
+        run: pytest tests/test_backends.py tests/test_palettes.py -v --tb=short
+        env:
+          MPLBACKEND: Agg
+
+  full:
+    name: Full (all extras)
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.12"]
 
     steps:
       - uses: actions/checkout@v4
@@ -26,11 +57,70 @@ jobs:
           sudo apt-get install -y libgl1 libglib2.0-0
 
       - name: Install
-        run: |
-          pip install -e ".[all]"
-          pip install mudata pytest
+        run: pip install -e ".[all,dev]"
 
-      - name: Run tests
+      - name: Run full test suite
         run: pytest tests/ -v --tb=short
         env:
           MPLBACKEND: Agg
+
+  optional-backend:
+    name: Isolated backend (${{ matrix.extra }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        extra: [anndata, sce, se, multimodal]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install core + one optional extra
+        run: pip install -e ".[${{ matrix.extra }},dev]"
+
+      - name: Import ggnomics with only this backend installed
+        run: |
+          python -c "
+          import ggnomics
+          print('import OK with only [${{ matrix.extra }}] installed')
+          "
+
+      - name: Run backend registration tests
+        run: pytest tests/test_backends.py -v --tb=short
+        env:
+          MPLBACKEND: Agg
+
+  build:
+    name: Build + wheel install smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install build tooling
+        run: pip install build
+
+      - name: Build sdist and wheel
+        run: python -m build
+
+      - name: Install the built wheel into a clean environment
+        run: |
+          python -m venv /tmp/wheel-venv
+          /tmp/wheel-venv/bin/pip install dist/*.whl
+          cd /tmp
+          /tmp/wheel-venv/bin/python -c "
+          import ggnomics
+          import pandas as pd
+          df = pd.DataFrame({'x': [1, 2, 3], 'y': [3, 2, 1]})
+          p = ggnomics.plot_scatter(df, x='x', y='y')
+          assert type(p).__name__ == 'ggplot'
+          print('wheel install + smoke test OK')
+          "

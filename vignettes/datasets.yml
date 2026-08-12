@@ -1,0 +1,157 @@
+# Machine-readable provenance manifest for every real public dataset used in the
+# ggnomics documentation. Rendered as a human-readable table by
+# `_includes/provenance.py` and embedded in `index.qmd`.
+#
+# Fields marked "TBD" are filled in during dataset inspection (see
+# single-cell-scranpy.qmd / bulk-rnaseq.qmd / multimodal.qmd / specialized-plots.qmd)
+# and are not guessed ahead of actually loading the resource.
+
+datasets:
+  - id: zeisel-brain-2015
+    display_name: "Zeisel mouse brain (2015)"
+    provider: scrnaseq (BiocPy)
+    accession: zeisel-brain-2015
+    version: "2023-12-14"
+    source_url: https://bioconductor.org/packages/release/data/experiment/html/scRNAseq.html
+    organism: Mus musculus
+    tissue: brain (cortex, hippocampus)
+    expected_object_class: SingleCellExperiment
+    expected_dims: "confirmed live: 20,006 features x 3,005 cells (exact match)"
+    key_annotations: [level1class (7 classes), level2class (49 classes)]
+    used_in:
+      - getting-started.qmd (deterministic stratified subset)
+      - single-cell-scranpy.qmd (full dataset)
+      - specialized-plots.qmd
+      - plot-gallery.qmd
+    fallback: none
+    retrieval_date: "2026-08-12"
+    notes: >
+      Confirmed live: altExps present are "repeat" and "ERCC"; no stored
+      reduced dimensions (PCA/UMAP computed fresh via scranpy in
+      single-cell-scranpy.qmd); 34 mitochondrial genes identified by an
+      "mt-" row-name prefix (standard mouse mitochondrial gene symbols).
+
+  - id: baron-pancreas-2016
+    display_name: "Baron human pancreas (2016)"
+    provider: scrnaseq (BiocPy)
+    accession: baron-pancreas-2016
+    version: "2023-12-14"
+    path: human
+    source_url: https://bioconductor.org/packages/release/data/experiment/html/scRNAseq.html
+    organism: Homo sapiens
+    tissue: pancreas
+    expected_object_class: SingleCellExperiment
+    expected_dims: "confirmed live: 20,125 features x 8,569 cells"
+    key_annotations:
+      - "donor: 4 GEO sample IDs (GSM2230757-GSM2230760), used as the biological-sample identifier"
+      - "label: 14 pancreatic cell types (beta, alpha, ductal, acinar, delta, activated_stellate, gamma, endothelial, quiescent_stellate, macrophage, mast, epsilon, schwann, t_cell), used as the cell-type grouping"
+    used_in:
+      - specialized-plots.qmd (abundance/composition, pseudobulk)
+      - plot-gallery.qmd
+    fallback: none
+    retrieval_date: "2026-08-12"
+
+  - id: E-MTAB-1625
+    display_name: "Rice salt-stress bulk RNA-seq (E-MTAB-1625)"
+    provider: pyexpressionatlas (BiocPy, wraps EMBL-EBI Expression Atlas)
+    accession: E-MTAB-1625
+    version: null  # Expression Atlas experiments are not separately versioned
+    source_url: https://www.ebi.ac.uk/gxa/experiments/E-MTAB-1625
+    organism: Oryza sativa Japonica Group (rice)
+    tissue: "shoot axis, vascular leaf (2-week-old seedlings)"
+    expected_object_class: "dict[str, SummarizedExperiment] (rnaseq assay)"
+    expected_dims: >
+      confirmed live: 38,866 genes x 18 samples - NOT the ~58,735 x 24 assumed from the
+      accession description before inspection; the live object is authoritative and this
+      variant covers shoot tissue only, with a clean balanced factorial design.
+    key_annotations:
+      - "growth condition: 2 levels (300 millimolar sodium chloride / normal watering)"
+      - "time: 3 levels (1 hour / 5 hour / 24 hour)"
+      - "design is a full 2x3 factorial with exactly 3 biological replicates per cell (18 = 2x3x3)"
+    contrast_used: >
+      growth_condition (300mM NaCl vs normal watering) at the matched 24-hour timepoint,
+      n=3 vs n=3, design=~growth_condition, reference level "normal watering" - the most
+      differentiated (chronic) stress timepoint, with genuine replication at a verified
+      common timepoint per the dataset policy.
+    used_in:
+      - bulk-rnaseq.qmd
+      - specialized-plots.qmd (reused DE results)
+      - plot-gallery.qmd
+    fallback: not needed - E-MTAB-1625 provided a clean, estimable, replicated contrast.
+    retrieval_date: "2026-08-12"
+
+  - id: EH7740
+    display_name: "CITEVizTestDataSC PBMC CITE-seq"
+    provider: experimenthub (BiocPy)
+    accession: EH7740
+    version: null
+    source_url: https://bioconductor.org/packages/release/data/experiment/html/CITEVizTestData.html
+    organism: Homo sapiens
+    tissue: peripheral blood mononuclear cells (PBMC)
+    expected_object_class: SingleCellExperiment
+    expected_dims: "~2,500 cells; RNA + ADT"
+    key_annotations: n/a - failed to load, see actually_used below
+    used_in:
+      - multimodal.qmd
+      - plot-gallery.qmd
+    fallback:
+      condition: "EH7740 fails to load, or has no usable ADT measurements"
+      resources:
+        - {id: EH3534, content: "Mair PBMC RNA counts"}
+        - {id: EH3535, content: "Mair PBMC RNA row metadata"}
+        - {id: EH3536, content: "Mair PBMC ADT counts"}
+        - {id: EH3537, content: "Mair PBMC ADT row metadata"}
+        - {id: EH3538, content: "Mair PBMC cell metadata"}
+    actually_used: >
+      FALLBACK (EH3534-EH3538). Confirmed live: EH7740's RDS file fails to parse with the
+      installed experimenthub/rds2py version - RdsParserError: "failed to parse an S4
+      object's body ... failed to parse pairlist element 'int_colData' ... class
+      attribute in an S4 object should have a 'package' character attribute". This is a
+      genuine rds2py parser limitation for this resource's nested int_colData structure,
+      not a data-availability problem. The fallback bundle (Mair et al. BD Rhapsody PBMC
+      CITE-seq) loaded cleanly: 499 RNA features x 29,033 cells (EH3534/EH3535), 42 ADT
+      features x 29,033 cells (EH3536/EH3537), and 3-column cell metadata (EH3538:
+      Sample_Tag/Sample_Name/Cartridge) identifying 3 main donors (Donor1-3_Bulk) plus
+      small EBV-transformed subsets and Multiplet/Undetermined droplets (dropped).
+      IMPORTANT: none of the 42 ADT panel antibodies are isotype controls (all are named
+      immune markers, e.g. CD3/CD4/CD8/CD19/CD14/HLA-DR/...) - `plot_adt_qc` therefore
+      could not be demonstrated on this dataset without fabricating a control, and is
+      documented as an honest limitation rather than given a false isotype-control label.
+    retrieval_date: "2026-08-12"
+
+  - id: EH4616
+    display_name: "CTCL TCR alpha/beta repertoire"
+    provider: experimenthub (BiocPy)
+    accession: EH4616
+    version: null
+    source_url: https://bioconductor.org/packages/release/data/experiment/html/ExperimentHub.html
+    organism: Homo sapiens
+    tissue: T cells (cutaneous T-cell lymphoma, CTCL)
+    expected_object_class: "data.frame (10x Cell Ranger VDJ filtered_contig_annotations convention)"
+    expected_dims: "confirmed live: 9,626 contigs"
+    key_annotations:
+      - "barcode, chain (TRA/TRB/Multi/IG*/TRG/TRD), v_gene, d_gene, j_gene, c_gene, cdr3, cdr3_nt, productive, raw_clonotype_id (present natively, but only unique within this one 10x run)"
+    used_in:
+      - specialized-plots.qmd (repertoire section)
+      - plot-gallery.qmd
+    fallback:
+      optional_extra: [{id: EH4617, content: "CTCL TCR gamma/delta"}]
+    retrieval_date: "2026-08-12"
+
+  - id: EH4621
+    display_name: "Control TCR alpha/beta repertoire"
+    provider: experimenthub (BiocPy)
+    accession: EH4621
+    version: null
+    source_url: https://bioconductor.org/packages/release/data/experiment/html/ExperimentHub.html
+    organism: Homo sapiens
+    tissue: T cells (healthy control)
+    expected_object_class: "data.frame (10x Cell Ranger VDJ filtered_contig_annotations convention)"
+    expected_dims: "confirmed live: 8,359 contigs"
+    key_annotations: "same schema as EH4616"
+    used_in:
+      - specialized-plots.qmd (repertoire section)
+      - plot-gallery.qmd
+    fallback:
+      optional_extra: [{id: EH4622, content: "control TCR gamma/delta"}]
+    retrieval_date: "2026-08-12"

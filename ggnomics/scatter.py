@@ -1,7 +1,8 @@
-"""Scatter-plot hierarchy: _scatter_ggplot → plot_scatter → plot_reduced_dim → plot_umap/pca/tsne."""
+"""Plotnine scatter and embedding plots with optional container dispatch."""
 
 from __future__ import annotations
 
+from functools import singledispatch
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
@@ -20,8 +21,67 @@ from plotnine import (
     coord_fixed,
 )
 
-from ._accessor import DataAccessor, _strip_x_prefix
 from ._utils import adaptive_size, adaptive_stroke
+
+
+def _strip_x_prefix(key: str) -> str:
+    """Remove the leading ``X_`` used by the AnnData embedding convention."""
+
+    return key[2:] if key.lower().startswith("x_") else key
+
+
+def _embedding_key_candidates(key: str) -> list[str]:
+    """Return common AnnData and SingleCellExperiment key variants."""
+
+    stripped = _strip_x_prefix(key)
+    candidates: list[str] = []
+    for candidate in (
+        key,
+        f"X_{stripped}",
+        stripped,
+        stripped.upper(),
+        key.upper(),
+        key.lower(),
+    ):
+        if candidate not in candidates:
+            candidates.append(candidate)
+    return candidates
+
+
+def _embedding_frame_from_dataframe(data: pd.DataFrame, key: str) -> pd.DataFrame:
+    """Find embedding columns in a DataFrame and give them normalized names."""
+
+    columns = list(data.columns)
+    stripped = _strip_x_prefix(key).lower()
+
+    def matches(column: str) -> bool:
+        lowered = str(column).lower()
+        return (
+            lowered.startswith(f"{stripped}_")
+            or lowered.startswith(f"x_{stripped}_")
+            or (
+                lowered.startswith(stripped)
+                and len(lowered) > len(stripped)
+                and lowered[len(stripped)].isdigit()
+            )
+        )
+
+    matched = sorted(column for column in columns if matches(column))
+    if not matched:
+        matched = [
+            column
+            for column in columns
+            if str(column).lower() in {stripped, key.lower()}
+        ]
+    if not matched:
+        raise KeyError(
+            f"Embedding {key!r} not found in DataFrame columns. "
+            f"Available columns: {columns[:20]}"
+        )
+
+    frame = data[matched].copy().reset_index(drop=True)
+    frame.columns = [f"{stripped}_{index + 1}" for index in range(len(matched))]
+    return frame
 
 
 # ---------------------------------------------------------------------------
@@ -113,12 +173,13 @@ def _scatter_ggplot(
 
 
 # ---------------------------------------------------------------------------
-# Layer 2: public DataAccessor-aware function
+# Layer 2: public scatter dispatcher and DataFrame implementation
 # ---------------------------------------------------------------------------
 
 
+@singledispatch
 def plot_scatter(
-    data,
+    data: pd.DataFrame,
     x: str,
     y: str,
     color: Optional[str] = None,
@@ -138,42 +199,87 @@ def plot_scatter(
     title: Optional[str] = None,
     aspect_ratio: Optional[float] = None,
 ) -> ggplot:
-    """General scatter plot for any two variables in a data object.
+    """Plot two columns from a pandas DataFrame.
 
-    ``x`` and ``y`` are resolved in priority order:
-    obs / colData columns → feature names (expression fetched) →
-    DataFrame columns (for plain DataFrames).
+    This DataFrame interface is the canonical plotting API shown by Jupyter.
+    Optional AnnData and SingleCellExperiment implementations extract an
+    equivalent DataFrame and then delegate to this implementation.
 
-    ``color`` follows the same resolution; categorical obs columns use a
-    discrete palette while numeric / expression columns use a continuous cmap.
+    Parameters
+    ----------
+    data:
+        DataFrame containing ``x``, ``y``, and any requested color/facet
+        columns.
+    x, y:
+        Columns mapped to the horizontal and vertical axes.
+    color:
+        Optional column mapped to color. Numeric columns receive a continuous
+        scale; other columns receive a discrete scale.
+    layer:
+        Ignored for DataFrames. Optional container backends use it to select
+        an expression layer or assay when ``color`` names a feature.
     """
-    acc = DataAccessor(data)
-    n = acc.n_obs()
+    raise TypeError(
+        f"plot_scatter does not support {type(data).__module__}."
+        f"{type(data).__qualname__}. Pass a pandas.DataFrame or install the "
+        "optional dependency for the requested genomics container."
+    )
 
-    x_series, _ = acc.resolve_column(x, layer=None)
-    y_series, _ = acc.resolve_column(y, layer=None)
 
-    color_series: Optional[pd.Series] = None
-    color_is_continuous = False
-    if color is not None:
-        color_series, color_is_continuous = acc.resolve_column(color, layer=layer)
+@plot_scatter.register(pd.DataFrame)
+def _plot_scatter_dataframe(
+    data: pd.DataFrame,
+    x: str,
+    y: str,
+    color: Optional[str] = None,
+    size: Optional[float] = None,
+    stroke: Optional[float] = None,
+    alpha: float = 0.8,
+    palette: Optional[Dict] = None,
+    cmap: str = "viridis",
+    vmin: Optional[float] = None,
+    vmax: Optional[float] = None,
+    layer: Optional[str] = None,
+    facet_by: Optional[str] = None,
+    order: Optional[List] = None,
+    color_label: Optional[str] = None,
+    x_label: Optional[str] = None,
+    y_label: Optional[str] = None,
+    title: Optional[str] = None,
+    aspect_ratio: Optional[float] = None,
+) -> ggplot:
+    del layer  # Layer selection is meaningful only for expression containers.
 
-    facet_series: Optional[pd.Series] = None
-    if facet_by is not None:
-        obs_df = acc.obs()
-        if facet_by not in obs_df.columns:
+    for column in (x, y):
+        if column not in data.columns:
             raise KeyError(
-                f"facet_by '{facet_by}' not found in obs columns. "
-                f"Available: {list(obs_df.columns)[:20]}"
+                f"Column {column!r} not found in DataFrame. "
+                f"Available: {list(data.columns)[:20]}"
             )
-        facet_series = obs_df[facet_by].reset_index(drop=True)
 
-    # Assemble flat DataFrame with safe internal names
-    df = pd.DataFrame({"_gg_x_": x_series.values, "_gg_y_": y_series.values})
-    if color_series is not None:
-        df["_gg_color_"] = color_series.values
-    if facet_series is not None:
-        df["_gg_facet_"] = facet_series.values
+    if color is not None and color not in data.columns:
+        raise KeyError(
+            f"Color column {color!r} not found in DataFrame. "
+            f"Available: {list(data.columns)[:20]}"
+        )
+    if facet_by is not None and facet_by not in data.columns:
+        raise KeyError(
+            f"facet_by {facet_by!r} not found in DataFrame. "
+            f"Available: {list(data.columns)[:20]}"
+        )
+
+    n = len(data)
+    color_is_continuous = bool(
+        color is not None and pd.api.types.is_numeric_dtype(data[color])
+    )
+
+    frame = pd.DataFrame(
+        {"_gg_x_": data[x].to_numpy(), "_gg_y_": data[y].to_numpy()}
+    )
+    if color is not None:
+        frame["_gg_color_"] = data[color].to_numpy()
+    if facet_by is not None:
+        frame["_gg_facet_"] = data[facet_by].to_numpy()
 
     if size is None:
         size = adaptive_size(n)
@@ -181,10 +287,10 @@ def plot_scatter(
         stroke = adaptive_stroke(n)
 
     return _scatter_ggplot(
-        df,
+        frame,
         x="_gg_x_",
         y="_gg_y_",
-        color="_gg_color_" if color_series is not None else None,
+        color="_gg_color_" if color is not None else None,
         color_is_continuous=color_is_continuous,
         size=size,
         stroke=stroke,
@@ -197,19 +303,20 @@ def plot_scatter(
         x_label=x_label if x_label is not None else x,
         y_label=y_label if y_label is not None else y,
         title=title,
-        facet_by="_gg_facet_" if facet_series is not None else None,
+        facet_by="_gg_facet_" if facet_by is not None else None,
         order=order,
         aspect_ratio=aspect_ratio,
     )
 
 
 # ---------------------------------------------------------------------------
-# Layer 3: embedding convenience wrapper
+# Layer 3: public embedding dispatcher and DataFrame implementation
 # ---------------------------------------------------------------------------
 
 
-def plot_reduced_dim(
-    data,
+@singledispatch
+def plot_embedding(
+    data: pd.DataFrame,
     dimred: str = "X_umap",
     components: Tuple[int, int] = (1, 2),
     color: Optional[str] = None,
@@ -226,22 +333,47 @@ def plot_reduced_dim(
     title: Optional[str] = None,
     color_label: Optional[str] = None,
 ) -> ggplot:
-    """Plot a 2-D embedding stored in obsm / reducedDims.
+    """Plot embedding columns from a pandas DataFrame.
 
-    ``dimred`` is resolved case-insensitively and with or without the ``X_``
-    prefix.  ``components=(1, 2)`` selects the 1st and 2nd dimensions
-    (1-indexed).  The x and y axis labels default to e.g. ``"UMAP 1"`` /
-    ``"UMAP 2"``.
+    DataFrame embedding columns may use names such as ``UMAP1``, ``UMAP2``,
+    ``umap_1``, or ``X_umap_1``. ``components`` is one-indexed.
 
-    Calls ``plot_scatter`` internally after extracting the embedding columns
-    and, if needed, pre-fetching gene expression for *color*.
+    Optional container backends resolve ``dimred`` from ``AnnData.obsm`` or
+    ``SingleCellExperiment.reduced_dimensions`` and delegate here. ``layer``
+    is ignored for DataFrames and used by those backends for feature coloring.
     """
-    acc = DataAccessor(data)
+    raise TypeError(
+        f"plot_embedding does not support {type(data).__module__}."
+        f"{type(data).__qualname__}. Pass a pandas.DataFrame or install the "
+        "optional dependency for the requested genomics container."
+    )
 
-    emb_df = acc.get_embedding(dimred)
+
+@plot_embedding.register(pd.DataFrame)
+def _plot_embedding_dataframe(
+    data: pd.DataFrame,
+    dimred: str = "X_umap",
+    components: Tuple[int, int] = (1, 2),
+    color: Optional[str] = None,
+    layer: Optional[str] = None,
+    size: Optional[float] = None,
+    stroke: Optional[float] = None,
+    alpha: float = 0.8,
+    palette: Optional[Dict] = None,
+    cmap: str = "viridis",
+    vmin: Optional[float] = None,
+    vmax: Optional[float] = None,
+    facet_by: Optional[str] = None,
+    order: Optional[List] = None,
+    title: Optional[str] = None,
+    color_label: Optional[str] = None,
+) -> ggplot:
+    del layer
+
+    emb_df = _embedding_frame_from_dataframe(data, dimred)
     comp_cols = list(emb_df.columns)
     ci, cj = components[0] - 1, components[1] - 1
-    if ci >= len(comp_cols) or cj >= len(comp_cols):
+    if ci < 0 or cj < 0 or ci >= len(comp_cols) or cj >= len(comp_cols):
         raise IndexError(
             f"components={components} out of range for embedding with "
             f"{len(comp_cols)} dimensions."
@@ -254,22 +386,21 @@ def plot_reduced_dim(
     y_safe = f"__emb_{y_col}__"
     emb_2d = emb_df[[x_col, y_col]].rename(columns={x_col: x_safe, y_col: y_safe})
 
-    obs_df = acc.obs().reset_index(drop=True)
-    work_df = pd.concat([emb_2d.reset_index(drop=True), obs_df], axis=1)
+    work_df = pd.concat(
+        [emb_2d.reset_index(drop=True), data.reset_index(drop=True)],
+        axis=1,
+    )
 
-    # Pre-fetch gene expression for color if needed
-    color_col = color
-    if color is not None and color not in obs_df.columns:
-        if color in acc.var_names():
-            expr = acc.get_expression([color], layer=layer)
-            work_df["__color_expr__"] = expr[color].values
-            color_col = "__color_expr__"
-        else:
-            raise KeyError(
-                f"'{color}' not found in obs columns or feature names. "
-                f"Obs columns: {list(obs_df.columns)[:10]}. "
-                f"Feature names (first 10): {acc.var_names()[:10]}"
-            )
+    if color is not None and color not in data.columns:
+        raise KeyError(
+            f"Color column {color!r} not found in DataFrame. "
+            f"Available: {list(data.columns)[:20]}"
+        )
+    if facet_by is not None and facet_by not in data.columns:
+        raise KeyError(
+            f"facet_by {facet_by!r} not found in DataFrame. "
+            f"Available: {list(data.columns)[:20]}"
+        )
 
     base_name = _strip_x_prefix(dimred).upper()
     x_label = f"{base_name} {components[0]}"
@@ -279,7 +410,7 @@ def plot_reduced_dim(
         work_df,
         x=x_safe,
         y=y_safe,
-        color=color_col,
+        color=color,
         size=size,
         stroke=stroke,
         alpha=alpha,
@@ -297,13 +428,18 @@ def plot_reduced_dim(
     )
 
 
+# Compatibility names are true aliases: all share one dispatch registry.
+plot_reduced_dim = plot_embedding
+dim_plot = plot_embedding
+
+
 def plot_umap(
     data,
     color: Optional[str] = None,
     **kwargs,
 ) -> ggplot:
-    """Convenience wrapper: ``plot_reduced_dim`` with ``dimred='X_umap'``."""
-    return plot_reduced_dim(data, dimred="X_umap", color=color, **kwargs)
+    """Plot the first two dimensions of the ``X_umap`` embedding."""
+    return plot_embedding(data, dimred="X_umap", color=color, **kwargs)
 
 
 def plot_pca(
@@ -312,8 +448,14 @@ def plot_pca(
     components: Tuple[int, int] = (1, 2),
     **kwargs,
 ) -> ggplot:
-    """Convenience wrapper: ``plot_reduced_dim`` with ``dimred='X_pca'``."""
-    return plot_reduced_dim(data, dimred="X_pca", components=components, color=color, **kwargs)
+    """Plot selected dimensions of the ``X_pca`` embedding."""
+    return plot_embedding(
+        data,
+        dimred="X_pca",
+        components=components,
+        color=color,
+        **kwargs,
+    )
 
 
 def plot_tsne(
@@ -321,5 +463,16 @@ def plot_tsne(
     color: Optional[str] = None,
     **kwargs,
 ) -> ggplot:
-    """Convenience wrapper: ``plot_reduced_dim`` with ``dimred='X_tsne'``."""
-    return plot_reduced_dim(data, dimred="X_tsne", color=color, **kwargs)
+    """Plot the first two dimensions of the ``X_tsne`` embedding."""
+    return plot_embedding(data, dimred="X_tsne", color=color, **kwargs)
+
+
+__all__ = [
+    "plot_scatter",
+    "plot_embedding",
+    "plot_reduced_dim",
+    "dim_plot",
+    "plot_umap",
+    "plot_pca",
+    "plot_tsne",
+]

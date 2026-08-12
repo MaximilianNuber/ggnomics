@@ -1,5 +1,5 @@
 from typing import Optional
-from ggnomics.plotting.utils import plot_reduced_dim
+from ..scatter import plot_embedding as _plot_reduced_dim
 from .pca import build_plot_df_from_sce
 
 # Placeholder for UMAP logic since the prompt asked for "do the same thing for UMAP"
@@ -62,8 +62,7 @@ def plot_umap(
         run_umap(sce, dest_key=dim_name)
 
     plot_df = build_plot_df_from_sce(sce, dim_name=dim_name, prefix="umap")
-    
-    x = f"umap_{x_comp}"
-    y = f"umap_{y_comp}"
-    
-    return plot_reduced_dim(plot_df, x=x, y=y, color=color, size=size, **kwargs)
+
+    return _plot_reduced_dim(
+        plot_df, dimred="umap", components=(x_comp, y_comp), color=color, size=size, **kwargs
+    )

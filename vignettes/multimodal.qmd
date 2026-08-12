@@ -1,0 +1,221 @@
+---
+title: "Multimodal: RNA + protein (CITE-seq)"
+subtitle: "RNA/ADT interoperability in PBMC CITE-seq data"
+---
+
+CITE-seq measures transcripts and surface proteins in the same cells. This
+workflow uses a PBMC dataset to combine RNA and antibody-derived tag (ADT)
+measurements with BiocPy, AnnData, MuData, and ggnomics.
+
+```{python}
+import sys, pathlib
+sys.path.insert(0, str(pathlib.Path("_includes").resolve()))
+from setup import configure_warnings, ensure_matplotlib_initialized
+ensure_matplotlib_initialized()
+configure_warnings()
+
+import numpy as np
+import pandas as pd
+import ggnomics as gg
+from plotnine import theme_bw, labs, theme
+```
+
+## 1. Data source
+
+ExperimentHub resource `EH7740` (`CITEVizTestDataSCE`, approximately 2,500
+cells) is distributed as a multimodal `SingleCellExperiment`. With the
+current `experimenthub`/`rds2py` versions, its nested `int_colData` structure
+cannot be parsed:
+
+```{python}
+from experimenthub import ExperimentHubRegistry
+from setup import EXPERIMENTHUB_CACHE
+
+hub = ExperimentHubRegistry(cache_dir=str(EXPERIMENTHUB_CACHE))
+try:
+    hub.load("EH7740")
+except Exception as exc:
+    print(f"{type(exc).__name__}: {str(exc)[:200]}...")
+```
+
+We therefore use the Mair et al. BD Rhapsody PBMC resources
+`EH3534`–`EH3538`, which provide 499 RNA features, 42 ADT features, and
+29,033 droplets from three main donors. The individual ExperimentHub
+resources are assembled by `load_pbmc_cite_seq()`.
+
+```{python}
+from data import load_pbmc_cite_seq
+
+mods, note = load_pbmc_cite_seq()
+note
+```
+
+## 2. Discovering the RNA and ADT representations
+
+```{python}
+rna, adt = mods["rna"], mods["adt"]
+rna
+```
+
+```{python}
+adt
+```
+
+```{python}
+adt.obs["donor"].value_counts()
+```
+
+## 3. Validating shared cell identifiers
+
+The two cartridges reuse some numeric barcodes, so a barcode alone is not a
+unique cell identifier. The loader combines barcode and cartridge, verifies
+the correspondence between modalities, and preserves the resulting order.
+After assembly, the RNA and ADT observation names should match:
+
+```{python}
+(rna.obs_names == adt.obs_names).all()
+```
+
+## 4. Mapping RNA genes to ADT proteins
+
+Protein names do not always match their corresponding gene symbols.
+`adt.var["Alternative"]` provides the mapping used here:
+
+```{python}
+rna_genes = set(rna.var_names)
+matched = [(protein, gene) for protein, gene in adt.var["Alternative"].items() if gene in rna_genes]
+len(matched), matched[:8]
+```
+
+## 5. RNA QC and ADT QC
+
+```{python}
+rna_qc = pd.DataFrame({
+    "n_counts": np.asarray(rna.X.sum(axis=1)).ravel(),
+    "n_features": (rna.X > 0).sum(axis=1),
+    "donor": rna.obs["donor"].to_numpy(),
+})
+gg.plot_coldata(rna_qc, x="n_counts", y="n_features", color_by="donor") + theme_bw() + labs(title="RNA QC (targeted 499-gene panel)")
+```
+
+`plot_adt_qc` uses isotype controls to estimate background signal. This
+panel contains immune markers but no annotated isotype-control antibodies,
+as seen from its feature names:
+
+```{python}
+sorted(adt.var_names)
+```
+
+```{python}
+try:
+    gg.plot_adt_qc(adt, isotype_controls=[])
+except ValueError as exc:
+    print("ValueError:", exc)
+```
+
+The function therefore cannot calculate an isotype-based QC summary for this
+dataset. The empty control list in the check above shows the corresponding validation
+error; the [API reference](../mkdocs) documents the required input.
+
+A control-free library-size check can still be drawn with `plot_coldata`:
+
+```{python}
+adt_qc = pd.DataFrame({
+    "adt_counts": np.asarray(adt.X.sum(axis=1)).ravel(),
+    "donor": adt.obs["donor"].to_numpy(),
+})
+gg.plot_coldata(adt_qc, x="donor", y="adt_counts", shape="violin") + theme_bw() + labs(title="ADT library size by donor", y="Total ADT counts")
+```
+
+The raw ADT counts are strongly right-skewed, so the scatter and embedding
+plots below use a log1p-transformed copy of the ADT modality:
+
+```{python}
+adt_log = adt.copy()
+adt_log.X = np.log1p(adt_log.X)
+```
+
+## 6. RNA-versus-protein scatter (MuData)
+
+```{python}
+import mudata as mu
+
+mu.set_options(pull_on_update=False)
+mdata = mu.MuData({"rna": rna, "prot": adt_log})
+mdata
+```
+
+```{python}
+gg.plot_bimodal_scatter(mdata, x_feature="CD3E", y_feature="CD3", x_mod="rna", y_mod="prot") + theme_bw() + labs(title="CD3E (RNA) vs. CD3 (protein)", y="log1p(CD3 ADT counts)")
+```
+
+## 7. Matched gene/protein panel
+
+```{python}
+pairs = [(gene, protein) for protein, gene in matched if protein in ("CD3", "CD4", "CD8", "CD38")]
+pairs
+```
+
+```{python}
+panels = [
+    gg.plot_bimodal_scatter(mdata, x_feature=g, y_feature=p, x_mod="rna", y_mod="prot") + theme_bw() + theme(figure_size=(3, 3))
+    for g, p in pairs
+]
+panels[0] | panels[1] | panels[2] | panels[3]
+```
+
+## 8. An embedding computed from RNA, colored by RNA and by protein
+
+The ExperimentHub bundle does not include an embedding. We calculate QC
+metrics, normalize the RNA counts, and run PCA and UMAP with `scranpy`,
+following the [single-cell workflow](single-cell-scranpy.qmd). HVG selection
+is omitted because this is already a targeted 499-gene panel. The processed
+object is cached by `run_scranpy_pipeline_on_cite_seq_rna()`.
+
+```{python}
+from data import run_scranpy_pipeline_on_cite_seq_rna
+
+final_rna = run_scranpy_pipeline_on_cite_seq_rna()
+final_rna.get_reduced_dim_names()
+```
+
+```{python}
+final_for_export = final_rna.set_metadata({})
+adata_final, _alt = final_for_export.to_anndata()
+adata_final.X = adata_final.layers["counts"]
+
+# Align the ADT modality to exactly the QC-passing RNA cells (order preserved).
+adt_aligned = adt_log[adata_final.obs_names, :]
+for protein in ("CD3", "CD4", "CD8", "CD38"):
+    adata_final.obs[f"ADT_{protein}"] = np.asarray(adt_aligned[:, protein].X).ravel()
+
+gg.plot_umap(adata_final, color="donor") + theme_bw() + labs(title="RNA-derived UMAP, colored by donor")
+```
+
+```{python}
+gg.plot_umap(adata_final, color="CD3E", layer="counts") + theme_bw() + labs(title="Same UMAP, colored by CD3E RNA expression")
+```
+
+```{python}
+gg.plot_umap(adata_final, color="ADT_CD3") + theme_bw() + labs(title="Same UMAP, colored by CD3 protein (ADT) abundance", colour="log1p(CD3 ADT)")
+```
+
+RNA and protein measurements both highlight the CD3-high T-cell region,
+providing a simple visual comparison across modalities.
+
+## 9. Composability
+
+Because both embeddings are returned as `ggplot` objects, they can be placed
+side by side with plotnine's composition operator:
+
+```{python}
+umap_rna = gg.plot_umap(adata_final, color="CD3E", layer="counts") + theme_bw() + labs(title="RNA: CD3E")
+umap_adt = gg.plot_umap(adata_final, color="ADT_CD3") + theme_bw() + labs(title="Protein: CD3")
+umap_rna | umap_adt
+```
+
+## Next
+
+* [Specialized plots](specialized-plots.qmd) and the [plot gallery](plot-gallery.qmd)
+  for everything else, including the repertoire and significance-bracket
+  functionality.

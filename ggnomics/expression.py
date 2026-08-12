@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from functools import singledispatch
 from typing import Dict, List, Optional
 
 import numpy as np
@@ -25,12 +26,56 @@ from plotnine import (
     scale_size_continuous,
 )
 
-from ._accessor import DataAccessor
 from ._utils import adaptive_size, color_scale, to_long
 
 
+def _unsupported_type(function_name: str, data: object) -> TypeError:
+    return TypeError(
+        f"{function_name} does not support {type(data).__module__}."
+        f"{type(data).__qualname__}. Pass a pandas.DataFrame or install the "
+        "optional dependency for a supported genomics container."
+    )
+
+
+def _validate_features(features: List[str]) -> None:
+    if not features:
+        raise ValueError("`features` must be a non-empty list of feature names.")
+    seen = set()
+    duplicates = sorted({f for f in features if f in seen or seen.add(f)})
+    if duplicates:
+        raise ValueError(
+            f"`features` contains duplicate names, which would make the "
+            f"result ambiguous: {duplicates}"
+        )
+
+
+def _validate_no_collision(features: List[str], metadata_names: List[str]) -> None:
+    collisions = sorted(set(features) & set(metadata_names))
+    if collisions:
+        raise ValueError(
+            f"Name(s) {collisions} are used both as requested feature(s) and "
+            "as metadata column(s), which is ambiguous. Rename one side or "
+            "request a disjoint set of names."
+        )
+
+
+def _require_columns(data: pd.DataFrame, columns: List[str], *, location: str) -> None:
+    missing = [c for c in columns if c not in data.columns]
+    if missing:
+        raise KeyError(
+            f"Column(s) {missing} not found in {location}. "
+            f"Available: {list(data.columns)}"
+        )
+
+
+# ---------------------------------------------------------------------------
+# plot_expression
+# ---------------------------------------------------------------------------
+
+
+@singledispatch
 def plot_expression(
-    data,
+    data: pd.DataFrame,
     features: List[str],
     group_by: str,
     layer: Optional[str] = None,
@@ -42,19 +87,20 @@ def plot_expression(
     point_size: Optional[float] = None,
     title: Optional[str] = None,
 ) -> ggplot:
-    """Violin plot of feature expression across cell groups.
+    """Violin plot of feature expression across cell/sample groups.
 
     Each ``feature`` becomes one facet panel; the x-axis shows ``group_by``
     categories and the y-axis shows expression level.
 
     Args:
-        data: ``pd.DataFrame``, ``anndata.AnnData``, or
-            ``SingleCellExperiment``.
-        features: List of feature/gene names to plot.
-        group_by: Obs column whose categories define the x-axis groups.
-        layer: Expression layer/assay (``None`` → default X / counts).
-        color_by: Obs column to map to fill color.  Defaults to
-            ``group_by``.
+        data: DataFrame whose rows are cells/samples. Requested ``features``
+            and ``group_by``/``color_by`` are columns.
+        features: Non-empty list of feature/gene column names to plot. Must
+            not contain duplicates or collide with ``group_by``/``color_by``.
+        group_by: Column whose categories define the x-axis groups.
+        layer: Present for cross-container signature consistency. Has no
+            effect for a plain DataFrame, which has no concept of layers.
+        color_by: Column to map to fill color. Defaults to ``group_by``.
         palette: ``{category: hex}`` color mapping.
         ncol: Number of columns in ``facet_wrap`` layout.
         log1p: If ``True``, log1p-transform expression values before
@@ -65,33 +111,48 @@ def plot_expression(
 
     Returns:
         A ``plotnine.ggplot`` object.
+
+    Raises:
+        TypeError: If no implementation is registered for ``type(data)``.
+        ValueError: If ``features`` is empty, contains duplicates, or
+            collides with ``group_by``/``color_by``.
+        KeyError: If a requested column is absent.
     """
-    acc = DataAccessor(data)
-    obs_df = acc.obs().reset_index(drop=True)
-    expr_df = acc.get_expression(features, layer=layer)
+    raise _unsupported_type("plot_expression", data)
 
-    if group_by not in obs_df.columns:
-        raise KeyError(f"group_by '{group_by}' not found in obs. Available: {list(obs_df.columns)}")
 
+@plot_expression.register(pd.DataFrame)
+def _plot_expression_dataframe(
+    data: pd.DataFrame,
+    features: List[str],
+    group_by: str,
+    layer: Optional[str] = None,
+    color_by: Optional[str] = None,
+    palette: Optional[Dict] = None,
+    ncol: Optional[int] = None,
+    log1p: bool = False,
+    add_points: bool = False,
+    point_size: Optional[float] = None,
+    title: Optional[str] = None,
+) -> ggplot:
+    _validate_features(features)
     fill_col = color_by if color_by is not None else group_by
-    if fill_col not in obs_df.columns:
-        raise KeyError(f"color_by '{fill_col}' not found in obs.")
+    metadata_names = list(dict.fromkeys([group_by, fill_col]))
+    _validate_no_collision(features, metadata_names)
+    _require_columns(data, metadata_names + features, location="the DataFrame")
 
-    # Build long format
-    id_cols = [group_by]
-    if fill_col != group_by:
-        id_cols.append(fill_col)
-    id_cols_unique = list(dict.fromkeys(id_cols))
+    obs_df = data.reset_index(drop=True)
+    id_cols = metadata_names
 
     wide = pd.concat(
-        [obs_df[id_cols_unique].reset_index(drop=True), expr_df.reset_index(drop=True)],
+        [obs_df[id_cols], obs_df[features]],
         axis=1,
     )
-
-    long = to_long(wide, id_vars=id_cols_unique, value_vars=features)
+    long = to_long(wide, id_vars=id_cols, value_vars=features)
+    long["feature"] = pd.Categorical(long["feature"], categories=features, ordered=True)
 
     if log1p:
-        long["expression"] = np.log1p(long["expression"].values)
+        long["expression"] = np.log1p(long["expression"].to_numpy())
 
     aes_kwargs = {"x": group_by, "y": "expression", "fill": fill_col}
 
@@ -116,8 +177,14 @@ def plot_expression(
     return p
 
 
+# ---------------------------------------------------------------------------
+# plot_dot
+# ---------------------------------------------------------------------------
+
+
+@singledispatch
 def plot_dot(
-    data,
+    data: pd.DataFrame,
     features: List[str],
     group_by: str,
     layer: Optional[str] = None,
@@ -135,14 +202,17 @@ def plot_dot(
     group; dot size encodes the fraction of cells with non-zero expression.
 
     Args:
-        data: ``pd.DataFrame``, ``anndata.AnnData``, or
-            ``SingleCellExperiment``.
-        features: Feature/gene names to display (y-axis).
-        group_by: Obs column for groups (x-axis).
-        layer: Expression layer/assay.
-        scale: If ``True``, scale mean expression per gene to ``[0, 1]``
-            before plotting.
-        dot_max: Maximum dot size (mapped to 100 % expressing).
+        data: DataFrame whose rows are cells/samples. Requested ``features``
+            and ``group_by`` are columns.
+        features: Non-empty list of feature/gene column names to display
+            (y-axis). Must not contain duplicates or collide with
+            ``group_by``.
+        group_by: Column for groups (x-axis).
+        layer: Present for cross-container signature consistency. Has no
+            effect for a plain DataFrame, which has no concept of layers.
+        scale: If ``True``, scale mean expression per gene to
+            ``[col_min, col_max]`` before plotting.
+        dot_max: Maximum dot size (mapped to 100% expressing).
         dot_min: Minimum dot size.
         col_min: Clip scaled expression below this value.
         col_max: Clip scaled expression above this value.
@@ -151,24 +221,41 @@ def plot_dot(
 
     Returns:
         A ``plotnine.ggplot`` object.
+
+    Raises:
+        TypeError: If no implementation is registered for ``type(data)``.
+        ValueError: If ``features`` is empty, contains duplicates, or
+            collides with ``group_by``.
+        KeyError: If a requested column is absent.
     """
-    acc = DataAccessor(data)
-    obs_df = acc.obs().reset_index(drop=True)
-    expr_df = acc.get_expression(features, layer=layer)
+    raise _unsupported_type("plot_dot", data)
 
-    if group_by not in obs_df.columns:
-        raise KeyError(f"group_by '{group_by}' not found in obs.")
 
-    groups = obs_df[group_by].reset_index(drop=True)
+@plot_dot.register(pd.DataFrame)
+def _plot_dot_dataframe(
+    data: pd.DataFrame,
+    features: List[str],
+    group_by: str,
+    layer: Optional[str] = None,
+    scale: bool = True,
+    dot_max: float = 1.0,
+    dot_min: float = 0.0,
+    col_min: float = -2.5,
+    col_max: float = 2.5,
+    palette: str = "viridis",
+    title: Optional[str] = None,
+) -> ggplot:
+    _validate_features(features)
+    _validate_no_collision(features, [group_by])
+    _require_columns(data, [group_by] + features, location="the DataFrame")
 
-    # Compute per-group stats
+    obs_df = data.reset_index(drop=True)
+    groups = obs_df[group_by]
+
     records = []
     for feat in features:
-        vals = expr_df[feat].values
-        series = pd.Series(vals)
-        grp_series = groups
-        tmp = pd.DataFrame({"val": series, "group": grp_series})
-        agg = tmp.groupby("group").agg(
+        tmp = pd.DataFrame({"val": obs_df[feat].to_numpy(), "group": groups.to_numpy()})
+        agg = tmp.groupby("group", observed=True).agg(
             mean_expr=("val", "mean"),
             frac_expr=("val", lambda v: float((v > 0).mean())),
         ).reset_index()
@@ -178,8 +265,6 @@ def plot_dot(
     stats = pd.concat(records, ignore_index=True)
 
     if scale:
-        # Scale mean_expr per feature to [col_min, col_max].
-        # Use transform so the "feature" column is not dropped.
         def _scale_vals(vals: pd.Series) -> pd.Series:
             mn, mx = vals.min(), vals.max()
             rng = mx - mn
@@ -191,8 +276,11 @@ def plot_dot(
         stats["mean_expr"] = stats.groupby("feature")["mean_expr"].transform(_scale_vals)
         stats["mean_expr"] = stats["mean_expr"].clip(col_min, col_max)
 
-    # Clip fraction
     stats["frac_expr"] = stats["frac_expr"].clip(dot_min, dot_max)
+    stats["feature"] = pd.Categorical(stats["feature"], categories=features, ordered=True)
+    stats["group"] = pd.Categorical(
+        stats["group"], categories=list(dict.fromkeys(groups)), ordered=True
+    )
 
     p = (
         ggplot(stats)
@@ -211,8 +299,14 @@ def plot_dot(
     return p
 
 
+# ---------------------------------------------------------------------------
+# plot_heatmap
+# ---------------------------------------------------------------------------
+
+
+@singledispatch
 def plot_heatmap(
-    data,
+    data: pd.DataFrame,
     features: List[str],
     group_by: Optional[str] = None,
     layer: Optional[str] = None,
@@ -229,67 +323,83 @@ def plot_heatmap(
     when ``group_by`` is provided, to group-level mean expression.
 
     Args:
-        data: ``pd.DataFrame``, ``anndata.AnnData``, or
-            ``SingleCellExperiment``.
-        features: Feature/gene names to display.
+        data: DataFrame whose rows are cells/samples. Requested ``features``
+            and ``group_by`` are columns.
+        features: Non-empty list of feature/gene column names to display.
         group_by: When supplied, average expression per group is plotted
             instead of per-cell values (much faster for large datasets).
-        layer: Expression layer/assay.
+        layer: Present for cross-container signature consistency. Has no
+            effect for a plain DataFrame, which has no concept of layers.
         scale: Z-score each feature (row) before plotting.
-        cluster_rows: Hierarchically cluster rows (features).
-        cluster_cols: Hierarchically cluster columns (cells/groups).
+        cluster_rows: Hierarchically cluster rows (features). Requires SciPy.
+        cluster_cols: Hierarchically cluster columns (cells/groups). Requires
+            SciPy.
         palette: Diverging Matplotlib colormap name (default ``"RdBu_r"``).
         title: Plot title.
         show_colnames: Whether to render column axis text.
 
     Returns:
         A ``plotnine.ggplot`` object.
+
+    Raises:
+        TypeError: If no implementation is registered for ``type(data)``.
+        ValueError: If ``features`` is empty or contains duplicates.
+        KeyError: If a requested column is absent.
+        ImportError: If clustering is requested and SciPy is not installed.
     """
-    acc = DataAccessor(data)
-    obs_df = acc.obs().reset_index(drop=True)
-    expr_df = acc.get_expression(features, layer=layer)  # cells × features
+    raise _unsupported_type("plot_heatmap", data)
+
+
+@plot_heatmap.register(pd.DataFrame)
+def _plot_heatmap_dataframe(
+    data: pd.DataFrame,
+    features: List[str],
+    group_by: Optional[str] = None,
+    layer: Optional[str] = None,
+    scale: bool = True,
+    cluster_rows: bool = True,
+    cluster_cols: bool = False,
+    palette: str = "RdBu_r",
+    title: Optional[str] = None,
+    show_colnames: bool = False,
+) -> ggplot:
+    _validate_features(features)
+    required = features + ([group_by] if group_by is not None else [])
+    _require_columns(data, required, location="the DataFrame")
+    if group_by is not None:
+        _validate_no_collision(features, [group_by])
+
+    obs_df = data.reset_index(drop=True)
+    expr_df = obs_df[features]
 
     if group_by is not None:
-        if group_by not in obs_df.columns:
-            raise KeyError(f"group_by '{group_by}' not found in obs.")
-        grp = obs_df[group_by].values
-        mat_dict = {}
-        for feat in features:
-            vals = expr_df[feat].values
-            tmp = pd.Series(vals)
-            grp_s = pd.Series(grp)
-            means = tmp.groupby(grp_s).mean()
-            mat_dict[feat] = means
-        mean_df = pd.DataFrame(mat_dict).T  # features × groups
-        mat = mean_df.values
+        grp = obs_df[group_by]
+        mean_df = expr_df.groupby(grp, observed=True).mean().T  # features x groups
+        mat = mean_df.to_numpy(dtype=float)
         col_labels = list(mean_df.columns.astype(str))
         row_labels = list(mean_df.index)
     else:
-        mat = expr_df.values.T  # features × cells
+        mat = expr_df.to_numpy(dtype=float).T  # features x cells
         col_labels = [str(i) for i in range(mat.shape[1])]
         row_labels = features
 
-    # Z-score per row (feature)
     if scale:
         mu = mat.mean(axis=1, keepdims=True)
         sd = mat.std(axis=1, keepdims=True) + 1e-9
         mat = (mat - mu) / sd
 
-    # Hierarchical clustering
     if cluster_rows and mat.shape[0] > 1:
         row_labels, mat = _hclust_order(mat, labels=row_labels, axis=0)
 
     if cluster_cols and mat.shape[1] > 1:
         col_labels, mat = _hclust_order(mat, labels=col_labels, axis=1)
 
-    # Long format for plotnine
     df_long = (
         pd.DataFrame(mat, index=row_labels, columns=col_labels)
         .reset_index(names="feature")
         .melt(id_vars="feature", var_name="sample", value_name="value")
     )
 
-    # Preserve ordering via Categorical
     df_long["feature"] = pd.Categorical(df_long["feature"], categories=row_labels, ordered=True)
     df_long["sample"] = pd.Categorical(df_long["sample"], categories=col_labels, ordered=True)
 
@@ -324,9 +434,18 @@ def _hclust_order(mat: np.ndarray, labels: list, axis: int):
 
     Returns:
         Tuple ``(reordered_labels, reordered_mat)``.
+
+    Raises:
+        ImportError: If SciPy is not installed.
     """
-    from scipy.cluster.hierarchy import linkage, leaves_list
-    from scipy.spatial.distance import pdist
+    try:
+        from scipy.cluster.hierarchy import linkage, leaves_list
+        from scipy.spatial.distance import pdist
+    except ImportError as exc:
+        raise ImportError(
+            "Hierarchical clustering in plot_heatmap requires SciPy. "
+            "Install with: pip install 'ggnomics[stats]' (or: pip install scipy)"
+        ) from exc
 
     if axis == 1:
         mat = mat.T
@@ -342,3 +461,6 @@ def _hclust_order(mat: np.ndarray, labels: list, axis: int):
         return reordered_labels, reordered_mat
 
     return reordered_labels, reordered_mat
+
+
+__all__ = ["plot_expression", "plot_dot", "plot_heatmap"]

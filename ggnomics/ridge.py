@@ -12,10 +12,9 @@ from plotnine import (
     ggtitle,
     scale_fill_brewer,
 )
-from sklearn.neighbors import KernelDensity
-
-
 def _kde_density(values: np.ndarray, bandwidth: float, grid: np.ndarray) -> np.ndarray:
+    from sklearn.neighbors import KernelDensity
+
     kde = KernelDensity(bandwidth=bandwidth, kernel="gaussian")
     kde.fit(values[:, None])
     log_dens = kde.score_samples(grid[:, None])

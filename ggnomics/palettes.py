@@ -1,8 +1,22 @@
-"""Color palettes for ggnomics."""
+"""Color palette registry for ggnomics.
+
+Palettes are registered as :class:`PaletteSpec` entries in a single
+explicit registry (`_REGISTRY`). :func:`get_palette` and
+:func:`resolve_palette` are the two public entry points; individual plot
+modules should prefer :func:`resolve_palette` over reconstructing
+``breaks``/``values`` from a raw dict.
+"""
 
 from __future__ import annotations
 
-from typing import Dict
+import re
+import warnings
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Sequence, Tuple, Union
+
+import pandas as pd
+
+# ── Palette color data ──────────────────────────────────────────────────────
 
 # Tableau 10 categorical palette
 TABLEAU_10: Dict[str, str] = {
@@ -66,9 +80,13 @@ BIOC_COLORS: Dict[str, str] = {
     "19": "#BEBADA",
 }
 
-# ── IGV palettes ──────────────────────────────────────────────────────────────
-# Source: Integrative Genomics Viewer chromosome colors, via ggsci R package
-# Robinson et al., Nature Biotechnology 29, 24–26 (2011)
+# ── IGV palettes ─────────────────────────────────────────────────────────
+# Colors originate from the Integrative Genomics Viewer (IGV) chromosome
+# color convention. Values here were taken via the `ggsci` R package
+# (`ggsci::pal_igv()`), which republishes the IGV palette for ggplot2.
+# Cite: Robinson et al., "Integrative Genomics Viewer", Nature
+# Biotechnology 29, 24-26 (2011). Preserve this attribution if these values
+# are redistributed.
 
 IGV_DEFAULT = {
     "chr1":  "#5050FF", "chr2":  "#CE3D32", "chr3":  "#749B58",
@@ -95,45 +113,233 @@ IGV_ALTERNATING = {
     "odd":  "#FFB900",  # Selective Yellow
 }
 
-_NAMED_PALETTES = {
-    "tableau10": TABLEAU_10,
-    "tableau": TABLEAU_10,
-    "tableau20": TABLEAU_20,
-    "bioc": BIOC_COLORS,
-    "igv_default": IGV_DEFAULT,
-    "igv_alternating": IGV_ALTERNATING,
-}
 
-# Ordered list of colors for numeric indexing
-_TABLEAU_10_LIST = list(TABLEAU_10.values())
-_TABLEAU_20_LIST = list(TABLEAU_20.values())
-_BIOC_LIST = list(BIOC_COLORS.values())
-_IGV_DEFAULT_LIST = list(IGV_DEFAULT.values())
-_IGV_ALTERNATING_LIST = list(IGV_ALTERNATING.values())
+# ── Palette registry ─────────────────────────────────────────────────────
+
+
+@dataclass(frozen=True)
+class PaletteSpec:
+    """Immutable description of one registered palette.
+
+    Attributes:
+        name: Canonical registry name.
+        aliases: Additional names that resolve to this palette.
+        colors: Ordered sequence of hex colors, used for both by-index
+            lookup (:func:`get_palette`) and gap-filling
+            (:func:`resolve_palette`).
+        kind: ``"categorical"`` or ``"continuous"``.
+        source: Human-readable attribution/provenance.
+        max_categories: Recommended maximum distinct category count before
+            colors repeat.
+        overflow: Policy applied when more categories are requested than
+            ``max_categories`` — currently always ``"cycle"``.
+    """
+
+    name: str
+    aliases: Tuple[str, ...]
+    colors: Tuple[str, ...]
+    kind: str
+    source: str
+    max_categories: int
+    overflow: str = "cycle"
+
+
+def _normalize_name(name: str) -> str:
+    return name.strip().lower().replace("-", "")
+
+
+_REGISTRY: Dict[str, PaletteSpec] = {}
+
+
+def _register(spec: PaletteSpec) -> None:
+    for key in (spec.name, *spec.aliases):
+        normalized = _normalize_name(key)
+        existing = _REGISTRY.get(normalized)
+        if existing is not None and existing.name != spec.name:
+            raise RuntimeError(
+                f"Palette alias {key!r} collides between "
+                f"{existing.name!r} and {spec.name!r}."
+            )
+        _REGISTRY[normalized] = spec
+
+
+_register(PaletteSpec(
+    name="tableau10", aliases=("tableau", "tab10"),
+    colors=tuple(TABLEAU_10.values()), kind="categorical",
+    source="Tableau 10 categorical palette", max_categories=10,
+))
+_register(PaletteSpec(
+    name="tableau20", aliases=("tab20",),
+    colors=tuple(TABLEAU_20.values()), kind="categorical",
+    source="Tableau 20 categorical palette", max_categories=20,
+))
+_register(PaletteSpec(
+    name="bioc", aliases=("bioconductor", "scater"),
+    colors=tuple(BIOC_COLORS.values()), kind="categorical",
+    source="scater-like Bioconductor categorical palette", max_categories=20,
+))
+_register(PaletteSpec(
+    name="igv_default", aliases=("igv",),
+    colors=tuple(IGV_DEFAULT.values()), kind="categorical",
+    source=(
+        "Integrative Genomics Viewer chromosome colors, via the ggsci R "
+        "package (ggsci::pal_igv()). Robinson et al., Nature Biotechnology "
+        "29, 24-26 (2011)."
+    ),
+    max_categories=len(IGV_DEFAULT),
+))
+_register(PaletteSpec(
+    name="igv_alternating", aliases=(),
+    colors=tuple(IGV_ALTERNATING.values()), kind="categorical",
+    source="Integrative Genomics Viewer alternating band colors.",
+    max_categories=2,
+))
+
+_CANONICAL_NAMES = sorted({spec.name for spec in _REGISTRY.values()})
+
+
+def _resolve_spec(name: str) -> PaletteSpec:
+    key = _normalize_name(name)
+    spec = _REGISTRY.get(key)
+    if spec is None:
+        raise ValueError(
+            f"Unknown palette {name!r}. Choose from: {_CANONICAL_NAMES}"
+        )
+    return spec
+
+
+# ── Public API ────────────────────────────────────────────────────────────
 
 
 def get_palette(n: int, name: str = "tableau") -> Dict[int, str]:
     """Return a palette mapping integer indices to hex colors.
 
     Args:
-        n: Number of categories.
-        name: Palette family name — ``"tableau"`` / ``"tableau10"``
-              (10 colors, cycled), ``"tableau20"`` (20 colors, cycled),
-              or ``"bioc"`` (20 scater-like colors, cycled).
+        n: Number of categories. Must be ``>= 0``.
+        name: Palette name or alias (e.g. ``"tableau"``, ``"tableau20"``,
+            ``"bioc"``, ``"igv_default"``, ``"igv_alternating"``).
 
     Returns:
         ``{0: "#hex", 1: "#hex", ...}`` dict with ``n`` entries.
 
     Raises:
-        ValueError: If ``name`` is not recognised.
+        ValueError: If ``n < 0`` or ``name`` is not recognised.
     """
-    key = name.lower().replace("-", "")
-    if key not in _NAMED_PALETTES:
+    if n < 0:
+        raise ValueError(f"n must be >= 0, got {n}.")
+
+    spec = _resolve_spec(name)
+    colors = spec.colors
+    m = len(colors)
+    if n > m:
+        warnings.warn(
+            f"get_palette: requested {n} colors from palette {spec.name!r}, "
+            f"which has only {m} distinct colors; colors will repeat.",
+            UserWarning,
+            stacklevel=2,
+        )
+    return {i: colors[i % m] for i in range(n)}
+
+
+_HEX_COLOR_RE = re.compile(r"^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$")
+
+
+def _validate_color(category: object, color: object) -> None:
+    if not isinstance(color, str) or not color:
         raise ValueError(
-            f"Unknown palette '{name}'. Choose from: {list(_NAMED_PALETTES.keys())}"
+            f"Invalid color for category {category!r}: {color!r}. "
+            "Expected a non-empty color string."
+        )
+    if color.startswith("#") and not _HEX_COLOR_RE.match(color):
+        raise ValueError(
+            f"Invalid hex color for category {category!r}: {color!r}."
         )
 
-    base = _NAMED_PALETTES[key]
-    color_list = list(base.values())
-    m = len(color_list)
-    return {i: color_list[i % m] for i in range(n)}
+
+def _ordered_unique_categories(categories) -> List:
+    """Category order: declared order for pandas categoricals, else first-appearance."""
+
+    if isinstance(categories, pd.CategoricalDtype):
+        return list(categories.categories)
+    if isinstance(categories, pd.Categorical):
+        return list(categories.categories)
+    if isinstance(categories, pd.Series) and isinstance(categories.dtype, pd.CategoricalDtype):
+        return list(categories.cat.categories)
+
+    seen: List = []
+    seen_set = set()
+    for value in categories:
+        if value is None or (isinstance(value, float) and pd.isna(value)):
+            continue
+        if value not in seen_set:
+            seen_set.add(value)
+            seen.append(value)
+    return seen
+
+
+def resolve_palette(
+    categories: Union[pd.Series, pd.Categorical, Sequence],
+    palette: Optional[Dict] = None,
+    *,
+    default: str = "tableau",
+) -> Dict:
+    """Resolve a ``{category: color}`` mapping for the observed categories.
+
+    Args:
+        categories: Observed category values. A pandas ``Categorical`` (or a
+            ``Series`` with categorical dtype) contributes its *declared*
+            category order; anything else is ordered by first appearance
+            (never sorted).
+        palette: Optional explicit ``{category: color}`` mapping. Takes
+            precedence for every category it covers. Never mutated.
+        default: Palette name used to fill any category missing from
+            ``palette`` (or to color everything, when ``palette is None``).
+
+    Returns:
+        A new dict mapping every observed category to a color, in
+        deterministic category order.
+
+    Raises:
+        ValueError: If ``default`` names an unknown palette, or a color in
+            ``palette`` is not a plausible color string.
+    """
+    ordered = _ordered_unique_categories(categories)
+
+    user_palette = palette or {}
+    resolved: Dict = {}
+    missing: List = []
+    for category in ordered:
+        if category in user_palette:
+            color = user_palette[category]
+            _validate_color(category, color)
+            resolved[category] = color
+        else:
+            missing.append(category)
+
+    if missing:
+        spec = _resolve_spec(default)
+        colors = spec.colors
+        m = len(colors)
+        for offset, category in enumerate(missing):
+            resolved[category] = colors[offset % m]
+        if palette is not None:
+            warnings.warn(
+                f"resolve_palette: {missing} not found in the given palette; "
+                f"filled from the {spec.name!r} default palette.",
+                UserWarning,
+                stacklevel=2,
+            )
+
+    return resolved
+
+
+__all__ = [
+    "PaletteSpec",
+    "TABLEAU_10",
+    "TABLEAU_20",
+    "BIOC_COLORS",
+    "IGV_DEFAULT",
+    "IGV_ALTERNATING",
+    "get_palette",
+    "resolve_palette",
+]
