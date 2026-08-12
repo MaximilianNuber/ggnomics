@@ -1,0 +1,103 @@
+---
+title: "ggnomics: Expression Heatmap"
+format: html
+execute:
+  echo: true
+  warning: false
+---
+
+```{python}
+import importlib.util, os
+spec = importlib.util.spec_from_file_location("mock_data", os.path.join(os.getcwd(), "examples", "00_mock_data.py"))
+mock_data = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(mock_data)
+
+from ggnomics import plot_heatmap
+
+df    = mock_data.make_mock_df(n_cells=500)
+adata = mock_data.make_mock_anndata(n_cells=500)
+sce   = mock_data.make_mock_sce(n_cells=500)
+
+# Select marker genes
+MARKERS = [f"Gene{i+1:04d}" for i in range(0, 50, 2)][:15]
+```
+
+## Overview
+
+`plot_heatmap` produces a gene-expression heatmap using `geom_tile`.  Rows
+(genes) and columns (cells or groups) can be reordered by hierarchical
+clustering.  When `group_by` is supplied, per-group mean expression is
+plotted instead of per-cell values — much faster for large datasets.
+
+---
+
+## 1 — Per-group heatmap (grouped mean)
+
+```{python}
+p = plot_heatmap(df, features=MARKERS, group_by="cluster",
+                 title="Grouped heatmap — Z-scored")
+p.save("examples/img/04a_heatmap_grouped.png", width=7, height=6, dpi=120)
+p
+```
+
+## 2 — Cluster both rows and columns
+
+```{python}
+p = plot_heatmap(df, features=MARKERS, group_by="cluster",
+                 cluster_rows=True, cluster_cols=True,
+                 title="Heatmap — rows + cols clustered")
+p.save("examples/img/04b_heatmap_clustered.png", width=7, height=6, dpi=120)
+p
+```
+
+## 3 — No row clustering
+
+```{python}
+p = plot_heatmap(df, features=MARKERS, group_by="cluster",
+                 cluster_rows=False, cluster_cols=False,
+                 title="Heatmap — input order")
+p.save("examples/img/04c_heatmap_noclust.png", width=7, height=6, dpi=120)
+p
+```
+
+## 4 — Raw (unscaled) expression
+
+```{python}
+p = plot_heatmap(df, features=MARKERS, group_by="cluster",
+                 scale=False, palette="Blues",
+                 title="Heatmap — raw expression")
+p.save("examples/img/04d_heatmap_raw.png", width=7, height=6, dpi=120)
+p
+```
+
+## 5 — AnnData (logcounts layer)
+
+```{python}
+p = plot_heatmap(adata, features=MARKERS, group_by="cluster",
+                 layer="logcounts", title="AnnData heatmap — logcounts")
+p.save("examples/img/04e_heatmap_adata.png", width=7, height=6, dpi=120)
+p
+```
+
+## 6 — SCE
+
+```{python}
+p = plot_heatmap(sce, features=MARKERS, group_by="cluster",
+                 layer="logcounts", title="SCE heatmap")
+p.save("examples/img/04f_heatmap_sce.png", width=7, height=6, dpi=120)
+p
+```
+
+---
+
+## Key parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `features` | List of gene names (rows) |
+| `group_by` | Obs column; if supplied, plot group means |
+| `scale` | Z-score per gene (row) |
+| `cluster_rows` | Hierarchically reorder rows |
+| `cluster_cols` | Hierarchically reorder columns |
+| `palette` | Matplotlib diverging colormap (default `"RdBu_r"`) |
+| `show_colnames` | Render column axis tick labels |

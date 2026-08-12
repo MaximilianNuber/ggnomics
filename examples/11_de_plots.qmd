@@ -1,0 +1,108 @@
+---
+title: "Differential expression plots"
+format: html
+---
+
+```{python}
+import sys
+sys.path.insert(0, "..")
+
+import importlib.util
+_spec = importlib.util.spec_from_file_location("mock_data", "00_mock_data.py")
+_m = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(_m)
+
+de_df    = _m.make_mock_de_results(n_genes=2000, seed=42)
+coef_df  = _m.make_mock_coefs(n_features=100, seed=42)
+adata    = _m.make_mock_anndata(n_cells=500, n_genes=50, seed=42)
+```
+
+## `plot_volcano` — defaults
+
+```{python}
+from ggnomics import plot_volcano
+
+p_vol = plot_volcano(de_df, gene_col="gene",
+                     title="Volcano plot — default thresholds")
+p_vol
+```
+
+### Custom label_genes
+
+```{python}
+p_labeled = plot_volcano(
+    de_df, gene_col="gene",
+    label_genes=["Gene0001", "Gene0010", "Gene0050"],
+    title="Volcano — highlighted genes",
+)
+p_labeled
+```
+
+### Trimmed axes
+
+```{python}
+p_xlim = plot_volcano(
+    de_df, gene_col="gene",
+    xlim=(-4, 4), ylim=(0, 8),
+    title="Volcano — custom axis limits",
+)
+p_xlim
+```
+
+## `plot_ma` alongside Volcano
+
+```{python}
+from ggnomics import plot_ma
+
+p_ma = plot_ma(de_df, gene_col="gene", label_top_n=5,
+               title="MA plot")
+p_ma
+```
+
+## `plot_coef_lollipop` — model coefficients
+
+```{python}
+from ggnomics import plot_coef_lollipop
+
+coef_series = coef_df["coefficient"]
+p_lollipop = plot_coef_lollipop(coef_series, top_n=20,
+                                  title="Top-20 elastic net coefficients")
+p_lollipop
+```
+
+### With error bars
+
+```{python}
+p_se = plot_coef_lollipop(coef_df, top_n=20, se_col="se",
+                            title="Coefficients with standard errors")
+p_se
+```
+
+## `plot_coef_expression` — paired expression view
+
+```{python}
+from ggnomics import plot_coef_expression
+
+# Use the AnnData gene names as coefficient indices
+import pandas as pd
+var_names = list(adata.var_names)
+coef_matched = pd.Series(
+    [0.5 - i * 0.05 for i in range(len(var_names))],
+    index=var_names,
+)
+
+p_dot = plot_coef_expression(
+    adata, coef_matched, group_by="cluster",
+    plot_type="dot", top_n=10,
+    title="Top-10 features — dot plot",
+)
+p_dot
+```
+
+```{python}
+hm = plot_coef_expression(
+    adata, coef_matched, group_by="cluster",
+    plot_type="heatmap", top_n=10,
+    title="Top-10 features — heatmap",
+)
+hm.plot
+```

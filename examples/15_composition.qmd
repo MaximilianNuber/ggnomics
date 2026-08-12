@@ -1,0 +1,143 @@
+---
+title: "Plot composition"
+format: html
+---
+
+ggnomics uses **plotnine's native composition system** (plotnine ≥ 0.15).
+Any ggnomics plot function returns a `ggplot` object that can be combined
+with standard operators — no extra dependencies needed.
+
+```{python}
+import sys
+sys.path.insert(0, "..")
+
+import importlib.util
+_spec = importlib.util.spec_from_file_location("mock_data", "00_mock_data.py")
+_m = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(_m)
+
+adata = _m.make_mock_anndata(n_cells=500, n_genes=50, seed=42)
+de_df = _m.make_mock_de_results(n_genes=500, seed=42)
+```
+
+## Basic operators
+
+### Side by side ( `|` )
+
+```{python}
+from ggnomics import plot_umap, plot_violin_stats
+
+p_umap  = plot_umap(adata, color="cluster", title="UMAP")
+p_violin = plot_violin_stats(adata, "Gene0001", group_by="cluster",
+                              sig_only=False, title="Gene0001")
+
+p_umap | p_violin
+```
+
+### Stacked ( `/` )
+
+```{python}
+p_umap / p_violin
+```
+
+### With spacer
+
+```{python}
+from plotnine.composition import plot_spacer
+
+p_umap | plot_spacer() | p_violin
+```
+
+## Apply theme to all panels ( `&` )
+
+```{python}
+from plotnine import theme_minimal
+
+(p_umap | p_violin) & theme_minimal()
+```
+
+## Complex layout
+
+```{python}
+from ggnomics import plot_dot, plot_volcano
+
+p_dot   = plot_dot(adata, features=["Gene0001","Gene0002","Gene0003"],
+                   group_by="cluster", title="Dot plot")
+p_vol   = plot_volcano(de_df, gene_col="gene", label_top_n=3, title="Volcano")
+
+(p_umap | p_vol) / p_dot
+```
+
+## `grid` helper — equal-sized grid
+
+```{python}
+from ggnomics import plot_embedding_panel
+
+comp = plot_embedding_panel(
+    adata,
+    features=[f"Gene{i+1:04d}" for i in range(6)],
+    ncol=3,
+    shared_scale=True,
+)
+comp
+```
+
+## Composition-level annotation (plotnine ≥ 0.16)
+
+```{python}
+from ggnomics import annotate_composition
+
+comp_ann = annotate_composition(
+    p_umap | p_violin,
+    title="UMAP and expression",
+    subtitle="500 mock cells · 5 clusters",
+    caption="Generated with ggnomics",
+)
+comp_ann
+```
+
+## Saving a composition
+
+```{python}
+# Same API as ggplot.save()
+(p_umap | p_violin).save("/tmp/my_figure.png", dpi=150)
+print("Saved to /tmp/my_figure.png")
+```
+
+## `ggnomics` composition helpers
+
+The `hstack`, `vstack`, `grid`, and `annotate_composition` helpers are
+exported from `ggnomics` directly:
+
+```{python}
+from ggnomics import hstack, vstack, grid, annotate_composition
+
+# hstack with spacers
+hstack(p_umap, p_violin, spacer=True)
+```
+
+```{python}
+# vstack
+vstack(p_umap, p_violin)
+```
+
+```{python}
+# grid: uses plot_layout(ncol=...) on plotnine ≥ 0.16
+grid([p_umap, p_violin, p_dot], ncol=2)
+```
+
+## Width / height control (plotnine ≥ 0.16)
+
+```{python}
+from plotnine.composition import plot_layout, plot_annotation
+
+# 2:1 width ratio
+(p_umap | p_violin) + plot_layout(widths=[2, 1])
+```
+
+```{python}
+# Apply whole-figure title
+(p_umap | p_violin | p_dot) + plot_annotation(
+    title="Three panels",
+    subtitle="plotnine 0.16 native composition",
+)
+```

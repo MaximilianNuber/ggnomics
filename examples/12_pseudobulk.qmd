@@ -1,0 +1,74 @@
+---
+title: "Pseudobulk QC and DE"
+format: html
+---
+
+```{python}
+import sys
+sys.path.insert(0, "..")
+
+import importlib.util
+_spec = importlib.util.spec_from_file_location("mock_data", "00_mock_data.py")
+_m = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(_m)
+
+adata   = _m.make_mock_anndata(n_cells=500, n_genes=50, seed=42)
+de_df   = _m.make_mock_de_results(n_genes=500, seed=42)
+```
+
+## `plot_pseudobulk_qc` — 4 samples, 5 clusters
+
+```{python}
+try:
+    from ggnomics import plot_pseudobulk_qc
+    bricks = plot_pseudobulk_qc(
+        adata, sample_by="sample", group_by="cluster",
+        condition_by="batch", min_cells=20,
+    )
+    bricks
+except ImportError as e:
+    print(f"Skipped: {e}")
+```
+
+## `plot_pseudobulk_de` — three modes
+
+### Volcano grid
+
+```{python}
+try:
+    from ggnomics import plot_pseudobulk_de
+    results = {f"Cluster {i}": de_df.copy() for i in range(4)}
+    bricks_vol = plot_pseudobulk_de(results, mode="volcano", ncol=2,
+                                     gene_col="gene", top_n_label=3)
+    bricks_vol
+except ImportError as e:
+    print(f"Skipped: {e}")
+```
+
+### Summary bar
+
+```{python}
+try:
+    p_bar = plot_pseudobulk_de(
+        results, mode="summary_bar",
+        title="Significant genes per cluster",
+    )
+    p_bar
+except Exception as e:
+    print(f"Error: {e}")
+```
+
+### UpSet plot
+
+```{python}
+try:
+    from ggnomics import plot_pseudobulk_de
+    results_named = {f"C{i}": de_df.copy() for i in range(3)}
+    fig = plot_pseudobulk_de(
+        results_named, mode="upset",
+        gene_col="gene",
+        title="Shared DE genes (UpSet)",
+    )
+    fig
+except ImportError as e:
+    print(f"Skipped (upsetplot not installed): {e}")
+```

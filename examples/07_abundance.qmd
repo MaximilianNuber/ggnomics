@@ -1,0 +1,89 @@
+---
+title: "ggnomics: Cluster Abundance / Composition"
+format: html
+execute:
+  echo: true
+  warning: false
+---
+
+```{python}
+import importlib.util, os
+spec = importlib.util.spec_from_file_location("mock_data", os.path.join(os.getcwd(), "examples", "00_mock_data.py"))
+mock_data = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(mock_data)
+
+from ggnomics import plot_abundance
+
+df    = mock_data.make_mock_df(n_cells=500)
+adata = mock_data.make_mock_anndata(n_cells=500)
+sce   = mock_data.make_mock_sce(n_cells=500)
+```
+
+## Overview
+
+`plot_abundance` shows how a grouping variable (e.g. cluster) is composed
+of a coloring variable (e.g. sample or condition).  It produces a stacked
+bar chart, either normalised to proportions (default) or showing raw counts.
+
+This is a standard compositional analysis plot — check whether each cluster
+has roughly equal contributions from all samples before running differential
+abundance testing.
+
+---
+
+## 1 — Proportional composition (DataFrame)
+
+```{python}
+p = plot_abundance(df, group_by="cluster", color_by="sample",
+                   title="Cluster composition by sample (proportions)")
+p.save("examples/img/07a_abundance_prop.png", width=7, height=5, dpi=120)
+p
+```
+
+## 2 — Raw counts
+
+```{python}
+p = plot_abundance(df, group_by="cluster", color_by="sample",
+                   normalize=False,
+                   title="Cluster composition by sample (counts)")
+p.save("examples/img/07b_abundance_counts.png", width=7, height=5, dpi=120)
+p
+```
+
+## 3 — Colour by batch
+
+```{python}
+p = plot_abundance(df, group_by="cluster", color_by="batch",
+                   title="Cluster composition by batch")
+p.save("examples/img/07c_abundance_batch.png", width=7, height=5, dpi=120)
+p
+```
+
+## 4 — AnnData
+
+```{python}
+p = plot_abundance(adata, group_by="cluster", color_by="sample",
+                   title="AnnData — cluster composition")
+p.save("examples/img/07d_abundance_adata.png", width=7, height=5, dpi=120)
+p
+```
+
+## 5 — SCE
+
+```{python}
+p = plot_abundance(sce, group_by="cluster", color_by="batch",
+                   title="SCE — cluster composition")
+p.save("examples/img/07e_abundance_sce.png", width=7, height=5, dpi=120)
+p
+```
+
+---
+
+## Key parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `group_by` | Obs column for x-axis groups (e.g. cluster) |
+| `color_by` | Obs column for fill colors (e.g. sample, condition) |
+| `normalize` | Proportions (`True`) vs raw counts (`False`) |
+| `palette` | `{category: hex}` color mapping |

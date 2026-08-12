@@ -1,0 +1,127 @@
+---
+title: "ggnomics: ColData / ObsData Plots"
+format: html
+execute:
+  echo: true
+  warning: false
+---
+
+```{python}
+import importlib.util, os
+spec = importlib.util.spec_from_file_location("mock_data", os.path.join(os.getcwd(), "examples", "00_mock_data.py"))
+mock_data = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(mock_data)
+
+from ggnomics import plot_coldata, plot_rowdata
+
+df    = mock_data.make_mock_df(n_cells=500)
+adata = mock_data.make_mock_anndata(n_cells=500)
+sce   = mock_data.make_mock_sce(n_cells=500)
+```
+
+## Overview
+
+`plot_coldata` mirrors scater's `plotColData`: it plots cell-level metadata
+against each other.  The geometry is chosen automatically based on column
+dtypes and the `shape` argument.
+
+---
+
+## 1 — Scatter plot (both numeric)
+
+```{python}
+p = plot_coldata(df, x="n_counts", y="n_genes_detected",
+                 color_by="mito_frac", title="n_counts vs n_genes (coloured by mito)")
+p.save("examples/img/03a_scatter.png", width=6, height=5, dpi=120)
+p
+```
+
+### Facet by batch
+
+```{python}
+p = plot_coldata(df, x="n_counts", y="n_genes_detected",
+                 facet_by="batch", title="QC scatter faceted by batch")
+p.save("examples/img/03b_scatter_facet.png", width=10, height=5, dpi=120)
+p
+```
+
+---
+
+## 2 — Violin (categorical x)
+
+```{python}
+p = plot_coldata(df, x="cluster", y="n_counts", shape="violin",
+                 title="n_counts per cluster — violin")
+p.save("examples/img/03c_violin.png", width=7, height=5, dpi=120)
+p
+```
+
+## 3 — Boxplot
+
+```{python}
+p = plot_coldata(df, x="cluster", y="mito_frac", shape="box",
+                 title="mito_frac per cluster — boxplot")
+p.save("examples/img/03d_box.png", width=7, height=5, dpi=120)
+p
+```
+
+## 4 — Bar chart
+
+```{python}
+p = plot_coldata(df, x="cluster", y="n_counts", shape="bar",
+                 title="mean n_counts per cluster — bar")
+p.save("examples/img/03e_bar.png", width=6, height=5, dpi=120)
+p
+```
+
+## 5 — Strip / jitter
+
+```{python}
+p = plot_coldata(df, x="cluster", y="n_genes_detected", shape="point",
+                 color_by="batch", title="n_genes per cluster — jitter")
+p.save("examples/img/03f_strip.png", width=7, height=5, dpi=120)
+p
+```
+
+---
+
+## 6 — AnnData and SCE
+
+```{python}
+p = plot_coldata(adata, x="n_counts", y="n_genes_detected", shape="violin",
+                 x="cluster", title="AnnData — violin")
+p.save("examples/img/03g_adata.png", width=7, height=5, dpi=120)
+p
+```
+
+```{python}
+p = plot_coldata(sce, x="cluster", y="n_counts", shape="box",
+                 title="SCE — boxplot")
+p.save("examples/img/03h_sce.png", width=7, height=5, dpi=120)
+p
+```
+
+---
+
+## 7 — Row/feature data (`plot_rowdata`)
+
+For AnnData this plots `var` metadata.
+
+```{python}
+p = plot_rowdata(adata, x="mean_expr", y="mean_expr",
+                 color_by="highly_variable", title="Feature mean expression")
+p.save("examples/img/03i_rowdata.png", width=6, height=5, dpi=120)
+p
+```
+
+---
+
+## Key parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `x`, `y` | Obs/var column names |
+| `color_by` | Obs column for point/fill color |
+| `shape` | `"point"` / `"violin"` / `"box"` / `"bar"` |
+| `size` | Point size (`None` → adaptive) |
+| `facet_by` | Obs column for faceting |

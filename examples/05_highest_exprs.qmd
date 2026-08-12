@@ -1,0 +1,75 @@
+---
+title: "ggnomics: Highest-Expressed Genes"
+format: html
+execute:
+  echo: true
+  warning: false
+---
+
+```{python}
+import importlib.util, os
+spec = importlib.util.spec_from_file_location("mock_data", os.path.join(os.getcwd(), "examples", "00_mock_data.py"))
+mock_data = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(mock_data)
+
+from ggnomics import plot_highest_exprs
+
+df    = mock_data.make_mock_df(n_cells=500)
+adata = mock_data.make_mock_anndata(n_cells=500)
+sce   = mock_data.make_mock_sce(n_cells=500)
+```
+
+## Overview
+
+`plot_highest_exprs` identifies the top-``n`` most highly expressed genes
+(by median fraction of total library size) and shows their per-cell
+distribution as horizontal boxplots.  This is a standard quality control
+plot — the top spots should be occupied by housekeeping genes or ribosomal
+genes, not marker genes.
+
+---
+
+## 1 — Top 20 genes, DataFrame
+
+```{python}
+p = plot_highest_exprs(df, n=20, title="Top 20 highest expressed genes")
+p.save("examples/img/05a_highest_df.png", width=7, height=8, dpi=120)
+p
+```
+
+## 2 — Colour boxes by cluster
+
+```{python}
+p = plot_highest_exprs(df, n=20, color_cells_by="cluster",
+                       title="Top 20 genes — coloured by cluster")
+p.save("examples/img/05b_highest_cluster.png", width=9, height=8, dpi=120)
+p
+```
+
+## 3 — AnnData (logcounts layer)
+
+```{python}
+p = plot_highest_exprs(adata, n=20, layer="logcounts",
+                       title="AnnData — top 20 genes (logcounts)")
+p.save("examples/img/05c_highest_adata.png", width=7, height=8, dpi=120)
+p
+```
+
+## 4 — SCE
+
+```{python}
+p = plot_highest_exprs(sce, n=20, title="SCE — top 20 genes")
+p.save("examples/img/05d_highest_sce.png", width=7, height=8, dpi=120)
+p
+```
+
+---
+
+## Key parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `n` | Number of top genes to show |
+| `layer` | AnnData layer / SCE assay for expression |
+| `color_cells_by` | Obs column to colour box fill |
+| `palette` | `{category: hex}` color mapping |

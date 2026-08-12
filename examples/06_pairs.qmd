@@ -1,0 +1,89 @@
+---
+title: "ggnomics: Pairs Plot (Scatterplot Matrix)"
+format: html
+execute:
+  echo: true
+  warning: false
+---
+
+```{python}
+import importlib.util, os
+spec = importlib.util.spec_from_file_location("mock_data", os.path.join(os.getcwd(), "examples", "00_mock_data.py"))
+mock_data = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(mock_data)
+
+from ggnomics import plot_pairs
+
+df    = mock_data.make_mock_df(n_cells=500)
+adata = mock_data.make_mock_anndata(n_cells=500)
+sce   = mock_data.make_mock_sce(n_cells=500)
+```
+
+## Overview
+
+`plot_pairs` builds a scatterplot matrix of the first ``n_components``
+embedding dimensions.  Each facet ``(row, col)`` shows component ``row``
+(y-axis) against component ``col`` (x-axis).  All cells share the same
+color mapping.
+
+This is analogous to `scater::plotPCApairs` or `GGally::ggpairs` — useful
+for exploring how well the leading PCs separate biological groups.
+
+---
+
+## 1 — PCA pairs (3 × 3), DataFrame
+
+```{python}
+p = plot_pairs(df, dimred="PCA", n_components=3, color_by="cluster",
+               title="PCA pairs — cluster")
+p.save("examples/img/06a_pairs_pca.png", width=8, height=8, dpi=120)
+p
+```
+
+## 2 — Colour by batch
+
+```{python}
+p = plot_pairs(df, dimred="PCA", n_components=3, color_by="batch",
+               title="PCA pairs — batch")
+p.save("examples/img/06b_pairs_batch.png", width=8, height=8, dpi=120)
+p
+```
+
+## 3 — UMAP 2 components
+
+```{python}
+p = plot_pairs(df, dimred="UMAP", n_components=2,
+               title="UMAP pairs")
+p.save("examples/img/06c_pairs_umap.png", width=6, height=6, dpi=120)
+p
+```
+
+## 4 — AnnData PCA
+
+```{python}
+p = plot_pairs(adata, dimred="X_pca", n_components=4, color_by="cluster",
+               title="AnnData PCA pairs")
+p.save("examples/img/06d_pairs_adata.png", width=9, height=9, dpi=120)
+p
+```
+
+## 5 — SCE PCA
+
+```{python}
+p = plot_pairs(sce, dimred="PCA", n_components=3, color_by="cluster",
+               title="SCE PCA pairs")
+p.save("examples/img/06e_pairs_sce.png", width=8, height=8, dpi=120)
+p
+```
+
+---
+
+## Key parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `dimred` | Embedding key |
+| `n_components` | Number of components to include |
+| `color_by` | Obs column for point color |
+| `size` | Point size (`None` → adaptive) |
+| `alpha` | Point transparency |
