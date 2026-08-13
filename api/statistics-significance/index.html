@@ -1,0 +1,4087 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Composable, ggplot2-style genomics visualization for Python">
+      
+      
+      
+        <link rel="canonical" href="https://maximiliannuber.github.io/ggnomics/api/statistics-significance/">
+      
+      
+        <link rel="prev" href="../repertoire/">
+      
+      
+        <link rel="next" href="../palettes/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Statistics & significance - ggnomics</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#statistics-significance" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="ggnomics" class="md-header__button md-logo" aria-label="ggnomics" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            ggnomics
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Statistics & significance
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/MaximilianNuber/ggnomics" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="ggnomics" class="md-nav__button md-logo" aria-label="ggnomics" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    ggnomics
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/MaximilianNuber/ggnomics" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vignettes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vignettes (Quarto site)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reduced-dimensions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reduced dimensions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../expression-metadata/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Expression & metadata
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../abundance-composition/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Abundance & composition
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../heatmaps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Heatmaps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../qc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    QC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../differential-expression/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Differential expression
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pseudobulk/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pseudobulk
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../upset/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UpSet plots
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../multimodal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multimodal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../repertoire/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Repertoire
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Statistics & significance
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Statistics & significance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ggnomics.signif.geom_signif" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        geom_signif
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="geom_signif">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ggnomics.signif.geom_signif--manual-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MANUAL MODE
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ggnomics.signif.geom_signif--automatic-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AUTOMATIC MODE
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ggnomics.signif.geom_signif--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ggnomics.signif.run_comparisons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run_comparisons
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="run_comparisons">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ggnomics.signif.run_comparisons--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ggnomics.signif.run_comparisons--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returns
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ggnomics.signif.map_pvalue_to_stars" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        map_pvalue_to_stars
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="map_pvalue_to_stars">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ggnomics.signif.map_pvalue_to_stars--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ggnomics.stats_plots.plot_violin_stats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        plot_violin_stats
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ggnomics.stats_plots.plot_box_stats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        plot_box_stats
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ggnomics.stats_plots.plot_scatter_marginal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        plot_scatter_marginal
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ggnomics.stats_plots.plot_embedding_panel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        plot_embedding_panel
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ggnomics.pairs.plot_pairs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        plot_pairs
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../palettes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Palettes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pca/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PCA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../composition-helpers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Composition helpers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../legacy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Legacy API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ggnomics.signif.geom_signif" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        geom_signif
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="geom_signif">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ggnomics.signif.geom_signif--manual-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MANUAL MODE
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ggnomics.signif.geom_signif--automatic-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AUTOMATIC MODE
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ggnomics.signif.geom_signif--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ggnomics.signif.run_comparisons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run_comparisons
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="run_comparisons">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ggnomics.signif.run_comparisons--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ggnomics.signif.run_comparisons--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returns
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ggnomics.signif.map_pvalue_to_stars" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        map_pvalue_to_stars
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="map_pvalue_to_stars">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ggnomics.signif.map_pvalue_to_stars--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ggnomics.stats_plots.plot_violin_stats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        plot_violin_stats
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ggnomics.stats_plots.plot_box_stats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        plot_box_stats
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ggnomics.stats_plots.plot_scatter_marginal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        plot_scatter_marginal
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ggnomics.stats_plots.plot_embedding_panel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        plot_embedding_panel
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ggnomics.pairs.plot_pairs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        plot_pairs
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="statistics-significance">Statistics &amp; significance</h1>
+<p><code>ggnomics.signif</code> is the ggsignif-inspired significance-bracket submodule.
+<code>geom_signif</code> in automatic mode (comparisons given, no manual <code>y_position</code>)
+returns a deferred placeholder rather than a plain plotnine layer — call
+<code>.resolve(df, x_col, y_col)</code> to get concrete layers, or use
+<code>plot_violin_stats</code>/<code>plot_box_stats</code>, which do this internally.</p>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="ggnomics.signif.geom_signif" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">ggnomics.signif.geom_signif</span>
+
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">geom_signif</span><span class="p">(</span><span class="n">comparisons</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">annotations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_position</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">test</span><span class="o">=</span><span class="s1">&#39;mannwhitney&#39;</span><span class="p">,</span> <span class="n">test_args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">map_signif_level</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">p_adjust</span><span class="o">=</span><span class="s1">&#39;bonferroni&#39;</span><span class="p">,</span> <span class="n">margin_top</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">step_increase</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">tip_length</span><span class="o">=</span><span class="mf">0.03</span><span class="p">,</span> <span class="n">bracket_nudge_y</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">textsize</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">vjust</span><span class="o">=-</span><span class="mi">10</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linetype</span><span class="o">=</span><span class="s1">&#39;solid&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">sig_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">orientation</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents first">
+
+        <p>Add significance brackets to a plotnine violin/box/bar plot.</p>
+<p>Returns a list of plotnine layers (manual mode) or a _DeferredSignif
+object (automatic mode) that can be resolved with .resolve(df, x_col, y_col).</p>
+<h4 id="ggnomics.signif.geom_signif--manual-mode">MANUAL MODE</h4>
+<p>When annotations + y_position + xmin + xmax are all provided, draws
+brackets at the exact positions given without running any statistics.</p>
+<pre><code>geom_signif(
+    annotations=["p = 0.003"],
+    y_position=[8.5],
+    xmin=[1], xmax=[3],
+)
+</code></pre>
+<h4 id="ggnomics.signif.geom_signif--automatic-mode">AUTOMATIC MODE</h4>
+<p>When only comparisons are given, returns a _DeferredSignif that runs
+statistical tests at resolve time.</p>
+<pre><code>deferred = geom_signif(comparisons=[("A", "B"), ("A", "C")])
+layers = deferred.resolve(df, x_col="group", y_col="value")
+for layer in layers:
+    p = p + layer
+</code></pre>
+<h4 id="ggnomics.signif.geom_signif--parameters">Parameters</h4>
+<p>comparisons : list of (group_a, group_b)
+annotations : list of str — pre-computed labels (manual mode)
+y_position  : list of float — bracket bar y positions (manual mode)
+xmin, xmax  : list of float — bracket x spans, numeric (manual mode)
+test : "mannwhitney" | "wilcoxon" | "ttest" | "kruskal"
+map_signif_level : True | False | dict | callable
+    True  → default star mapping
+    False → "p={value:.3f}"
+    dict  → {threshold: label}
+    callable → f(p) → str
+p_adjust : "bonferroni" | "fdr_bh" | "none"
+margin_top : fraction of y range above data max before first bracket
+step_increase : fraction of y range added per stacked bracket
+tip_length : fraction of y range for vertical tips; [left, right] for asymmetric
+sig_only : if True, only draw brackets with adjusted p &lt; 0.05
+orientation : "x" (vertical plots) | "y" (horizontal plots, experimental)</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>ggnomics/signif/_geom.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span>
+<span class="normal">321</span>
+<span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span>
+<span class="normal">326</span>
+<span class="normal">327</span>
+<span class="normal">328</span>
+<span class="normal">329</span>
+<span class="normal">330</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span>
+<span class="normal">334</span>
+<span class="normal">335</span>
+<span class="normal">336</span>
+<span class="normal">337</span>
+<span class="normal">338</span>
+<span class="normal">339</span>
+<span class="normal">340</span>
+<span class="normal">341</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">geom_signif</span><span class="p">(</span>
+    <span class="n">comparisons</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="c1"># manual mode</span>
+    <span class="n">annotations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">y_position</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">xmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">xmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="c1"># auto stats</span>
+    <span class="n">test</span><span class="o">=</span><span class="s2">&quot;mannwhitney&quot;</span><span class="p">,</span>
+    <span class="n">test_args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">map_signif_level</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">p_adjust</span><span class="o">=</span><span class="s2">&quot;bonferroni&quot;</span><span class="p">,</span>
+    <span class="c1"># appearance</span>
+    <span class="n">margin_top</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
+    <span class="n">step_increase</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">tip_length</span><span class="o">=</span><span class="mf">0.03</span><span class="p">,</span>
+    <span class="n">bracket_nudge_y</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">textsize</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
+    <span class="n">vjust</span><span class="o">=-</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+    <span class="n">linetype</span><span class="o">=</span><span class="s2">&quot;solid&quot;</span><span class="p">,</span>
+    <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="c1"># filter</span>
+    <span class="n">sig_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">orientation</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add significance brackets to a plotnine violin/box/bar plot.</span>
+
+<span class="sd">    Returns a list of plotnine layers (manual mode) or a _DeferredSignif</span>
+<span class="sd">    object (automatic mode) that can be resolved with .resolve(df, x_col, y_col).</span>
+
+<span class="sd">    MANUAL MODE</span>
+<span class="sd">    -----------</span>
+<span class="sd">    When annotations + y_position + xmin + xmax are all provided, draws</span>
+<span class="sd">    brackets at the exact positions given without running any statistics.</span>
+
+<span class="sd">        geom_signif(</span>
+<span class="sd">            annotations=[&quot;p = 0.003&quot;],</span>
+<span class="sd">            y_position=[8.5],</span>
+<span class="sd">            xmin=[1], xmax=[3],</span>
+<span class="sd">        )</span>
+
+<span class="sd">    AUTOMATIC MODE</span>
+<span class="sd">    --------------</span>
+<span class="sd">    When only comparisons are given, returns a _DeferredSignif that runs</span>
+<span class="sd">    statistical tests at resolve time.</span>
+
+<span class="sd">        deferred = geom_signif(comparisons=[(&quot;A&quot;, &quot;B&quot;), (&quot;A&quot;, &quot;C&quot;)])</span>
+<span class="sd">        layers = deferred.resolve(df, x_col=&quot;group&quot;, y_col=&quot;value&quot;)</span>
+<span class="sd">        for layer in layers:</span>
+<span class="sd">            p = p + layer</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    comparisons : list of (group_a, group_b)</span>
+<span class="sd">    annotations : list of str — pre-computed labels (manual mode)</span>
+<span class="sd">    y_position  : list of float — bracket bar y positions (manual mode)</span>
+<span class="sd">    xmin, xmax  : list of float — bracket x spans, numeric (manual mode)</span>
+<span class="sd">    test : &quot;mannwhitney&quot; | &quot;wilcoxon&quot; | &quot;ttest&quot; | &quot;kruskal&quot;</span>
+<span class="sd">    map_signif_level : True | False | dict | callable</span>
+<span class="sd">        True  → default star mapping</span>
+<span class="sd">        False → &quot;p={value:.3f}&quot;</span>
+<span class="sd">        dict  → {threshold: label}</span>
+<span class="sd">        callable → f(p) → str</span>
+<span class="sd">    p_adjust : &quot;bonferroni&quot; | &quot;fdr_bh&quot; | &quot;none&quot;</span>
+<span class="sd">    margin_top : fraction of y range above data max before first bracket</span>
+<span class="sd">    step_increase : fraction of y range added per stacked bracket</span>
+<span class="sd">    tip_length : fraction of y range for vertical tips; [left, right] for asymmetric</span>
+<span class="sd">    sig_only : if True, only draw brackets with adjusted p &lt; 0.05</span>
+<span class="sd">    orientation : &quot;x&quot; (vertical plots) | &quot;y&quot; (horizontal plots, experimental)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># ------------------------------------------------------------------</span>
+    <span class="c1"># Manual mode: all four manual parameters provided</span>
+    <span class="c1"># ------------------------------------------------------------------</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">annotations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="ow">and</span> <span class="n">y_position</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="ow">and</span> <span class="n">xmin</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="ow">and</span> <span class="n">xmax</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">._brackets</span><span class="w"> </span><span class="kn">import</span> <span class="n">BracketSpec</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tip_length</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+            <span class="n">tip_l</span> <span class="o">=</span> <span class="n">tip_r</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">tip_length</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tip_l</span><span class="p">,</span> <span class="n">tip_r</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">tip_length</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">tip_length</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="n">brackets</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ann</span><span class="p">,</span> <span class="n">yp</span><span class="p">,</span> <span class="n">xl</span><span class="p">,</span> <span class="n">xr</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">annotations</span><span class="p">,</span> <span class="n">y_position</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">):</span>
+            <span class="n">yp</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">yp</span><span class="p">)</span>
+            <span class="n">brackets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">BracketSpec</span><span class="p">(</span>
+                    <span class="n">xmin</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">xl</span><span class="p">),</span>
+                    <span class="n">xmax</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">xr</span><span class="p">),</span>
+                    <span class="n">y_bracket</span><span class="o">=</span><span class="n">yp</span><span class="p">,</span>
+                    <span class="n">y_tip_left</span><span class="o">=</span><span class="n">yp</span> <span class="o">-</span> <span class="n">tip_l</span><span class="p">,</span>
+                    <span class="n">y_tip_right</span><span class="o">=</span><span class="n">yp</span> <span class="o">-</span> <span class="n">tip_r</span><span class="p">,</span>
+                    <span class="n">label</span><span class="o">=</span><span class="n">ann</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">class</span><span class="w"> </span><span class="nc">_ManualParams</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="n">p</span> <span class="o">=</span> <span class="n">_ManualParams</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">linetype</span> <span class="o">=</span> <span class="n">linetype</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">linewidth</span> <span class="o">=</span> <span class="n">linewidth</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">textsize</span> <span class="o">=</span> <span class="n">textsize</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">vjust</span> <span class="o">=</span> <span class="n">vjust</span>
+
+        <span class="k">return</span> <span class="n">_brackets_to_layers</span><span class="p">(</span><span class="n">brackets</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+
+    <span class="c1"># ------------------------------------------------------------------</span>
+    <span class="c1"># Automatic (deferred) mode</span>
+    <span class="c1"># ------------------------------------------------------------------</span>
+    <span class="k">return</span> <span class="n">_DeferredSignif</span><span class="p">(</span>
+        <span class="n">comparisons</span><span class="o">=</span><span class="n">comparisons</span><span class="p">,</span>
+        <span class="n">test</span><span class="o">=</span><span class="n">test</span><span class="p">,</span>
+        <span class="n">map_signif_level</span><span class="o">=</span><span class="n">map_signif_level</span><span class="p">,</span>
+        <span class="n">p_adjust</span><span class="o">=</span><span class="n">p_adjust</span><span class="p">,</span>
+        <span class="n">margin_top</span><span class="o">=</span><span class="n">margin_top</span><span class="p">,</span>
+        <span class="n">step_increase</span><span class="o">=</span><span class="n">step_increase</span><span class="p">,</span>
+        <span class="n">tip_length</span><span class="o">=</span><span class="n">tip_length</span><span class="p">,</span>
+        <span class="n">sig_only</span><span class="o">=</span><span class="n">sig_only</span><span class="p">,</span>
+        <span class="n">textsize</span><span class="o">=</span><span class="n">textsize</span><span class="p">,</span>
+        <span class="n">vjust</span><span class="o">=</span><span class="n">vjust</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+        <span class="n">linetype</span><span class="o">=</span><span class="n">linetype</span><span class="p">,</span>
+        <span class="n">linewidth</span><span class="o">=</span><span class="n">linewidth</span><span class="p">,</span>
+        <span class="n">bracket_nudge_y</span><span class="o">=</span><span class="n">bracket_nudge_y</span><span class="p">,</span>
+        <span class="n">orientation</span><span class="o">=</span><span class="n">orientation</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="ggnomics.signif.run_comparisons" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">ggnomics.signif.run_comparisons</span>
+
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">run_comparisons</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Series</span><span class="p">,</span> <span class="n">groups</span><span class="p">:</span> <span class="n">Series</span><span class="p">,</span> <span class="n">comparisons</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">test</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;mannwhitney&#39;</span><span class="p">,</span> <span class="n">p_adjust</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;bonferroni&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span>
+</code></pre></div>
+
+    <div class="doc doc-contents first">
+
+        <p>Run pairwise statistical tests for specified comparisons.</p>
+<h4 id="ggnomics.signif.run_comparisons--parameters">Parameters</h4>
+<p>data :
+    Numeric values.
+groups :
+    Group labels, same index as data.
+comparisons :
+    List of (g1, g2) pairs. None → all pairwise combinations.
+test :
+    Key in TESTS dict.
+p_adjust :
+    "bonferroni" | "fdr_bh" | "none"</p>
+<h4 id="ggnomics.signif.run_comparisons--returns">Returns</h4>
+<p>DataFrame with columns: group1, group2, statistic, pvalue, padj, n1, n2</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>ggnomics/signif/_stats.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 49</span>
+<span class="normal"> 50</span>
+<span class="normal"> 51</span>
+<span class="normal"> 52</span>
+<span class="normal"> 53</span>
+<span class="normal"> 54</span>
+<span class="normal"> 55</span>
+<span class="normal"> 56</span>
+<span class="normal"> 57</span>
+<span class="normal"> 58</span>
+<span class="normal"> 59</span>
+<span class="normal"> 60</span>
+<span class="normal"> 61</span>
+<span class="normal"> 62</span>
+<span class="normal"> 63</span>
+<span class="normal"> 64</span>
+<span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">run_comparisons</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+    <span class="n">groups</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+    <span class="n">comparisons</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">test</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mannwhitney&quot;</span><span class="p">,</span>
+    <span class="n">p_adjust</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;bonferroni&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run pairwise statistical tests for specified comparisons.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data :</span>
+<span class="sd">        Numeric values.</span>
+<span class="sd">    groups :</span>
+<span class="sd">        Group labels, same index as data.</span>
+<span class="sd">    comparisons :</span>
+<span class="sd">        List of (g1, g2) pairs. None → all pairwise combinations.</span>
+<span class="sd">    test :</span>
+<span class="sd">        Key in TESTS dict.</span>
+<span class="sd">    p_adjust :</span>
+<span class="sd">        &quot;bonferroni&quot; | &quot;fdr_bh&quot; | &quot;none&quot;</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    DataFrame with columns: group1, group2, statistic, pvalue, padj, n1, n2</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">test</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">TESTS</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown test </span><span class="si">{</span><span class="n">test</span><span class="si">!r}</span><span class="s2">. Available: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">TESTS</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">test_fn</span> <span class="o">=</span> <span class="n">TESTS</span><span class="p">[</span><span class="n">test</span><span class="p">]</span>
+    <span class="n">unique_groups</span> <span class="o">=</span> <span class="n">groups</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">comparisons</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_groups</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Auto-computing all pairwise comparisons for </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> groups &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">n</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="mi">2</span><span class="si">}</span><span class="s2"> comparisons). &quot;</span>
+                <span class="s2">&quot;Consider passing explicit comparisons.&quot;</span>
+            <span class="p">)</span>
+        <span class="n">comparisons</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">combinations</span><span class="p">(</span><span class="n">unique_groups</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+    <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">g1</span><span class="p">,</span> <span class="n">g2</span> <span class="ow">in</span> <span class="n">comparisons</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">groups</span> <span class="o">==</span> <span class="n">g1</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">groups</span> <span class="o">==</span> <span class="n">g2</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">values</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">stat</span><span class="p">,</span> <span class="n">pval</span> <span class="o">=</span> <span class="n">test_fn</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="c1"># e.g. all-identical values or insufficient variation for the</span>
+            <span class="c1"># chosen test; skip this comparison rather than failing the plot.</span>
+            <span class="k">continue</span>
+        <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;group1&quot;</span><span class="p">:</span> <span class="n">g1</span><span class="p">,</span>
+                <span class="s2">&quot;group2&quot;</span><span class="p">:</span> <span class="n">g2</span><span class="p">,</span>
+                <span class="s2">&quot;statistic&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">stat</span><span class="p">),</span>
+                <span class="s2">&quot;pvalue&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">pval</span><span class="p">),</span>
+                <span class="s2">&quot;n1&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)),</span>
+                <span class="s2">&quot;n2&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)),</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+    <span class="n">empty</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;group1&quot;</span><span class="p">,</span> <span class="s2">&quot;group2&quot;</span><span class="p">,</span> <span class="s2">&quot;statistic&quot;</span><span class="p">,</span> <span class="s2">&quot;pvalue&quot;</span><span class="p">,</span> <span class="s2">&quot;padj&quot;</span><span class="p">,</span> <span class="s2">&quot;n1&quot;</span><span class="p">,</span> <span class="s2">&quot;n2&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rows</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">empty</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">p_adjust</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;padj&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;pvalue&quot;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">statsmodels.stats.multitest</span><span class="w"> </span><span class="kn">import</span> <span class="n">multipletests</span>
+
+            <span class="n">method</span> <span class="o">=</span> <span class="s2">&quot;bonferroni&quot;</span> <span class="k">if</span> <span class="n">p_adjust</span> <span class="o">==</span> <span class="s2">&quot;bonferroni&quot;</span> <span class="k">else</span> <span class="s2">&quot;fdr_bh&quot;</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">padj_arr</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">multipletests</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;pvalue&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
+            <span class="n">df</span><span class="p">[</span><span class="s2">&quot;padj&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">padj_arr</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="n">df</span><span class="p">[</span><span class="s2">&quot;padj&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;pvalue&quot;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">df</span><span class="p">[[</span><span class="s2">&quot;group1&quot;</span><span class="p">,</span> <span class="s2">&quot;group2&quot;</span><span class="p">,</span> <span class="s2">&quot;statistic&quot;</span><span class="p">,</span> <span class="s2">&quot;pvalue&quot;</span><span class="p">,</span> <span class="s2">&quot;padj&quot;</span><span class="p">,</span> <span class="s2">&quot;n1&quot;</span><span class="p">,</span> <span class="s2">&quot;n2&quot;</span><span class="p">]]</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="ggnomics.signif.map_pvalue_to_stars" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">ggnomics.signif.map_pvalue_to_stars</span>
+
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">map_pvalue_to_stars</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">mapping</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+</code></pre></div>
+
+    <div class="doc doc-contents first">
+
+        <p>Convert a p-value to a significance label.</p>
+
+
+<details class="default-thresholds-match-ggsignif" open>
+  <summary>Default thresholds match ggsignif</summary>
+  <p>p &lt;= 0.0001 → "<strong><em>*"
+p &lt;= 0.001  → "</em></strong>"
+p &lt;= 0.01   → "*<em>"
+p &lt;= 0.05   → "</em>"
+p &gt;  0.05   → "ns"</p>
+</details>        <h4 id="ggnomics.signif.map_pvalue_to_stars--parameters">Parameters</h4>
+<p>p :
+    p-value.
+mapping :
+    Custom {threshold: label} dict. Thresholds are tested in ascending order;
+    the first threshold for which p &lt;= threshold is returned.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>ggnomics/signif/_brackets.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">map_pvalue_to_stars</span><span class="p">(</span>
+    <span class="n">p</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">mapping</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a p-value to a significance label.</span>
+
+<span class="sd">    Default thresholds match ggsignif:</span>
+<span class="sd">        p &lt;= 0.0001 → &quot;****&quot;</span>
+<span class="sd">        p &lt;= 0.001  → &quot;***&quot;</span>
+<span class="sd">        p &lt;= 0.01   → &quot;**&quot;</span>
+<span class="sd">        p &lt;= 0.05   → &quot;*&quot;</span>
+<span class="sd">        p &gt;  0.05   → &quot;ns&quot;</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    p :</span>
+<span class="sd">        p-value.</span>
+<span class="sd">    mapping :</span>
+<span class="sd">        Custom {threshold: label} dict. Thresholds are tested in ascending order;</span>
+<span class="sd">        the first threshold for which p &lt;= threshold is returned.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">mapping</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">p</span> <span class="o">&lt;=</span> <span class="mf">0.0001</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;****&quot;</span>
+        <span class="k">if</span> <span class="n">p</span> <span class="o">&lt;=</span> <span class="mf">0.001</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;***&quot;</span>
+        <span class="k">if</span> <span class="n">p</span> <span class="o">&lt;=</span> <span class="mf">0.01</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;**&quot;</span>
+        <span class="k">if</span> <span class="n">p</span> <span class="o">&lt;=</span> <span class="mf">0.05</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;*&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;ns&quot;</span>
+
+    <span class="k">for</span> <span class="n">threshold</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">mapping</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="n">p</span> <span class="o">&lt;=</span> <span class="n">threshold</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">mapping</span><span class="p">[</span><span class="n">threshold</span><span class="p">]</span>
+    <span class="k">return</span> <span class="s2">&quot;ns&quot;</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="ggnomics.stats_plots.plot_violin_stats" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">ggnomics.stats_plots.plot_violin_stats</span>
+
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">plot_violin_stats</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">feature</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">group_by</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">layer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">comparisons</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">test</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;mannwhitney&#39;</span><span class="p">,</span> <span class="n">p_adjust</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;bonferroni&#39;</span><span class="p">,</span> <span class="n">sig_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">annotation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;stars&#39;</span><span class="p">,</span> <span class="n">add_boxplot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">add_points</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">point_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">palette</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">order</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">x_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">y_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dodge</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ggplot</span>
+</code></pre></div>
+
+    <div class="doc doc-contents first">
+
+        <p>Violin plot with automatic statistical significance annotations.</p>
+<p>Runs pairwise tests between groups defined by <code>comparisons</code> (or all
+pairs when the number of groups is <code>&lt;= 5</code> and <code>comparisons</code> is
+<code>None</code>). Draws significance brackets as <code>geom_segment</code>/<code>geom_text</code>
+layers via :func:<code>ggnomics.signif.geom_signif</code>, using proportional
+spacing (fractions of the y-range) so brackets look correct regardless
+of data scale.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>DataFrame whose rows are cells/samples. <code>feature</code> and
+<code>group_by</code> are columns.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>feature</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Column holding the numeric value to plot. For a plain
+DataFrame this is simply a column; container adapters may also
+resolve it against an expression feature.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>group_by</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Column whose categories define the x-axis groups.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>layer</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="str">str</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Present for cross-container signature consistency. Has no
+effect for a plain DataFrame, which has no concept of layers.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>comparisons</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="typing.List">List</span>[<span title="typing.Tuple">Tuple</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Explicit list of <code>(group_a, group_b)</code> tuples to test.
+<code>None</code> auto-generates all pairs when there are <code>&lt;= 5</code> groups.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>test</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>One of the tests supported by
+:func:<code>ggnomics.signif.run_comparisons</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;mannwhitney&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>p_adjust</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Multiple-testing correction method.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;bonferroni&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>sig_only</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Only draw brackets for significant comparisons.</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>annotation</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>"stars"</code>, <code>"pvalue"</code>, <code>"padj"</code>, or a callable
+mapping a p-value to a label.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;stars&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>add_boxplot</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Overlay a narrow boxplot on each violin.</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>add_points</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Overlay jittered points.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>point_size</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="float">float</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Jittered point size (<code>None</code> → adaptive).</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>palette</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Dict">Dict</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>{category: hex}</code> fill color mapping.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>order</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="typing.List">List</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Explicit group ordering (unlisted groups appended at the end).</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>x_label</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="str">str</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Override x-axis label (defaults to <code>group_by</code>).</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>y_label</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="str">str</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Override y-axis label (defaults to <code>feature</code>).</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>title</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="str">str</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Plot title.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>dodge</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Reserved for future grouped-violin support.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="plotnine.ggplot">ggplot</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A <code>plotnine.ggplot</code> object.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="TypeError">TypeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If no implementation is registered for <code>type(data)</code>.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="KeyError">KeyError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If a requested column is absent.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>ggnomics/stats_plots.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@singledispatch</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_violin_stats</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">feature</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">group_by</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">layer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">comparisons</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">test</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mannwhitney&quot;</span><span class="p">,</span>
+    <span class="n">p_adjust</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;bonferroni&quot;</span><span class="p">,</span>
+    <span class="n">sig_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">annotation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;stars&quot;</span><span class="p">,</span>
+    <span class="n">add_boxplot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">add_points</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">point_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">palette</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">order</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">x_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">y_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">title</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">dodge</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ggplot</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Violin plot with automatic statistical significance annotations.</span>
+
+<span class="sd">    Runs pairwise tests between groups defined by ``comparisons`` (or all</span>
+<span class="sd">    pairs when the number of groups is ``&lt;= 5`` and ``comparisons`` is</span>
+<span class="sd">    ``None``). Draws significance brackets as ``geom_segment``/``geom_text``</span>
+<span class="sd">    layers via :func:`ggnomics.signif.geom_signif`, using proportional</span>
+<span class="sd">    spacing (fractions of the y-range) so brackets look correct regardless</span>
+<span class="sd">    of data scale.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data: DataFrame whose rows are cells/samples. ``feature`` and</span>
+<span class="sd">            ``group_by`` are columns.</span>
+<span class="sd">        feature: Column holding the numeric value to plot. For a plain</span>
+<span class="sd">            DataFrame this is simply a column; container adapters may also</span>
+<span class="sd">            resolve it against an expression feature.</span>
+<span class="sd">        group_by: Column whose categories define the x-axis groups.</span>
+<span class="sd">        layer: Present for cross-container signature consistency. Has no</span>
+<span class="sd">            effect for a plain DataFrame, which has no concept of layers.</span>
+<span class="sd">        comparisons: Explicit list of ``(group_a, group_b)`` tuples to test.</span>
+<span class="sd">            ``None`` auto-generates all pairs when there are ``&lt;= 5`` groups.</span>
+<span class="sd">        test: One of the tests supported by</span>
+<span class="sd">            :func:`ggnomics.signif.run_comparisons`.</span>
+<span class="sd">        p_adjust: Multiple-testing correction method.</span>
+<span class="sd">        sig_only: Only draw brackets for significant comparisons.</span>
+<span class="sd">        annotation: ``&quot;stars&quot;``, ``&quot;pvalue&quot;``, ``&quot;padj&quot;``, or a callable</span>
+<span class="sd">            mapping a p-value to a label.</span>
+<span class="sd">        add_boxplot: Overlay a narrow boxplot on each violin.</span>
+<span class="sd">        add_points: Overlay jittered points.</span>
+<span class="sd">        point_size: Jittered point size (``None`` → adaptive).</span>
+<span class="sd">        palette: ``{category: hex}`` fill color mapping.</span>
+<span class="sd">        order: Explicit group ordering (unlisted groups appended at the end).</span>
+<span class="sd">        x_label: Override x-axis label (defaults to ``group_by``).</span>
+<span class="sd">        y_label: Override y-axis label (defaults to ``feature``).</span>
+<span class="sd">        title: Plot title.</span>
+<span class="sd">        dodge: Reserved for future grouped-violin support.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A ``plotnine.ggplot`` object.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        TypeError: If no implementation is registered for ``type(data)``.</span>
+<span class="sd">        KeyError: If a requested column is absent.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="n">_unsupported_type</span><span class="p">(</span><span class="s2">&quot;plot_violin_stats&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="ggnomics.stats_plots.plot_box_stats" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">ggnomics.stats_plots.plot_box_stats</span>
+
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">plot_box_stats</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">feature</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">group_by</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">layer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">comparisons</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">test</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;mannwhitney&#39;</span><span class="p">,</span> <span class="n">p_adjust</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;bonferroni&#39;</span><span class="p">,</span> <span class="n">sig_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">annotation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;stars&#39;</span><span class="p">,</span> <span class="n">add_points</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">point_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">palette</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">order</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">x_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">y_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ggplot</span>
+</code></pre></div>
+
+    <div class="doc doc-contents first">
+
+        <p>Box plot with automatic statistical significance annotations.</p>
+<p>Same semantics as :func:<code>plot_violin_stats</code> but uses <code>geom_boxplot</code> as
+the base layer, sharing all stat-annotation logic.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>DataFrame whose rows are cells/samples. <code>feature</code> and
+<code>group_by</code> are columns.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>feature</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Column holding the numeric value to plot. For a plain
+DataFrame this is simply a column; container adapters may also
+resolve it against an expression feature.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>group_by</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Column whose categories define the x-axis groups.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>layer</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="str">str</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Present for cross-container signature consistency. Has no
+effect for a plain DataFrame, which has no concept of layers.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>comparisons</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="typing.List">List</span>[<span title="typing.Tuple">Tuple</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Explicit list of <code>(group_a, group_b)</code> tuples to test.
+<code>None</code> auto-generates all pairs when there are <code>&lt;= 5</code> groups.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>test</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>One of the tests supported by
+:func:<code>ggnomics.signif.run_comparisons</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;mannwhitney&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>p_adjust</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Multiple-testing correction method.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;bonferroni&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>sig_only</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Only draw brackets for significant comparisons.</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>annotation</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>"stars"</code>, <code>"pvalue"</code>, <code>"padj"</code>, or a callable
+mapping a p-value to a label.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;stars&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>add_points</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Overlay jittered points.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>point_size</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="float">float</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Jittered point size (<code>None</code> → adaptive).</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>palette</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Dict">Dict</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>{category: hex}</code> fill color mapping.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>order</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="typing.List">List</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Explicit group ordering (unlisted groups appended at the end).</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>x_label</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="str">str</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Override x-axis label (defaults to <code>group_by</code>).</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>y_label</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="str">str</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Override y-axis label (defaults to <code>feature</code>).</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>title</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="str">str</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Plot title.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="plotnine.ggplot">ggplot</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A <code>plotnine.ggplot</code> object.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="TypeError">TypeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If no implementation is registered for <code>type(data)</code>.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="KeyError">KeyError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If a requested column is absent.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>ggnomics/stats_plots.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span>
+<span class="normal">321</span>
+<span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span>
+<span class="normal">326</span>
+<span class="normal">327</span>
+<span class="normal">328</span>
+<span class="normal">329</span>
+<span class="normal">330</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@singledispatch</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_box_stats</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">feature</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">group_by</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">layer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">comparisons</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">test</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mannwhitney&quot;</span><span class="p">,</span>
+    <span class="n">p_adjust</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;bonferroni&quot;</span><span class="p">,</span>
+    <span class="n">sig_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">annotation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;stars&quot;</span><span class="p">,</span>
+    <span class="n">add_points</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">point_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">palette</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">order</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">x_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">y_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">title</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ggplot</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Box plot with automatic statistical significance annotations.</span>
+
+<span class="sd">    Same semantics as :func:`plot_violin_stats` but uses ``geom_boxplot`` as</span>
+<span class="sd">    the base layer, sharing all stat-annotation logic.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data: DataFrame whose rows are cells/samples. ``feature`` and</span>
+<span class="sd">            ``group_by`` are columns.</span>
+<span class="sd">        feature: Column holding the numeric value to plot. For a plain</span>
+<span class="sd">            DataFrame this is simply a column; container adapters may also</span>
+<span class="sd">            resolve it against an expression feature.</span>
+<span class="sd">        group_by: Column whose categories define the x-axis groups.</span>
+<span class="sd">        layer: Present for cross-container signature consistency. Has no</span>
+<span class="sd">            effect for a plain DataFrame, which has no concept of layers.</span>
+<span class="sd">        comparisons: Explicit list of ``(group_a, group_b)`` tuples to test.</span>
+<span class="sd">            ``None`` auto-generates all pairs when there are ``&lt;= 5`` groups.</span>
+<span class="sd">        test: One of the tests supported by</span>
+<span class="sd">            :func:`ggnomics.signif.run_comparisons`.</span>
+<span class="sd">        p_adjust: Multiple-testing correction method.</span>
+<span class="sd">        sig_only: Only draw brackets for significant comparisons.</span>
+<span class="sd">        annotation: ``&quot;stars&quot;``, ``&quot;pvalue&quot;``, ``&quot;padj&quot;``, or a callable</span>
+<span class="sd">            mapping a p-value to a label.</span>
+<span class="sd">        add_points: Overlay jittered points.</span>
+<span class="sd">        point_size: Jittered point size (``None`` → adaptive).</span>
+<span class="sd">        palette: ``{category: hex}`` fill color mapping.</span>
+<span class="sd">        order: Explicit group ordering (unlisted groups appended at the end).</span>
+<span class="sd">        x_label: Override x-axis label (defaults to ``group_by``).</span>
+<span class="sd">        y_label: Override y-axis label (defaults to ``feature``).</span>
+<span class="sd">        title: Plot title.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A ``plotnine.ggplot`` object.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        TypeError: If no implementation is registered for ``type(data)``.</span>
+<span class="sd">        KeyError: If a requested column is absent.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="n">_unsupported_type</span><span class="p">(</span><span class="s2">&quot;plot_box_stats&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="ggnomics.stats_plots.plot_scatter_marginal" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">ggnomics.stats_plots.plot_scatter_marginal</span>
+
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">plot_scatter_marginal</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">color</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">layer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">marginal</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;density&#39;</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">stroke</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.7</span><span class="p">,</span> <span class="n">palette</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">cmap</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;viridis&#39;</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">x_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">y_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Compose&#39;</span>
+</code></pre></div>
+
+    <div class="doc doc-contents first">
+
+        <p>Scatter plot with marginal distributions.</p>
+<p>Composed from three plotnine panels (scatter, x-marginal, y-marginal)
+using plotnine's native composition system (requires plotnine &gt;= 0.15).
+Width ratio scatter : right-marginal = 3 : 1; height ratio top-marginal :
+scatter = 1 : 3 (on plotnine &gt;= 0.16).</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>DataFrame whose rows are cells/samples. <code>x</code>, <code>y</code>, and
+<code>color</code> are columns.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>x</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Column mapped to the x-axis and top marginal.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>y</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Column mapped to the y-axis and right marginal.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>color</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="str">str</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional column mapped to point/marginal fill color.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>layer</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="str">str</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Present for cross-container signature consistency. Has no
+effect for a plain DataFrame, which has no concept of layers.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>marginal</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>One of <code>"density"</code>, <code>"histogram"</code>, or <code>"boxplot"</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;density&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>size</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="float">float</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Point size (<code>None</code> → adaptive).</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>stroke</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="float">float</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Point stroke width (<code>None</code> → adaptive).</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>alpha</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Point transparency.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.7</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>palette</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Dict">Dict</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>{category: hex}</code> color mapping.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>cmap</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Matplotlib colormap for a continuous <code>color</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;viridis&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>title</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="str">str</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Plot title (applied to the scatter panel).</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>x_label</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="str">str</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Override x-axis label.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>y_label</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="str">str</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Override y-axis label.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>&#39;Compose&#39;</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A <code>plotnine.composition.Compose</code> object.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="TypeError">TypeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If no implementation is registered for <code>type(data)</code>.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="KeyError">KeyError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If a requested column is absent.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="ValueError">ValueError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>marginal</code> is not a supported mode.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>ggnomics/stats_plots.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">383</span>
+<span class="normal">384</span>
+<span class="normal">385</span>
+<span class="normal">386</span>
+<span class="normal">387</span>
+<span class="normal">388</span>
+<span class="normal">389</span>
+<span class="normal">390</span>
+<span class="normal">391</span>
+<span class="normal">392</span>
+<span class="normal">393</span>
+<span class="normal">394</span>
+<span class="normal">395</span>
+<span class="normal">396</span>
+<span class="normal">397</span>
+<span class="normal">398</span>
+<span class="normal">399</span>
+<span class="normal">400</span>
+<span class="normal">401</span>
+<span class="normal">402</span>
+<span class="normal">403</span>
+<span class="normal">404</span>
+<span class="normal">405</span>
+<span class="normal">406</span>
+<span class="normal">407</span>
+<span class="normal">408</span>
+<span class="normal">409</span>
+<span class="normal">410</span>
+<span class="normal">411</span>
+<span class="normal">412</span>
+<span class="normal">413</span>
+<span class="normal">414</span>
+<span class="normal">415</span>
+<span class="normal">416</span>
+<span class="normal">417</span>
+<span class="normal">418</span>
+<span class="normal">419</span>
+<span class="normal">420</span>
+<span class="normal">421</span>
+<span class="normal">422</span>
+<span class="normal">423</span>
+<span class="normal">424</span>
+<span class="normal">425</span>
+<span class="normal">426</span>
+<span class="normal">427</span>
+<span class="normal">428</span>
+<span class="normal">429</span>
+<span class="normal">430</span>
+<span class="normal">431</span>
+<span class="normal">432</span>
+<span class="normal">433</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@singledispatch</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_scatter_marginal</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">y</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">color</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">layer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">marginal</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;density&quot;</span><span class="p">,</span>
+    <span class="n">size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">stroke</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.7</span><span class="p">,</span>
+    <span class="n">palette</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;viridis&quot;</span><span class="p">,</span>
+    <span class="n">title</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">x_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">y_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Compose&quot;</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Scatter plot with marginal distributions.</span>
+
+<span class="sd">    Composed from three plotnine panels (scatter, x-marginal, y-marginal)</span>
+<span class="sd">    using plotnine&#39;s native composition system (requires plotnine &gt;= 0.15).</span>
+<span class="sd">    Width ratio scatter : right-marginal = 3 : 1; height ratio top-marginal :</span>
+<span class="sd">    scatter = 1 : 3 (on plotnine &gt;= 0.16).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data: DataFrame whose rows are cells/samples. ``x``, ``y``, and</span>
+<span class="sd">            ``color`` are columns.</span>
+<span class="sd">        x: Column mapped to the x-axis and top marginal.</span>
+<span class="sd">        y: Column mapped to the y-axis and right marginal.</span>
+<span class="sd">        color: Optional column mapped to point/marginal fill color.</span>
+<span class="sd">        layer: Present for cross-container signature consistency. Has no</span>
+<span class="sd">            effect for a plain DataFrame, which has no concept of layers.</span>
+<span class="sd">        marginal: One of ``&quot;density&quot;``, ``&quot;histogram&quot;``, or ``&quot;boxplot&quot;``.</span>
+<span class="sd">        size: Point size (``None`` → adaptive).</span>
+<span class="sd">        stroke: Point stroke width (``None`` → adaptive).</span>
+<span class="sd">        alpha: Point transparency.</span>
+<span class="sd">        palette: ``{category: hex}`` color mapping.</span>
+<span class="sd">        cmap: Matplotlib colormap for a continuous ``color``.</span>
+<span class="sd">        title: Plot title (applied to the scatter panel).</span>
+<span class="sd">        x_label: Override x-axis label.</span>
+<span class="sd">        y_label: Override y-axis label.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A ``plotnine.composition.Compose`` object.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        TypeError: If no implementation is registered for ``type(data)``.</span>
+<span class="sd">        KeyError: If a requested column is absent.</span>
+<span class="sd">        ValueError: If ``marginal`` is not a supported mode.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="n">_unsupported_type</span><span class="p">(</span><span class="s2">&quot;plot_scatter_marginal&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="ggnomics.stats_plots.plot_embedding_panel" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">ggnomics.stats_plots.plot_embedding_panel</span>
+
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">plot_embedding_panel</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">features</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">dimred</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;X_umap&#39;</span><span class="p">,</span> <span class="n">components</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">ncol</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">layer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">stroke</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">,</span> <span class="n">shared_scale</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">cmap</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;viridis&#39;</span><span class="p">,</span> <span class="n">palette</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Union[Compose, ggplot]&#39;</span>
+</code></pre></div>
+
+    <div class="doc doc-contents first">
+
+        <p>Grid of embedding plots, one panel per feature.</p>
+<p>Each panel is a :func:<code>ggnomics.plot_reduced_dim</code> call. For continuous
+features, <code>shared_scale=True</code> computes a global vmin/vmax up front so
+all panels share the same color scale.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>DataFrame containing embedding columns (matched against
+<code>dimred</code> the same way as :func:<code>ggnomics.plot_embedding</code>) plus
+one column per requested feature.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>features</code>
+            </td>
+            <td>
+                  <code><span title="typing.List">List</span>[<span title="str">str</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Non-empty list of column names, one per panel. Every
+feature must be resolvable; otherwise the complete list of
+missing features is reported in one error.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>dimred</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Embedding key (e.g. <code>"X_pca"</code>, <code>"X_umap"</code>).</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;X_umap&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>components</code>
+            </td>
+            <td>
+                  <code><span title="typing.Tuple">Tuple</span>[<span title="int">int</span>, <span title="int">int</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>One-indexed <code>(x, y)</code> component pair to plot.</p>
+              </div>
+            </td>
+            <td>
+                  <code>(1, 2)</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>ncol</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of columns in the panel grid.</p>
+              </div>
+            </td>
+            <td>
+                  <code>3</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>layer</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="str">str</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Present for cross-container signature consistency. Has no
+effect for a plain DataFrame, which has no concept of layers.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>size</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="float">float</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Point size (<code>None</code> → adaptive).</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>stroke</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="float">float</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Point stroke width (<code>None</code> → adaptive).</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>alpha</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Point transparency.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.8</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>shared_scale</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Compute a single global vmin/vmax across all
+continuous features so panels are color-comparable.</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>cmap</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Matplotlib colormap for continuous features.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;viridis&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>palette</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Dict">Dict</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>{category: hex}</code> mapping for categorical features.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>title</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="str">str</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Overall composition title.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>&#39;Union[Compose, ggplot]&#39;</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A <code>plotnine.composition.Compose</code> object, or a bare</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code>&#39;Union[Compose, ggplot]&#39;</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>plotnine.ggplot</code> when only one feature is requested.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="TypeError">TypeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If no implementation is registered for <code>type(data)</code>.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="ValueError">ValueError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>features</code> is empty, or if any feature cannot be
+resolved (the complete missing list is reported at once).</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>ggnomics/stats_plots.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">537</span>
+<span class="normal">538</span>
+<span class="normal">539</span>
+<span class="normal">540</span>
+<span class="normal">541</span>
+<span class="normal">542</span>
+<span class="normal">543</span>
+<span class="normal">544</span>
+<span class="normal">545</span>
+<span class="normal">546</span>
+<span class="normal">547</span>
+<span class="normal">548</span>
+<span class="normal">549</span>
+<span class="normal">550</span>
+<span class="normal">551</span>
+<span class="normal">552</span>
+<span class="normal">553</span>
+<span class="normal">554</span>
+<span class="normal">555</span>
+<span class="normal">556</span>
+<span class="normal">557</span>
+<span class="normal">558</span>
+<span class="normal">559</span>
+<span class="normal">560</span>
+<span class="normal">561</span>
+<span class="normal">562</span>
+<span class="normal">563</span>
+<span class="normal">564</span>
+<span class="normal">565</span>
+<span class="normal">566</span>
+<span class="normal">567</span>
+<span class="normal">568</span>
+<span class="normal">569</span>
+<span class="normal">570</span>
+<span class="normal">571</span>
+<span class="normal">572</span>
+<span class="normal">573</span>
+<span class="normal">574</span>
+<span class="normal">575</span>
+<span class="normal">576</span>
+<span class="normal">577</span>
+<span class="normal">578</span>
+<span class="normal">579</span>
+<span class="normal">580</span>
+<span class="normal">581</span>
+<span class="normal">582</span>
+<span class="normal">583</span>
+<span class="normal">584</span>
+<span class="normal">585</span>
+<span class="normal">586</span>
+<span class="normal">587</span>
+<span class="normal">588</span>
+<span class="normal">589</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@singledispatch</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_embedding_panel</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">features</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">dimred</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;X_umap&quot;</span><span class="p">,</span>
+    <span class="n">components</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+    <span class="n">ncol</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">layer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">stroke</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">,</span>
+    <span class="n">shared_scale</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;viridis&quot;</span><span class="p">,</span>
+    <span class="n">palette</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">title</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Union[Compose, ggplot]&quot;</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Grid of embedding plots, one panel per feature.</span>
+
+<span class="sd">    Each panel is a :func:`ggnomics.plot_reduced_dim` call. For continuous</span>
+<span class="sd">    features, ``shared_scale=True`` computes a global vmin/vmax up front so</span>
+<span class="sd">    all panels share the same color scale.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data: DataFrame containing embedding columns (matched against</span>
+<span class="sd">            ``dimred`` the same way as :func:`ggnomics.plot_embedding`) plus</span>
+<span class="sd">            one column per requested feature.</span>
+<span class="sd">        features: Non-empty list of column names, one per panel. Every</span>
+<span class="sd">            feature must be resolvable; otherwise the complete list of</span>
+<span class="sd">            missing features is reported in one error.</span>
+<span class="sd">        dimred: Embedding key (e.g. ``&quot;X_pca&quot;``, ``&quot;X_umap&quot;``).</span>
+<span class="sd">        components: One-indexed ``(x, y)`` component pair to plot.</span>
+<span class="sd">        ncol: Number of columns in the panel grid.</span>
+<span class="sd">        layer: Present for cross-container signature consistency. Has no</span>
+<span class="sd">            effect for a plain DataFrame, which has no concept of layers.</span>
+<span class="sd">        size: Point size (``None`` → adaptive).</span>
+<span class="sd">        stroke: Point stroke width (``None`` → adaptive).</span>
+<span class="sd">        alpha: Point transparency.</span>
+<span class="sd">        shared_scale: Compute a single global vmin/vmax across all</span>
+<span class="sd">            continuous features so panels are color-comparable.</span>
+<span class="sd">        cmap: Matplotlib colormap for continuous features.</span>
+<span class="sd">        palette: ``{category: hex}`` mapping for categorical features.</span>
+<span class="sd">        title: Overall composition title.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A ``plotnine.composition.Compose`` object, or a bare</span>
+<span class="sd">        ``plotnine.ggplot`` when only one feature is requested.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        TypeError: If no implementation is registered for ``type(data)``.</span>
+<span class="sd">        ValueError: If ``features`` is empty, or if any feature cannot be</span>
+<span class="sd">            resolved (the complete missing list is reported at once).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="n">_unsupported_type</span><span class="p">(</span><span class="s2">&quot;plot_embedding_panel&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="ggnomics.pairs.plot_pairs" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">ggnomics.pairs.plot_pairs</span>
+
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">plot_pairs</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">dimred</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;X_pca&#39;</span><span class="p">,</span> <span class="n">n_components</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">color_by</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.6</span><span class="p">,</span> <span class="n">palette</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ggplot</span>
+</code></pre></div>
+
+    <div class="doc doc-contents first">
+
+        <p>Scatterplot matrix of the first <code>n_components</code> embedding components.</p>
+<p>Each panel <code>(row, col)</code> shows a scatter of component <code>row</code> (y-axis)
+against component <code>col</code> (x-axis). All panels share the same color
+mapping so they can be read as a pairwise comparison. Diagonal panels
+(where row == col) show the same component on both axes and appear as a
+perfect 45-degree line; they serve as dimensional dividers.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>DataFrame with embedding columns matched against <code>dimred</code>
+the same way as :func:<code>ggnomics.plot_embedding</code> (e.g.
+<code>PCA1</code>, <code>PCA2</code>, ... or <code>X_pca_1</code>, <code>X_pca_2</code>, ...).</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>dimred</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Embedding key (e.g. <code>"X_pca"</code>, <code>"X_umap"</code>).</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;X_pca&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>n_components</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of components to include (creates an
+<code>n_components x n_components</code> grid). Clipped to the number of
+available components.</p>
+              </div>
+            </td>
+            <td>
+                  <code>4</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>color_by</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="str">str</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Column mapped to point color.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>size</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="float">float</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Point size. <code>None</code> -&gt; adaptive (based on n_cells x n_panels).</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>alpha</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Point transparency.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.6</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>palette</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Dict">Dict</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>{category: hex}</code> color mapping.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>title</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="str">str</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Plot title (added as a label above the grid).</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="plotnine.ggplot">ggplot</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A <code>plotnine.ggplot</code> object.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="TypeError">TypeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If no implementation is registered for <code>type(data)</code>.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="ValueError">ValueError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If fewer than 2 components are available.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="KeyError">KeyError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>color_by</code> or the embedding is not found.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>ggnomics/pairs.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@singledispatch</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_pairs</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">dimred</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;X_pca&quot;</span><span class="p">,</span>
+    <span class="n">n_components</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="n">color_by</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.6</span><span class="p">,</span>
+    <span class="n">palette</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">title</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ggplot</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Scatterplot matrix of the first ``n_components`` embedding components.</span>
+
+<span class="sd">    Each panel ``(row, col)`` shows a scatter of component ``row`` (y-axis)</span>
+<span class="sd">    against component ``col`` (x-axis). All panels share the same color</span>
+<span class="sd">    mapping so they can be read as a pairwise comparison. Diagonal panels</span>
+<span class="sd">    (where row == col) show the same component on both axes and appear as a</span>
+<span class="sd">    perfect 45-degree line; they serve as dimensional dividers.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data: DataFrame with embedding columns matched against ``dimred``</span>
+<span class="sd">            the same way as :func:`ggnomics.plot_embedding` (e.g.</span>
+<span class="sd">            ``PCA1``, ``PCA2``, ... or ``X_pca_1``, ``X_pca_2``, ...).</span>
+<span class="sd">        dimred: Embedding key (e.g. ``&quot;X_pca&quot;``, ``&quot;X_umap&quot;``).</span>
+<span class="sd">        n_components: Number of components to include (creates an</span>
+<span class="sd">            ``n_components x n_components`` grid). Clipped to the number of</span>
+<span class="sd">            available components.</span>
+<span class="sd">        color_by: Column mapped to point color.</span>
+<span class="sd">        size: Point size. ``None`` -&gt; adaptive (based on n_cells x n_panels).</span>
+<span class="sd">        alpha: Point transparency.</span>
+<span class="sd">        palette: ``{category: hex}`` color mapping.</span>
+<span class="sd">        title: Plot title (added as a label above the grid).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A ``plotnine.ggplot`` object.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        TypeError: If no implementation is registered for ``type(data)``.</span>
+<span class="sd">        ValueError: If fewer than 2 components are available.</span>
+<span class="sd">        KeyError: If ``color_by`` or the embedding is not found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="n">_unsupported_type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
