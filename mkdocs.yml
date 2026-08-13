@@ -1,7 +1,7 @@
 site_name: ggnomics
 site_description: Composable, ggplot2-style genomics visualization for Python
-site_url: https://example.com/ggnomics
-repo_url: https://github.com/yourname/ggnomics
+site_url: https://maximiliannuber.github.io/ggnomics/
+repo_url: https://github.com/MaximilianNuber/ggnomics
 
 theme:
   name: material
@@ -33,6 +33,7 @@ nav:
       - QC: api/qc.md
       - Differential expression: api/differential-expression.md
       - Pseudobulk: api/pseudobulk.md
+      - UpSet plots: api/upset.md
       - Multimodal: api/multimodal.md
       - Repertoire: api/repertoire.md
       - Statistics & significance: api/statistics-significance.md

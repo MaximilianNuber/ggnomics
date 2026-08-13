@@ -11,11 +11,11 @@ This site has two parts:
   organized by family, generated from its docstring.
 * **[Vignettes](vignettes.md)** — the full, real-dataset Quarto workflows
   (getting started, single-cell analysis with scranpy, bulk RNA-seq with
-  PyDESeq2, multimodal CITE-seq, specialized plots, and a comprehensive plot
-  gallery).
+  PyDESeq2, native UpSet plots, multimodal CITE-seq, specialized plots, and a
+  comprehensive plot gallery).
 
-See the [project README](https://github.com/yourname/ggnomics#readme) for
-installation and a quick overview.
+See the [project README](https://github.com/MaximilianNuber/ggnomics#readme)
+for installation and a quick overview.
 
 ## Design in one sentence
 

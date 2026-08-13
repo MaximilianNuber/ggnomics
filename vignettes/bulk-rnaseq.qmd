@@ -216,6 +216,8 @@ volcano | ma
 
 ## Next
 
+* [UpSet plots](upset.qmd) compares the significant/top-ranked DE genes
+  across the three E-MTAB-1625 timepoints (1, 5, and 24 hours) fitted here.
 * [Specialized plots](specialized-plots.qmd) uses the cached fit for
   additional volcano, MA, lollipop, and heatmap examples.
 * [Single-cell analysis with scranpy](single-cell-scranpy.qmd) for the

@@ -23,12 +23,18 @@ jobs:
       - name: Import ggnomics and run a core-only smoke test
         run: |
           python -c "
+          import types
           import ggnomics
+          import ggnomics.upset as upset_a
+          from ggnomics import upset as upset_b
+          assert isinstance(upset_a, types.ModuleType)
+          assert upset_a is upset_b
+          assert callable(upset_a.upset)
           import pandas as pd
           df = pd.DataFrame({'x': [1, 2, 3], 'y': [3, 2, 1]})
           p = ggnomics.plot_scatter(df, x='x', y='y')
           assert type(p).__name__ == 'ggplot'
-          print('core-only import + plot OK')
+          print('core-only import + plot OK (including ggnomics.upset, without scipy/statsmodels/upsetplot)')
           "
 
       - name: Run tests that don't require optional dependencies
@@ -93,6 +99,63 @@ jobs:
         run: pytest tests/test_backends.py -v --tb=short
         env:
           MPLBACKEND: Agg
+
+  upset-focused:
+    name: UpSet plots (targeted)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install ggnomics with the upset extra
+        run: pip install -e ".[upset,dev]"
+
+      - name: Run focused ggnomics.upset tests
+        run: |
+          pytest -q \
+            tests/test_upset_api.py \
+            tests/test_upset_intersections.py \
+            tests/test_upset_components.py \
+            tests/test_upset_plot.py \
+            tests/test_upset_statistics.py \
+            tests/test_upset_venn.py \
+            -v --tb=short
+        env:
+          MPLBACKEND: Agg
+
+      - name: Run pseudobulk DE tests relevant to mode="upset"
+        run: pytest -q tests/test_pseudobulk.py -k pseudobulk_de -v --tb=short
+        env:
+          MPLBACKEND: Agg
+
+  docs:
+    name: Documentation build validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install ggnomics with docs and full-plotting extras
+        run: pip install -e ".[all,docs]"
+
+      - name: mkdocs build --strict
+        run: mkdocs build --strict
+
+      - uses: quarto-dev/quarto-actions/setup@v2
+
+      - name: quarto render vignettes --no-execute
+        # Uses the committed vignettes/_freeze results; does not execute
+        # code cells or download any datasets, so no docs environment
+        # (pydeseq2, BiocPy data-access packages, ...) is needed here.
+        run: quarto render vignettes --no-execute
 
   build:
     name: Build + wheel install smoke test

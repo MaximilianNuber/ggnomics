@@ -10,7 +10,7 @@
 #
 # Verify:
 #   mamba run -n ggnomics-docs python -c \
-#     "import ggnomics, scrnaseq, scranpy, pyexpressionatlas, experimenthub, pydeseq2, marsilea"
+#     "import ggnomics, ggnomics.upset, scrnaseq, scranpy, pyexpressionatlas, experimenthub, pydeseq2, marsilea"
 #
 # Render docs (see vignettes/README or the top-level README for the full command,
 # including how QUARTO_PYTHON is resolved from this environment's prefix):
@@ -26,9 +26,7 @@ dependencies:
 
   # Core plotting / scientific stack (ggnomics core deps + optional extras)
   - numpy>=1.24
-  # Pinned below 3.0: upsetplot's inplace-mutation pattern breaks under
-  # pandas 3's always-on copy-on-write (see final report / known limitations).
-  - pandas>=2.0,<3
+  - pandas>=2.0
   - scipy>=1.10
   - matplotlib-base>=3.8
   - scikit-learn>=1.3
@@ -53,7 +51,11 @@ dependencies:
   - pip:
       # ggnomics itself is installed editable in a separate step (see Usage above)
       # so that repo edits are picked up without recreating the environment.
-      - plotnine>=0.15
+      #
+      # Exact-pinned: ggnomics.upset needs the 0.16 composition layout API
+      # (relative widths/heights, guide handling) that is only available in
+      # this alpha release.
+      - plotnine==0.16.0a11
 
       # scverse / AnnData ecosystem
       - anndata>=0.10
@@ -75,6 +77,3 @@ dependencies:
 
       # Composable heatmaps
       - marsilea
-
-      # DE overlap plots (ggnomics "upset" extra)
-      - upsetplot>=0.8

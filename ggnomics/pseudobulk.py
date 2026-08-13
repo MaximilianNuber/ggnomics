@@ -27,7 +27,6 @@ from plotnine import (
 from ._compose import annotate_composition
 
 if TYPE_CHECKING:
-    from matplotlib.figure import Figure
     from plotnine.composition import Compose
 
 
@@ -374,7 +373,7 @@ def plot_pseudobulk_de(
     mode: str = "volcano",
     ncol: int = 3,
     title: Optional[str] = None,
-) -> "Union[Compose, ggplot, Figure]":
+) -> "Union[Compose, ggplot]":
     """Visualise DE results across multiple clusters or contrasts.
 
     Args:
@@ -390,18 +389,20 @@ def plot_pseudobulk_de(
         mode: ``"volcano"`` -- one volcano panel per cluster, arranged in a
             grid (plotnine composition, requires plotnine >= 0.15).
             ``"summary_bar"`` -- barplot of n_up / n_down per cluster.
-            ``"upset"`` -- UpSet plot of shared significant genes (requires
-            the optional ``upsetplot`` dependency).
+            ``"upset"`` -- native Plotnine UpSet plot (via
+            :mod:`ggnomics.upset`) of shared significant genes across
+            clusters/contrasts.
         ncol: Grid columns for ``mode="volcano"``.
         title: Overall title.
 
     Returns:
-        A ``plotnine.composition.Compose`` (volcano), a ``plotnine.ggplot`` (summary_bar), or a Matplotlib figure (upset).
+        A ``plotnine.composition.Compose`` (``mode="volcano"`` or
+        ``mode="upset"``), or a ``plotnine.ggplot`` (``mode="summary_bar"``).
 
     Raises:
-        ValueError: If ``results`` is empty, ``mode`` is unknown, or (for
-            ``mode="upset"``) no significant genes are found.
-        ImportError: If ``mode="upset"`` and ``upsetplot`` is not installed.
+        ValueError: If ``results`` is empty, ``mode`` is unknown, or no
+            significant genes remain in any cluster/contrast under the given
+            thresholds (``mode="upset"``).
     """
     if mode == "volcano":
         from .de_plots import plot_volcano
@@ -457,14 +458,7 @@ def plot_pseudobulk_de(
         return p
 
     if mode == "upset":
-        try:
-            from upsetplot import from_memberships, UpSet
-            import matplotlib.pyplot as plt
-        except ImportError as exc:
-            raise ImportError(
-                "upsetplot is required for mode='upset'. "
-                "Install with: pip install upsetplot>=0.8"
-            ) from exc
+        from .upset import upset as plot_upset
 
         sig_genes: Dict[str, set] = {}
         for name, df in results.items():
@@ -474,20 +468,19 @@ def plot_pseudobulk_de(
             gene_series = sig_de[gene_col] if gene_col and gene_col in sig_de.columns else sig_de.index.astype(str)
             sig_genes[name] = set(gene_series.astype(str).tolist())
 
-        all_genes = set.union(*sig_genes.values()) if sig_genes else set()
+        all_genes = sorted(set.union(*sig_genes.values())) if sig_genes else []
         if not all_genes:
             raise ValueError("No significant genes found in any cluster with the given thresholds.")
 
-        memberships = []
-        for gene in all_genes:
-            membership = tuple(k for k, v in sig_genes.items() if gene in v)
-            memberships.append(membership)
+        contrasts = list(results.keys())
+        membership = pd.DataFrame({"gene": all_genes})
+        for name in contrasts:
+            membership[name] = membership["gene"].isin(sig_genes[name])
 
-        upset_data = from_memberships(memberships)
-        UpSet(upset_data, subset_size="count").plot()
+        composition = plot_upset(membership, contrasts)
         if title:
-            plt.suptitle(title)
-        return plt.gcf()
+            composition = annotate_composition(composition, title=title)
+        return composition
 
     raise ValueError(f"Unknown mode '{mode}'. Choose 'volcano', 'summary_bar', or 'upset'.")
 

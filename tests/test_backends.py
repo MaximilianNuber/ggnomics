@@ -95,7 +95,7 @@ def _hide(*names: str) -> str:
 
 
 CONTAINER_PACKAGES = ("anndata", "singlecellexperiment", "biocframe", "summarizedexperiment", "mudata")
-STATS_PACKAGES = ("scipy", "statsmodels", "sklearn", "upsetplot")
+STATS_PACKAGES = ("scipy", "statsmodels", "sklearn")
 
 
 def test_core_only_import_succeeds_without_any_optional_package():

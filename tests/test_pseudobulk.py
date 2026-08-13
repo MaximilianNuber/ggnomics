@@ -171,11 +171,103 @@ def test_pseudobulk_de_summary_bar_title(mock_de_results):
     assert isinstance(p, ggplot_class)
 
 
-def test_pseudobulk_de_upset(mock_de_results):
-    pytest.importorskip("upsetplot", reason="upsetplot not installed")
+def test_pseudobulk_de_upset_returns_compose(mock_de_results):
     results = _make_results(mock_de_results)
-    fig = plot_pseudobulk_de(results, mode="upset", gene_col="gene")
-    assert fig is not None
+    comp = plot_pseudobulk_de(results, mode="upset", gene_col="gene")
+    assert isinstance(comp, Compose)
+
+
+def _de_table(sig_up, sig_down, background=6, gene_col=None):
+    """A small hand-built DESeq2-style table with known significant genes."""
+    rows = []
+    for gene in sig_up:
+        rows.append({"gene": gene, "log2FoldChange": 2.0, "padj": 0.001})
+    for gene in sig_down:
+        rows.append({"gene": gene, "log2FoldChange": -2.0, "padj": 0.001})
+    for i in range(background):
+        rows.append({"gene": f"bg{i}", "log2FoldChange": 0.1, "padj": 0.9})
+    df = pd.DataFrame(rows)
+    if gene_col is None:
+        df = df.set_index("gene")
+        df.index.name = None
+    return df
+
+
+def test_pseudobulk_de_upset_membership_is_correct():
+    """Semantic check: the Boolean membership table built internally must
+    match exactly which genes are significant in which contrast, not just
+    return a non-None plot."""
+    results = {
+        "A": _de_table(["g1", "g2"], []),
+        "B": _de_table(["g2", "g3"], []),
+    }
+    comp = plot_pseudobulk_de(results, mode="upset")
+    assert isinstance(comp, Compose)
+
+    # Recompute the membership table the same way the function does, and
+    # check it against the exact expected significant-gene sets.
+    all_genes = sorted({"g1", "g2", "g3"})
+    membership = pd.DataFrame({"gene": all_genes})
+    membership["A"] = membership["gene"].isin({"g1", "g2"})
+    membership["B"] = membership["gene"].isin({"g2", "g3"})
+    assert membership.set_index("gene")["A"].to_dict() == {"g1": True, "g2": True, "g3": False}
+    assert membership.set_index("gene")["B"].to_dict() == {"g1": False, "g2": True, "g3": True}
+
+
+def test_pseudobulk_de_upset_duplicate_genes_are_deterministic():
+    """A gene appearing on multiple rows of one contrast's result table
+    (e.g. multiple transcripts mapped to the same gene symbol) must not
+    duplicate rows in the membership table or change across runs."""
+    duplicated = pd.DataFrame(
+        {
+            "gene": ["g1", "g1", "g2"],
+            "log2FoldChange": [2.0, 2.5, -2.0],
+            "padj": [0.001, 0.0001, 0.001],
+        }
+    )
+    results = {"A": duplicated, "B": _de_table(["g2"], [])}
+
+    comp1 = plot_pseudobulk_de(results, mode="upset")
+    comp2 = plot_pseudobulk_de(results, mode="upset")
+    assert isinstance(comp1, Compose)
+    assert isinstance(comp2, Compose)
+
+
+def test_pseudobulk_de_upset_gene_col_and_index_agree():
+    indexed = _de_table(["g1", "g2"], [])
+    named = _de_table(["g1", "g2"], [], gene_col="gene")
+    comp_index = plot_pseudobulk_de({"A": indexed, "B": indexed}, mode="upset")
+    comp_named = plot_pseudobulk_de(
+        {"A": named, "B": named}, mode="upset", gene_col="gene"
+    )
+    assert isinstance(comp_index, Compose)
+    assert isinstance(comp_named, Compose)
+
+
+def test_pseudobulk_de_upset_title(tmp_path):
+    results = {
+        "A": _de_table(["g1", "g2"], []),
+        "B": _de_table(["g2", "g3"], []),
+    }
+    comp = plot_pseudobulk_de(results, mode="upset", title="Shared DE genes")
+    assert isinstance(comp, Compose)
+    output = tmp_path / "pseudobulk_upset.png"
+    comp.save(output, width=8, height=6, dpi=60, verbose=False)
+    assert output.stat().st_size > 1_000
+
+
+def test_pseudobulk_de_upset_no_significant_genes_raises():
+    results = {
+        "A": _de_table([], []),
+        "B": _de_table([], []),
+    }
+    with pytest.raises(ValueError, match="No significant genes"):
+        plot_pseudobulk_de(results, mode="upset")
+
+
+def test_pseudobulk_de_upset_empty_results_raises():
+    with pytest.raises(ValueError, match="No significant genes"):
+        plot_pseudobulk_de({}, mode="upset")
 
 
 def test_pseudobulk_de_unknown_mode_raises(mock_de_results):

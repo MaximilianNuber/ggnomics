@@ -77,6 +77,7 @@ datasets:
       - bulk-rnaseq.qmd
       - specialized-plots.qmd (reused DE results)
       - plot-gallery.qmd
+      - upset.qmd (reused DE results across timepoints)
     fallback: not needed - E-MTAB-1625 provided a clean, estimable, replicated contrast.
     retrieval_date: "2026-08-12"
 

@@ -257,13 +257,33 @@ gg.plot_pseudobulk_de(results_by_tp, mode="volcano", ncol=3)
 gg.plot_pseudobulk_de(results_by_tp, mode="summary_bar") + theme_bw()
 ```
 
-`mode="upset"` (requires the `upsetplot` extra) returns a matplotlib
-`Figure` directly, showing which significant genes are shared across
-timepoints:
+`mode="upset"` uses the native `ggnomics.upset` backend (part of the normal
+package — no extra install required for plotting) and returns an ordinary
+`plotnine.composition.Compose`, showing which significant genes are shared
+across timepoints:
 
 ```{python}
 gg.plot_pseudobulk_de(results_by_tp, mode="upset")
 ```
+
+## Native UpSet plots
+
+`ggnomics.upset` is a native Plotnine set-intersection ("UpSet") plot
+implementation — no Matplotlib-based `upsetplot` dependency. See
+[UpSet plots](upset.qmd) for the full workflow (computation internals,
+region-selection modes, highlighting, custom annotations, Venn helpers, and
+the statistical-comparison caveats); this table is a compact function index.
+
+| Function | Purpose |
+|---|---|
+| `upset.upset` | High-level plot: raw data or prepared `UpSetData` -> `Compose` |
+| `upset.upset_data` / `compute_intersections` / `select_intersections` / `apply_intersection_selection` | The compute -> select -> apply pipeline behind `upset()` |
+| `upset.intersection_size`, `upset.intersection_ratio`, `upset.upset_annotate` | Built-in and custom annotation panels |
+| `upset.intersection_matrix`, `upset.upset_set_size`, `upset.upset_stripes` | Matrix, marginal set-size, and stripe styling |
+| `upset.upset_query` | Highlight a set, intersection, or (not yet implemented) group |
+| `upset.upset_themes`, `upset.upset_default_themes`, `upset.upset_modify_themes` | Per-component theme collections |
+| `upset.compare_between_intersections`, `upset.upset_test` | Optional (`ggnomics[upset]`) statistical comparisons across intersections |
+| `upset.arrange_venn`, `upset.geom_venn_circle`, `upset.geom_venn_region`, `upset.scale_fill_venn_mix`, ... | Approximate 2-4 set Venn diagrams |
 
 ## Multimodal
 

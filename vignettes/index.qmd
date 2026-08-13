@@ -45,6 +45,10 @@ particular figure.
   mouse brain dataset from quality control to clustering and UMAP.
 * **[Bulk RNA-seq](bulk-rnaseq.qmd)** uses PyDESeq2 to analyse a rice
   salt-stress experiment.
+* **[UpSet plots](upset.qmd)** compares differentially expressed genes across
+  the three E-MTAB-1625 timepoints with `ggnomics.upset`, a native Plotnine
+  set-intersection plot; every plot it returns is an ordinary
+  `plotnine.composition.Compose` object.
 * **[Multimodal](multimodal.qmd)** combines RNA and ADT measurements from
   CITE-seq data.
 * **[Specialized plots](specialized-plots.qmd)** covers abundance,

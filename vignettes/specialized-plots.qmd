@@ -259,7 +259,10 @@ f"{len(ctcl_cdr3)} unique productive TRB CDR3s (CTCL), {len(control_cdr3)} (cont
 No exact CDR3 sequence is shared between the CTCL and control samples in
 these resources. Exact overlap between unrelated individuals is expected to
 be sparse because of the diversity of the TCR repertoire. The Jaccard matrix
-summarizes the comparison:
+summarizes the comparison. For more than two groups, a set-intersection
+matrix is often more legible than pairwise Jaccard values — see
+[UpSet plots](upset.qmd), which also covers `plot_pseudobulk_de`'s
+`mode="upset"`.
 
 ```{python}
 cdr3_level = productive_trb.drop_duplicates(subset=["cdr3", "condition"])[["cdr3", "condition"]]
@@ -311,5 +314,7 @@ p3 = gg.plot_clonotype_abundance(cell_level, clonotype_col="clonotype_id", sampl
 
 ## Next
 
+* [UpSet plots](upset.qmd) covers `plot_pseudobulk_de(mode="upset")` and the
+  full native set-intersection API in depth.
 * The [plot gallery](plot-gallery.qmd) provides a function-oriented index to
   these and the other plotting examples.

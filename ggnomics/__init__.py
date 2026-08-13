@@ -70,6 +70,7 @@ __all__ = [
     "qc_histogram",
     "cluster_composition_barplot",
     "ridge_density",
+    "upset"
 ]
 
 # Significance brackets
@@ -145,6 +146,9 @@ from .ridge import ridge_density
 from .bulk import pca as bulk_pca
 from .singlecell import pca as sc_pca
 from .singlecell import umap as sc_umap
+
+# independent submodules
+from . import upset
 
 # Register only the optional container packages that are actually installed.
 # This must happen after the public generic functions have been imported.

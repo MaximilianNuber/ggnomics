@@ -4,7 +4,11 @@ import importlib.util
 import os
 import sys
 
+import matplotlib
 import pytest
+
+# Headless rendering for the whole suite: no interactive windows.
+matplotlib.use("Agg")
 
 # Load examples/00_mock_data.py (file starts with digit, use importlib)
 _MOCK_PATH = os.path.join(os.path.dirname(__file__), "..", "examples", "00_mock_data.py")
@@ -93,3 +97,33 @@ def mock_mudata():
 def mock_repertoire_df():
     """obs DataFrame with clonotype info."""
     return make_mock_repertoire(n_cells=300, n_clonotypes=40, n_samples=3, seed=42)
+
+
+# ---------------------------------------------------------------------------
+# ggnomics.upset fixtures — shared across tests/test_upset_*.py
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture
+def abc_example():
+    """The ComplexUpset-distributed A/B/C example with known exact counts.
+
+    325 rows; exclusive counts: () -> 2, (A,) -> 50, (B,) -> 50, (C,) -> 200,
+    (A,B) -> 10, (A,C) -> 6, (B,C) -> 6, (A,B,C) -> 1.
+    """
+    import ggnomics.upset as upset
+
+    return upset.create_upset_abc_example()
+
+
+@pytest.fixture
+def abc_example_with_covariates(abc_example):
+    """The A/B/C example plus a numeric and a categorical covariate.
+
+    Deterministic, no randomness: ``score`` is the row position and
+    ``batch`` alternates first/second.
+    """
+    data = abc_example.copy(deep=True)
+    data["score"] = range(len(data))
+    data["batch"] = ["first", "second"] * (len(data) // 2) + ["first"]
+    return data

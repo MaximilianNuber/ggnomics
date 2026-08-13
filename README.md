@@ -93,6 +93,7 @@ for equivalent examples with DataFrame, SingleCellExperiment, and AnnData.
 - abundance and composition
 - single-cell and pseudobulk quality control
 - volcano, MA, and coefficient plots
+- native Plotnine UpSet plots and Venn diagrams for set intersections
 - multimodal RNA–protein visualization and ADT quality control
 - clonotype abundance, overlap, and repertoire embeddings
 - statistical annotations and ggsignif-style brackets
@@ -100,6 +101,19 @@ for equivalent examples with DataFrame, SingleCellExperiment, and AnnData.
 
 The [plot gallery](https://maximiliannuber.github.io/ggnomics/plot-gallery.html)
 groups the available functions by analysis task and includes runnable examples.
+
+Native UpSet plotting (`ggnomics.upset`) is available with the normal package
+install — no optional dependency needed for plotting itself:
+
+```python
+import ggnomics.upset as upset
+
+upset.upset(data, ["set_a", "set_b", "set_c"])
+```
+
+It returns an ordinary `plotnine.composition.Compose`. Only the between-
+intersection statistical comparison helpers (`upset.compare_between_intersections`,
+`upset.upset_test`) need `pip install "ggnomics[upset]"` (scipy, statsmodels).
 
 ## Input containers
 
@@ -135,6 +149,7 @@ AnnData. `ggnomics.bulk_pca` provides PCA directly from a bulk assay.
 - [Getting started](https://maximiliannuber.github.io/ggnomics/getting-started.html)
 - [Single-cell analysis with scranpy](https://maximiliannuber.github.io/ggnomics/single-cell-scranpy.html)
 - [Bulk RNA-seq with PyDESeq2](https://maximiliannuber.github.io/ggnomics/bulk-rnaseq.html)
+- [Native UpSet plots](https://maximiliannuber.github.io/ggnomics/upset.html)
 - [Multimodal RNA and protein](https://maximiliannuber.github.io/ggnomics/multimodal.html)
 - [Specialized plots](https://maximiliannuber.github.io/ggnomics/specialized-plots.html)
 - [Plot gallery](https://maximiliannuber.github.io/ggnomics/plot-gallery.html)
@@ -153,7 +168,7 @@ pip install "ggnomics[multimodal]" # MuData
 pip install "ggnomics[stats]"      # statistical tests and significance brackets
 pip install "ggnomics[pca]"        # PCA utilities
 pip install "ggnomics[pseudobulk]" # pseudobulk QC PCA panel
-pip install "ggnomics[upset]"      # UpSet-style DE overlap plots
+pip install "ggnomics[upset]"      # ggnomics.upset statistical comparisons (scipy, statsmodels)
 pip install "ggnomics[umap]"       # UMAP utilities
 pip install "ggnomics[all]"        # all optional features
 ```

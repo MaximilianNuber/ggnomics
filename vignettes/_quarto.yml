@@ -14,6 +14,8 @@ website:
         text: Single-cell (scranpy)
       - href: bulk-rnaseq.qmd
         text: Bulk RNA-seq
+      - href: upset.qmd
+        text: UpSet plots
       - href: multimodal.qmd
         text: Multimodal
       - href: specialized-plots.qmd
