@@ -12,9 +12,9 @@ The package works with tidy `pandas` data and common genomics containers,
 including AnnData, BiocPy `SingleCellExperiment`, `SummarizedExperiment`, and
 MuData.
 
-**[Read the documentation](https://maximiliannuber.github.io/ggnomics/)** ·
-**[Browse the plot gallery](https://maximiliannuber.github.io/ggnomics/plot-gallery.html)** ·
-**[Start with a complete example](https://maximiliannuber.github.io/ggnomics/getting-started.html)**
+**[API reference](https://maximiliannuber.github.io/ggnomics/)** · **[Read the vignettes](https://maximiliannuber.github.io/ggnomics/vignettes/)** ·
+**[Browse the plot gallery](https://maximiliannuber.github.io/ggnomics/vignettes/plot-gallery.html)** ·
+**[Start with a complete example](https://maximiliannuber.github.io/ggnomics/vignettes/getting-started.html)**
 
 ## Installation
 
@@ -80,7 +80,7 @@ gg.plot_expression(
 )
 ```
 
-See [Getting started](https://maximiliannuber.github.io/ggnomics/getting-started.html)
+See [Getting started](https://maximiliannuber.github.io/ggnomics/vignettes/getting-started.html)
 for equivalent examples with DataFrame, SingleCellExperiment, and AnnData.
 
 ## Plot families
@@ -99,7 +99,7 @@ for equivalent examples with DataFrame, SingleCellExperiment, and AnnData.
 - statistical annotations and ggsignif-style brackets
 - multi-panel plot composition
 
-The [plot gallery](https://maximiliannuber.github.io/ggnomics/plot-gallery.html)
+The [plot gallery](https://maximiliannuber.github.io/ggnomics/vignettes/plot-gallery.html)
 groups the available functions by analysis task and includes runnable examples.
 
 Native UpSet plotting (`ggnomics.upset`) is available with the normal package
@@ -139,20 +139,20 @@ AnnData. `ggnomics.bulk_pca` provides PCA directly from a bulk assay.
 
 | | |
 |---|---|
-| ![Zeisel mouse brain UMAP colored by cell class](docs/img/readme/zeisel_umap_level1class.png)<br>`plot_umap` on the Zeisel mouse brain dataset.<br>[Single-cell workflow](https://maximiliannuber.github.io/ggnomics/single-cell-scranpy.html) | ![Marker-gene violins across Zeisel cell classes](docs/img/readme/zeisel_marker_violins.png)<br>`plot_expression` for marker genes across cell classes.<br>[Single-cell workflow](https://maximiliannuber.github.io/ggnomics/single-cell-scranpy.html) |
-| ![E-MTAB-1625 volcano plot](docs/img/readme/emtab1625_volcano.png)<br>`plot_volcano` for the 24-hour salt-stress comparison in E-MTAB-1625.<br>[Bulk RNA-seq workflow](https://maximiliannuber.github.io/ggnomics/bulk-rnaseq.html) | ![Baron pancreas cell-type composition by donor](docs/img/readme/baron_composition.png)<br>`plot_abundance` for pancreatic cell-type composition across donors.<br>[Specialized plots](https://maximiliannuber.github.io/ggnomics/specialized-plots.html) |
-| ![RNA- and protein-coloured UMAP panels](docs/img/readme/cite_seq_rna_protein_umap.png)<br>RNA and ADT abundance on a shared CITE-seq embedding.<br>[Multimodal workflow](https://maximiliannuber.github.io/ggnomics/multimodal.html) | ![TCR clonotype abundance in CTCL and control samples](docs/img/readme/tcr_clonotype_abundance.png)<br>`plot_clonotype_abundance` for ECCITE-seq TCR data.<br>[Specialized plots](https://maximiliannuber.github.io/ggnomics/specialized-plots.html) |
-| ![Marsilea heatmap of differentially expressed genes](docs/img/readme/marsilea_heatmap.png)<br>PyDESeq2 results displayed with a Marsilea heatmap.<br>[Specialized plots](https://maximiliannuber.github.io/ggnomics/specialized-plots.html) | ![Significance brackets on a Zeisel violin plot](docs/img/readme/significance_brackets.png)<br>`plot_violin_stats` and `geom_signif` for statistical annotations.<br>[Specialized plots](https://maximiliannuber.github.io/ggnomics/specialized-plots.html) |
+| ![Zeisel mouse brain UMAP colored by cell class](docs/img/readme/zeisel_umap_level1class.png)<br>`plot_umap` on the Zeisel mouse brain dataset.<br>[Single-cell workflow](https://maximiliannuber.github.io/ggnomics/vignettes/single-cell-scranpy.html) | ![Marker-gene violins across Zeisel cell classes](docs/img/readme/zeisel_marker_violins.png)<br>`plot_expression` for marker genes across cell classes.<br>[Single-cell workflow](https://maximiliannuber.github.io/ggnomics/vignettes/single-cell-scranpy.html) |
+| ![E-MTAB-1625 volcano plot](docs/img/readme/emtab1625_volcano.png)<br>`plot_volcano` for the 24-hour salt-stress comparison in E-MTAB-1625.<br>[Bulk RNA-seq workflow](https://maximiliannuber.github.io/ggnomics/vignettes/bulk-rnaseq.html) | ![Baron pancreas cell-type composition by donor](docs/img/readme/baron_composition.png)<br>`plot_abundance` for pancreatic cell-type composition across donors.<br>[Specialized plots](https://maximiliannuber.github.io/ggnomics/vignettes/specialized-plots.html) |
+| ![RNA- and protein-coloured UMAP panels](docs/img/readme/cite_seq_rna_protein_umap.png)<br>RNA and ADT abundance on a shared CITE-seq embedding.<br>[Multimodal workflow](https://maximiliannuber.github.io/ggnomics/vignettes/multimodal.html) | ![TCR clonotype abundance in CTCL and control samples](docs/img/readme/tcr_clonotype_abundance.png)<br>`plot_clonotype_abundance` for ECCITE-seq TCR data.<br>[Specialized plots](https://maximiliannuber.github.io/ggnomics/vignettes/specialized-plots.html) |
+| ![Marsilea heatmap of differentially expressed genes](docs/img/readme/marsilea_heatmap.png)<br>PyDESeq2 results displayed with a Marsilea heatmap.<br>[Specialized plots](https://maximiliannuber.github.io/ggnomics/vignettes/specialized-plots.html) | ![Significance brackets on a Zeisel violin plot](docs/img/readme/significance_brackets.png)<br>`plot_violin_stats` and `geom_signif` for statistical annotations.<br>[Specialized plots](https://maximiliannuber.github.io/ggnomics/vignettes/specialized-plots.html) |
 
 ## Workflow guides
 
-- [Getting started](https://maximiliannuber.github.io/ggnomics/getting-started.html)
-- [Single-cell analysis with scranpy](https://maximiliannuber.github.io/ggnomics/single-cell-scranpy.html)
-- [Bulk RNA-seq with PyDESeq2](https://maximiliannuber.github.io/ggnomics/bulk-rnaseq.html)
+- [Getting started](https://maximiliannuber.github.io/ggnomics/vignettes/getting-started.html)
+- [Single-cell analysis with scranpy](https://maximiliannuber.github.io/ggnomics/vignettes/single-cell-scranpy.html)
+- [Bulk RNA-seq with PyDESeq2](https://maximiliannuber.github.io/ggnomics/vignettes/bulk-rnaseq.html)
 - [Native UpSet plots](https://maximiliannuber.github.io/ggnomics/upset.html)
-- [Multimodal RNA and protein](https://maximiliannuber.github.io/ggnomics/multimodal.html)
-- [Specialized plots](https://maximiliannuber.github.io/ggnomics/specialized-plots.html)
-- [Plot gallery](https://maximiliannuber.github.io/ggnomics/plot-gallery.html)
+- [Multimodal RNA and protein](https://maximiliannuber.github.io/ggnomics/vignettes/multimodal.html)
+- [Specialized plots](https://maximiliannuber.github.io/ggnomics/vignettes/specialized-plots.html)
+- [Plot gallery](https://maximiliannuber.github.io/ggnomics/vignettes/plot-gallery.html)
 
 The workflows use ggnomics alongside BiocPy, scverse, scranpy, PyDESeq2, and
 Marsilea. These packages perform data access or analysis; ggnomics provides
@@ -177,7 +177,7 @@ pip install "ggnomics[all]"        # all optional features
 
 `ggnomics` is under active development. A small legacy API—including
 `expression_violin`, `volcano_plot`, and `heatmap_from_matrix`—is retained for
-backwards compatibility. The [plot gallery](https://maximiliannuber.github.io/ggnomics/plot-gallery.html)
+backwards compatibility. The [plot gallery](https://maximiliannuber.github.io/ggnomics/vignettes/plot-gallery.html)
 identifies current and legacy interfaces.
 
 ## License
