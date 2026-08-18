@@ -178,7 +178,7 @@ pip install "ggnomics[all]"        # all optional features
 
 ## Development status
 
-`ggnomics` is under active development. A small legacy APIâ€”including
+`ggnomics` is under active development. A small legacy API including
 `expression_violin`, `volcano_plot`, and `heatmap_from_matrix` is retained for
 backwards compatibility. The [plot gallery](https://maximiliannuber.github.io/ggnomics/plot-gallery.html)
 identifies current and legacy interfaces.
