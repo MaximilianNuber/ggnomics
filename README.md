@@ -12,9 +12,9 @@ The package works with tidy `pandas` data and common genomics containers,
 including AnnData, BiocPy `SingleCellExperiment`, `SummarizedExperiment`, and
 MuData.
 
-**[Documentation](https://maximiliannuber.github.io/ggnomics/)** Â·
-**[Getting started](https://maximiliannuber.github.io/ggnomics/getting-started.html)** Â·
-**[Plot gallery](https://maximiliannuber.github.io/ggnomics/plot-gallery.html)** Â·
+**[Documentation](https://maximiliannuber.github.io/ggnomics/)** ·
+**[Getting started](https://maximiliannuber.github.io/ggnomics/getting-started.html)** ·
+**[Plot gallery](https://maximiliannuber.github.io/ggnomics/plot-gallery.html)** ·
 **[API reference](https://maximiliannuber.github.io/ggnomics/reference/)**
 
 ## Installation
@@ -95,7 +95,7 @@ for equivalent examples with DataFrame, SingleCellExperiment, and AnnData.
 - single-cell and pseudobulk quality control
 - volcano, MA, and coefficient plots
 - native Plotnine UpSet plots and Venn diagrams for set intersections
-- multimodal RNAâ€“protein visualization and ADT quality control
+- multimodal RNA + protein visualization and ADT quality control
 - clonotype abundance, overlap, and repertoire embeddings
 - statistical annotations and ggsignif-style brackets
 - multi-panel plot composition
@@ -104,7 +104,7 @@ The [plot gallery](https://maximiliannuber.github.io/ggnomics/plot-gallery.html)
 groups the available functions by analysis task and includes runnable examples.
 
 Native UpSet plotting (`ggnomics.upset`) is available with the normal package
-installâ€”no optional dependency is needed for plotting itself:
+install, no optional dependency is needed for plotting itself:
 
 ```python
 import ggnomics.upset as upset
@@ -179,7 +179,7 @@ pip install "ggnomics[all]"        # all optional features
 ## Development status
 
 `ggnomics` is under active development. A small legacy APIâ€”including
-`expression_violin`, `volcano_plot`, and `heatmap_from_matrix`â€”is retained for
+`expression_violin`, `volcano_plot`, and `heatmap_from_matrix` is retained for
 backwards compatibility. The [plot gallery](https://maximiliannuber.github.io/ggnomics/plot-gallery.html)
 identifies current and legacy interfaces.
 
