@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>ggnomics</title>
+<title>plot_pseudobulk_de – ggnomics</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -64,23 +64,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-7f2a73b4744d2b3fe1b4d8e76c164443.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-7f2a73b4744d2b3fe1b4d8e76c164443.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -110,17 +110,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 
 
-<link rel="stylesheet" href="reference/_styles-quartodoc.css">
+<link rel="stylesheet" href="../reference/_styles-quartodoc.css">
 </head>
 
-<body class="nav-fixed quarto-light">
+<body class="nav-sidebar floating nav-fixed quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">ggnomics</span>
     </a>
   </div>
@@ -131,35 +131,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./index.html" aria-current="page"> 
+    <a class="nav-link" href="../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./getting-started.html"> 
+    <a class="nav-link" href="../getting-started.html"> 
 <span class="menu-text">Getting started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./single-cell-scranpy.html"> 
+    <a class="nav-link" href="../single-cell-scranpy.html"> 
 <span class="menu-text">Single-cell</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./bulk-rnaseq.html"> 
+    <a class="nav-link" href="../bulk-rnaseq.html"> 
 <span class="menu-text">Bulk RNA-seq</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./multimodal.html"> 
+    <a class="nav-link" href="../multimodal.html"> 
 <span class="menu-text">Multimodal</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./specialized-plots.html"> 
+    <a class="nav-link" href="../specialized-plots.html"> 
 <span class="menu-text">Specialized plots</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./plot-gallery.html"> 
+    <a class="nav-link" href="../plot-gallery.html"> 
 <span class="menu-text">Plot gallery</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./reference/index.html"> 
+    <a class="nav-link active" href="../reference/index.html" aria-current="page"> 
 <span class="menu-text">API reference</span></a>
   </li>  
 </ul>
@@ -168,264 +168,328 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
       </div> <!-- /container-fluid -->
     </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/plot_pseudobulk_qc.html">Pseudobulk</a></li><li class="breadcrumb-item"><a href="../reference/plot_pseudobulk_de.html">plot_pseudobulk_de</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
 </header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">API reference</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Reduced dimensions</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/plot_embedding.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plot_embedding</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/plot_reduced_dim.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plot_reduced_dim</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/plot_umap.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plot_umap</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/plot_pca.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plot_pca</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/plot_tsne.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plot_tsne</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Expression and metadata</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/plot_expression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plot_expression</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/plot_coldata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plot_coldata</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/plot_rowdata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plot_rowdata</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/plot_dot.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plot_dot</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/plot_highest_exprs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plot_highest_exprs</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Abundance and composition</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/plot_abundance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plot_abundance</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Heatmaps</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/plot_heatmap.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plot_heatmap</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Differential expression</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/plot_volcano.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plot_volcano</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/plot_ma.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plot_ma</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/plot_coef_lollipop.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plot_coef_lollipop</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/plot_coef_expression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plot_coef_expression</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Pseudobulk</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/plot_pseudobulk_qc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plot_pseudobulk_qc</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/plot_pseudobulk_de.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">plot_pseudobulk_de</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
+ <span class="menu-text">Multimodal</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/plot_bimodal_scatter.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plot_bimodal_scatter</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/plot_adt_qc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plot_adt_qc</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true">
+ <span class="menu-text">Immune repertoire</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/plot_clonotype_abundance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plot_clonotype_abundance</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/plot_clonotype_overlap.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plot_clonotype_overlap</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/plot_clonotype_embedding.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plot_clonotype_embedding</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="true">
+ <span class="menu-text">Statistics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/plot_violin_stats.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plot_violin_stats</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/plot_box_stats.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plot_box_stats</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/geom_signif.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">geom_signif</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/run_comparisons.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">run_comparisons</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#examples" id="toc-examples" class="nav-link active" data-scroll-target="#examples">Examples</a></li>
-  <li><a href="#workflows" id="toc-workflows" class="nav-link" data-scroll-target="#workflows">Workflows</a></li>
-  <li><a href="#whats-supported" id="toc-whats-supported" class="nav-link" data-scroll-target="#whats-supported">What’s supported</a></li>
-  <li><a href="#one-plotting-interface" id="toc-one-plotting-interface" class="nav-link" data-scroll-target="#one-plotting-interface">One plotting interface</a></li>
-  <li><a href="#build-on-the-returned-plot" id="toc-build-on-the-returned-plot" class="nav-link" data-scroll-target="#build-on-the-returned-plot">Build on the returned plot</a></li>
-  <li><a href="#datasets-used-in-the-guides" id="toc-datasets-used-in-the-guides" class="nav-link" data-scroll-target="#datasets-used-in-the-guides">Datasets used in the guides</a></li>
-  <li><a href="#optional-backends" id="toc-optional-backends" class="nav-link" data-scroll-target="#optional-backends">Optional backends</a></li>
+  <li><a href="#ggnomics.plot_pseudobulk_de" id="toc-ggnomics.plot_pseudobulk_de" class="nav-link active" data-scroll-target="#ggnomics.plot_pseudobulk_de">plot_pseudobulk_de</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
-
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">ggnomics</h1>
-<p class="subtitle lead">Composable, ggplot2-style genomics visualization for Python</p>
-</div>
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/plot_pseudobulk_qc.html">Pseudobulk</a></li><li class="breadcrumb-item"><a href="../reference/plot_pseudobulk_de.html">plot_pseudobulk_de</a></li></ol></nav></header>
 
 
 
-<div class="quarto-title-meta">
 
-    
-  
-    
-  </div>
-  
-
-
-</header>
-
-
-<p><code>ggnomics</code> provides ggplot2-style visualizations for bulk, single-cell, and multimodal genomics in Python. Its plotting functions work with tidy <code>pandas</code> data and common genomics containers, including AnnData and BiocPy’s <code>SingleCellExperiment</code> and <code>SummarizedExperiment</code>.</p>
-<p>The result is a <a href="https://plotnine.org">plotnine</a> plot that remains yours to adapt:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> ggnomics <span class="im">as</span> gg</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> plotnine <span class="im">as</span> p9</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> gg.plot_umap(adata, color<span class="op">=</span><span class="st">"cluster"</span>)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>p <span class="op">+</span> p9.theme_bw() <span class="op">+</span> p9.labs(title<span class="op">=</span><span class="st">"Cell populations"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Start with <a href="./getting-started.html">Getting started</a>, follow one of the end-to-end workflows, or browse the <a href="./plot-gallery.html">plot gallery</a> for a particular figure.</p>
-<section id="examples" class="level2">
-<h2 class="anchored" data-anchor-id="examples">Examples</h2>
-<div class="quarto-layout-panel" data-layout="[[1,1], [1,1]]">
-<div class="quarto-layout-row">
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="single-cell-scranpy_files/figure-html/cell-22-output-1.png" class="img-fluid figure-img"></p>
-<figcaption><a href="./single-cell-scranpy.html">Cell classes in the Zeisel mouse brain dataset</a>.</figcaption>
-</figure>
-</div>
-</div>
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="bulk-rnaseq_files/figure-html/cell-16-output-1.png" class="img-fluid figure-img"></p>
-<figcaption><a href="./bulk-rnaseq.html">Differential expression after 24 hours of salt stress in rice</a>.</figcaption>
-</figure>
-</div>
-</div>
-</div>
-<div class="quarto-layout-row">
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="specialized-plots_files/figure-html/cell-4-output-1.png" class="img-fluid figure-img"></p>
-<figcaption><a href="./specialized-plots.html">Pancreatic cell-type composition across donors</a>.</figcaption>
-</figure>
-</div>
-</div>
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="multimodal_files/figure-html/cell-23-output-1.png" class="img-fluid figure-img"></p>
-<figcaption><a href="./multimodal.html">RNA and protein abundance on a shared CITE-seq embedding</a>.</figcaption>
-</figure>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="workflows" class="level2">
-<h2 class="anchored" data-anchor-id="workflows">Workflows</h2>
-<ul>
-<li><strong><a href="./getting-started.html">Getting started</a></strong> introduces DataFrame, SCE, and AnnData input and shows how to customize the returned plots.</li>
-<li><strong><a href="./single-cell-scranpy.html">Single-cell analysis with scranpy</a></strong> follows a mouse brain dataset from quality control to clustering and UMAP.</li>
-<li><strong><a href="./bulk-rnaseq.html">Bulk RNA-seq</a></strong> uses PyDESeq2 to analyse a rice salt-stress experiment.</li>
-<li><strong><a href="./upset.html">UpSet plots</a></strong> compares differentially expressed genes across the three E-MTAB-1625 timepoints with <code>ggnomics.upset</code>, a native Plotnine set-intersection plot; every plot it returns is an ordinary <code>plotnine.composition.Compose</code> object.</li>
-<li><strong><a href="./multimodal.html">Multimodal</a></strong> combines RNA and ADT measurements from CITE-seq data.</li>
-<li><strong><a href="./specialized-plots.html">Specialized plots</a></strong> covers abundance, pseudobulk QC, statistics, significance brackets, palettes, heatmaps, and immune repertoires.</li>
-<li><strong><a href="./plot-gallery.html">Plot gallery</a></strong> provides a compact reference organized by plot family.</li>
-</ul>
-</section>
-<section id="whats-supported" class="level2">
-<h2 class="anchored" data-anchor-id="whats-supported">What’s supported</h2>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Container</th>
-<th>Package</th>
-<th>Typical use</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>pd.DataFrame</code></td>
-<td>pandas</td>
-<td>Tidy plotting tables and model results</td>
-</tr>
-<tr class="even">
-<td><code>AnnData</code></td>
-<td>anndata / scverse</td>
-<td>Single-cell data in scverse workflows</td>
-</tr>
-<tr class="odd">
-<td><code>SingleCellExperiment</code></td>
-<td>BiocPy <code>singlecellexperiment</code></td>
-<td>Single-cell assays, metadata, and reduced dimensions</td>
-</tr>
-<tr class="even">
-<td><code>SummarizedExperiment</code></td>
-<td>BiocPy <code>summarizedexperiment</code></td>
-<td>Bulk assays and sample metadata</td>
-</tr>
-<tr class="odd">
-<td><code>MuData</code></td>
-<td>mudata / scverse</td>
-<td>Measurements across several modalities</td>
-</tr>
-</tbody>
-</table>
-<p>Because <code>SummarizedExperiment</code> does not store reduced dimensions, embedding plots require either explicit coordinates or a richer container. For bulk assays, <code>ggnomics.bulk_pca</code> computes and plots PCA scores directly. The <a href="./getting-started.html">Getting started</a> guide shows the supported paths in more detail.</p>
-</section>
-<section id="one-plotting-interface" class="level2">
-<h2 class="anchored" data-anchor-id="one-plotting-interface">One plotting interface</h2>
-<p>The public <code>plot_*</code> functions use Python’s <code>singledispatch</code>: the function name and main arguments stay the same while the input container determines how data are extracted. The DataFrame implementation supplies the public docstring shown by <code>help()</code> and in Jupyter. Adapters for AnnData, BiocPy, and MuData register automatically when their corresponding packages are installed.</p>
-<p><a href="./getting-started.html#7-how-dispatch-works">Getting started §7</a> explains the design and shows how to inspect the registered implementations.</p>
-</section>
-<section id="build-on-the-returned-plot" class="level2">
-<h2 class="anchored" data-anchor-id="build-on-the-returned-plot">Build on the returned plot</h2>
-<p>Most functions return an ordinary <code>ggplot</code>, so plotnine layers, scales, themes, coordinates, and labels can be added directly. This keeps the convenient genomics defaults without limiting the final figure.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> gg.plot_umap(adata, color<span class="op">=</span><span class="st">"cluster"</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>p <span class="op">+</span> p9.theme_bw() <span class="op">+</span> p9.labs(title<span class="op">=</span><span class="st">"My figure"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Multi-panel functions such as <code>plot_pseudobulk_qc</code>, <code>plot_scatter_marginal</code>, and <code>plot_embedding_panel</code> return a <code>plotnine.composition.Compose</code>. They can be arranged with plotnine’s <code>|</code> and <code>/</code> operators or with ggnomics helpers such as <code>hstack</code>, <code>vstack</code>, and <code>grid</code>.</p>
-</section>
-<section id="datasets-used-in-the-guides" class="level2">
-<h2 class="anchored" data-anchor-id="datasets-used-in-the-guides">Datasets used in the guides</h2>
-<p>The worked examples use publicly available bulk, single-cell, multimodal, and immune-repertoire datasets distributed through BiocPy data-access packages.</p>
-<div id="fd241803" class="cell" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys, pathlib</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>sys.path.insert(<span class="dv">0</span>, <span class="bu">str</span>(pathlib.Path(<span class="st">"_includes"</span>).resolve()))</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> provenance <span class="im">import</span> provenance_markdown</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> IPython.display <span class="im">import</span> Markdown</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>Markdown(provenance_markdown())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="1">
-<table class="caption-top table table-sm table-striped small">
-<colgroup>
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 16%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Dataset</th>
-<th>Provider</th>
-<th>Accession</th>
-<th>Version</th>
-<th>Organism</th>
-<th>Used in</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Zeisel mouse brain (2015)</td>
-<td>scrnaseq (BiocPy)</td>
-<td><code>zeisel-brain-2015</code></td>
-<td>2023-12-14</td>
-<td>Mus musculus</td>
-<td>getting-started.qmd (deterministic stratified subset), single-cell-scranpy.qmd (full dataset), specialized-plots.qmd, plot-gallery.qmd</td>
-</tr>
-<tr class="even">
-<td>Baron human pancreas (2016)</td>
-<td>scrnaseq (BiocPy)</td>
-<td><code>baron-pancreas-2016</code></td>
-<td>2023-12-14</td>
-<td>Homo sapiens</td>
-<td>specialized-plots.qmd (abundance/composition, pseudobulk), plot-gallery.qmd</td>
-</tr>
-<tr class="odd">
-<td>Rice salt-stress bulk RNA-seq (E-MTAB-1625)</td>
-<td>pyexpressionatlas (BiocPy, wraps EMBL-EBI Expression Atlas)</td>
-<td><code>E-MTAB-1625</code></td>
-<td>—</td>
-<td>Oryza sativa Japonica Group (rice)</td>
-<td>bulk-rnaseq.qmd, specialized-plots.qmd (reused DE results), plot-gallery.qmd, upset.qmd (reused DE results across timepoints)</td>
-</tr>
-<tr class="even">
-<td>CITEVizTestDataSC PBMC CITE-seq</td>
-<td>experimenthub (BiocPy)</td>
-<td><code>EH7740</code></td>
-<td>—</td>
-<td>Homo sapiens</td>
-<td>multimodal.qmd, plot-gallery.qmd</td>
-</tr>
-<tr class="odd">
-<td>CTCL TCR alpha/beta repertoire</td>
-<td>experimenthub (BiocPy)</td>
-<td><code>EH4616</code></td>
-<td>—</td>
-<td>Homo sapiens</td>
-<td>specialized-plots.qmd (repertoire section), plot-gallery.qmd</td>
-</tr>
-<tr class="even">
-<td>Control TCR alpha/beta repertoire</td>
-<td>experimenthub (BiocPy)</td>
-<td><code>EH4621</code></td>
-<td>—</td>
-<td>Homo sapiens</td>
-<td>specialized-plots.qmd (repertoire section), plot-gallery.qmd</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<p>Accessions, dataset versions, and resource notes are recorded in <a href="datasets.yml"><code>datasets.yml</code></a>.</p>
-</section>
-<section id="optional-backends" class="level2">
-<h2 class="anchored" data-anchor-id="optional-backends">Optional backends</h2>
-<p>The core installation provides the DataFrame interface. Container-specific support can be added through optional extras:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"ggnomics[anndata]"</span>    <span class="co"># AnnData / scverse</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"ggnomics[sce]"</span>        <span class="co"># SingleCellExperiment (BiocPy)</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"ggnomics[se]"</span>         <span class="co"># SummarizedExperiment (BiocPy)</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"ggnomics[multimodal]"</span> <span class="co"># MuData</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"ggnomics[stats]"</span>      <span class="co"># significance brackets (scipy, statsmodels)</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"ggnomics[pca]"</span>        <span class="co"># PCA utilities</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"ggnomics[umap]"</span>       <span class="co"># ggnomics.sc_umap</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"ggnomics[all]"</span>        <span class="co"># everything above</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>The workflow guides also use <code>scranpy</code>, PyDESeq2, Marsilea, <code>scrnaseq</code>, <code>pyexpressionatlas</code>, and <code>experimenthub</code>. These are analysis or data-access packages used alongside ggnomics rather than runtime dependencies of the plotting library.</p>
+<section id="ggnomics.plot_pseudobulk_de" class="level1">
+<h1>plot_pseudobulk_de</h1>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>plot_pseudobulk_de(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    results,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    logfc_col<span class="op">=</span><span class="st">'log2FoldChange'</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    pval_col<span class="op">=</span><span class="st">'padj'</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    gene_col<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    pval_threshold<span class="op">=</span><span class="fl">0.05</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    logfc_threshold<span class="op">=</span><span class="fl">1.0</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    top_n_label<span class="op">=</span><span class="dv">5</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    mode<span class="op">=</span><span class="st">'volcano'</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    ncol<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    title<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Visualise DE results across multiple clusters or contrasts.</p>
+<p>Args: results: Mapping of cluster/contrast name to a DESeq2-style DE DataFrame. This function is DataFrame/result-table based and does not need container dispatch. logfc_col: Log2 fold-change column. pval_col: Adjusted p-value column used for significance. gene_col: Column with gene names (<code>None</code> uses the index). pval_threshold: Significance threshold on <code>pval_col</code>. logfc_threshold: Absolute log2FC threshold for “significant”. top_n_label: Number of top genes labeled per volcano panel. mode: <code>"volcano"</code> – one volcano panel per cluster, arranged in a grid (plotnine composition, requires plotnine &gt;= 0.15). <code>"summary_bar"</code> – barplot of n_up / n_down per cluster. <code>"upset"</code> – native Plotnine UpSet plot (via :mod:<code>ggnomics.upset</code>) of shared significant genes across clusters/contrasts. ncol: Grid columns for <code>mode="volcano"</code>. title: Overall title.</p>
+<p>Returns: A <code>plotnine.composition.Compose</code> (<code>mode="volcano"</code> or <code>mode="upset"</code>), or a <code>plotnine.ggplot</code> (<code>mode="summary_bar"</code>).</p>
+<p>Raises: ValueError: If <code>results</code> is empty, <code>mode</code> is unknown, or no significant genes remain in any cluster/contrast under the given thresholds (<code>mode="upset"</code>).</p>
 
 
 </section>

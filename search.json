@@ -1,0 +1,1207 @@
+[
+  {
+    "objectID": "reference/plot_adt_qc.html",
+    "href": "reference/plot_adt_qc.html",
+    "title": "plot_adt_qc",
+    "section": "",
+    "text": "plot_adt_qc\nplot_adt_qc(\n    data,\n    isotype_controls,\n    layer=None,\n    group_by=None,\n    log1p=True,\n    palette=None,\n    ncol=3,\n    title=None,\n    features=None,\n    *,\n    mod='prot',\n)\nADT / protein QC: overlay isotype-control distributions on real antibodies.\nFor each real antibody, shows a density curve. Overlays the pooled isotype-control distribution as a shaded fill. If group_by is provided, facets by that column.\nArgs: data: DataFrame whose rows are cells. features are the antibody expression columns; group_by is a metadata column. isotype_controls: Non-empty list of isotype-control feature names. Must be a subset of features. layer: Present for cross-container signature consistency. Has no effect for a plain DataFrame, which has no concept of layers. group_by: Optional column used to facet the plot. Raises KeyError if supplied but absent (never silently ignored). log1p: Log1p-transform expression before plotting. palette: {antibody: hex} color mapping. ncol: Facet columns when group_by is given. title: Plot title. features: The antibody feature columns (real antibodies plus isotype controls). Required for a DataFrame — metadata columns are never guessed as antibodies. mod: Keyword-only. MuData modality to use (default \"prot\"). Ignored for a plain DataFrame.\nReturns: A plotnine.ggplot object.\nRaises: TypeError: If no implementation is registered for type(data). ValueError: If isotype_controls is empty, features is omitted for a DataFrame, or no real antibody features remain. KeyError: If a requested column/feature is absent.",
+    "crumbs": [
+      "API reference",
+      "Multimodal",
+      "plot_adt_qc"
+    ]
+  },
+  {
+    "objectID": "reference/plot_violin_stats.html",
+    "href": "reference/plot_violin_stats.html",
+    "title": "plot_violin_stats",
+    "section": "",
+    "text": "plot_violin_stats\nplot_violin_stats(\n    data,\n    feature,\n    group_by,\n    layer=None,\n    comparisons=None,\n    test='mannwhitney',\n    p_adjust='bonferroni',\n    sig_only=True,\n    annotation='stars',\n    add_boxplot=True,\n    add_points=False,\n    point_size=None,\n    palette=None,\n    order=None,\n    x_label=None,\n    y_label=None,\n    title=None,\n    dodge=False,\n)\nViolin plot with automatic statistical significance annotations.\nRuns pairwise tests between groups defined by comparisons (or all pairs when the number of groups is &lt;= 5 and comparisons is None). Draws significance brackets as geom_segment/geom_text layers via :func:ggnomics.signif.geom_signif, using proportional spacing (fractions of the y-range) so brackets look correct regardless of data scale.\nArgs: data: DataFrame whose rows are cells/samples. feature and group_by are columns. feature: Column holding the numeric value to plot. For a plain DataFrame this is simply a column; container adapters may also resolve it against an expression feature. group_by: Column whose categories define the x-axis groups. layer: Present for cross-container signature consistency. Has no effect for a plain DataFrame, which has no concept of layers. comparisons: Explicit list of (group_a, group_b) tuples to test. None auto-generates all pairs when there are &lt;= 5 groups. test: One of the tests supported by :func:ggnomics.signif.run_comparisons. p_adjust: Multiple-testing correction method. sig_only: Only draw brackets for significant comparisons. annotation: \"stars\", \"pvalue\", \"padj\", or a callable mapping a p-value to a label. add_boxplot: Overlay a narrow boxplot on each violin. add_points: Overlay jittered points. point_size: Jittered point size (None → adaptive). palette: {category: hex} fill color mapping. order: Explicit group ordering (unlisted groups appended at the end). x_label: Override x-axis label (defaults to group_by). y_label: Override y-axis label (defaults to feature). title: Plot title. dodge: Reserved for future grouped-violin support.\nReturns: A plotnine.ggplot object.\nRaises: TypeError: If no implementation is registered for type(data). KeyError: If a requested column is absent.",
+    "crumbs": [
+      "API reference",
+      "Statistics",
+      "plot_violin_stats"
+    ]
+  },
+  {
+    "objectID": "reference/geom_signif.html",
+    "href": "reference/geom_signif.html",
+    "title": "geom_signif",
+    "section": "",
+    "text": "geom_signif(\n    comparisons=None,\n    annotations=None,\n    y_position=None,\n    xmin=None,\n    xmax=None,\n    test='mannwhitney',\n    test_args=None,\n    map_signif_level=True,\n    p_adjust='bonferroni',\n    margin_top=0.05,\n    step_increase=0.1,\n    tip_length=0.03,\n    bracket_nudge_y=0.0,\n    textsize=15,\n    vjust=-10,\n    color='black',\n    linetype='solid',\n    linewidth=0.5,\n    sig_only=False,\n    orientation='x',\n)\nAdd significance brackets to a plotnine violin/box/bar plot.\nReturns a list of plotnine layers (manual mode) or a _DeferredSignif object (automatic mode) that can be resolved with .resolve(df, x_col, y_col).\n\n\nWhen annotations + y_position + xmin + xmax are all provided, draws brackets at the exact positions given without running any statistics.\ngeom_signif(\n    annotations=[\"p = 0.003\"],\n    y_position=[8.5],\n    xmin=[1], xmax=[3],\n)\n\n\n\nWhen only comparisons are given, returns a _DeferredSignif that runs statistical tests at resolve time.\ndeferred = geom_signif(comparisons=[(\"A\", \"B\"), (\"A\", \"C\")])\nlayers = deferred.resolve(df, x_col=\"group\", y_col=\"value\")\nfor layer in layers:\n    p = p + layer\n\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\ncomparisons\nlist of (group_a, group_b)\n\nNone\n\n\nannotations\nlist of str — pre-computed labels (manual mode)\n\nNone\n\n\ny_position\n\n\nNone\n\n\nxmin\n\n\nNone\n\n\nxmax\n\n\nNone\n\n\ntest\n'mannwhitney' | 'wilcoxon' | 'ttest' | 'kruskal'\n\n'mannwhitney'\n\n\nmap_signif_level\nTrue | False | dict | callable\nTrue → default star mapping False → “p={value:.3f}” dict → {threshold: label} callable → f(p) → str\nTrue\n\n\np_adjust\n'bonferroni' | 'fdr_bh' | 'none'\n\n'bonferroni'\n\n\nmargin_top\nfraction of y range above data max before first bracket\n\n0.05\n\n\nstep_increase\nfraction of y range added per stacked bracket\n\n0.1\n\n\ntip_length\nfraction of y range for vertical tips; [left, right] for asymmetric\n\n0.03\n\n\nsig_only\nif True, only draw brackets with adjusted p &lt; 0.05\n\nFalse\n\n\norientation\n\"x\" (vertical plots) | \"y\" (horizontal plots, experimental)\n\n'x'",
+    "crumbs": [
+      "API reference",
+      "Statistics",
+      "geom_signif"
+    ]
+  },
+  {
+    "objectID": "reference/geom_signif.html#manual-mode",
+    "href": "reference/geom_signif.html#manual-mode",
+    "title": "geom_signif",
+    "section": "",
+    "text": "When annotations + y_position + xmin + xmax are all provided, draws brackets at the exact positions given without running any statistics.\ngeom_signif(\n    annotations=[\"p = 0.003\"],\n    y_position=[8.5],\n    xmin=[1], xmax=[3],\n)",
+    "crumbs": [
+      "API reference",
+      "Statistics",
+      "geom_signif"
+    ]
+  },
+  {
+    "objectID": "reference/geom_signif.html#automatic-mode",
+    "href": "reference/geom_signif.html#automatic-mode",
+    "title": "geom_signif",
+    "section": "",
+    "text": "When only comparisons are given, returns a _DeferredSignif that runs statistical tests at resolve time.\ndeferred = geom_signif(comparisons=[(\"A\", \"B\"), (\"A\", \"C\")])\nlayers = deferred.resolve(df, x_col=\"group\", y_col=\"value\")\nfor layer in layers:\n    p = p + layer",
+    "crumbs": [
+      "API reference",
+      "Statistics",
+      "geom_signif"
+    ]
+  },
+  {
+    "objectID": "reference/geom_signif.html#parameters",
+    "href": "reference/geom_signif.html#parameters",
+    "title": "geom_signif",
+    "section": "",
+    "text": "Name\nType\nDescription\nDefault\n\n\n\n\ncomparisons\nlist of (group_a, group_b)\n\nNone\n\n\nannotations\nlist of str — pre-computed labels (manual mode)\n\nNone\n\n\ny_position\n\n\nNone\n\n\nxmin\n\n\nNone\n\n\nxmax\n\n\nNone\n\n\ntest\n'mannwhitney' | 'wilcoxon' | 'ttest' | 'kruskal'\n\n'mannwhitney'\n\n\nmap_signif_level\nTrue | False | dict | callable\nTrue → default star mapping False → “p={value:.3f}” dict → {threshold: label} callable → f(p) → str\nTrue\n\n\np_adjust\n'bonferroni' | 'fdr_bh' | 'none'\n\n'bonferroni'\n\n\nmargin_top\nfraction of y range above data max before first bracket\n\n0.05\n\n\nstep_increase\nfraction of y range added per stacked bracket\n\n0.1\n\n\ntip_length\nfraction of y range for vertical tips; [left, right] for asymmetric\n\n0.03\n\n\nsig_only\nif True, only draw brackets with adjusted p &lt; 0.05\n\nFalse\n\n\norientation\n\"x\" (vertical plots) | \"y\" (horizontal plots, experimental)\n\n'x'",
+    "crumbs": [
+      "API reference",
+      "Statistics",
+      "geom_signif"
+    ]
+  },
+  {
+    "objectID": "reference/plot_tsne.html",
+    "href": "reference/plot_tsne.html",
+    "title": "plot_tsne",
+    "section": "",
+    "text": "plot_tsne\nplot_tsne(data, color=None, **kwargs)\nPlot the first two dimensions of the X_tsne embedding.",
+    "crumbs": [
+      "API reference",
+      "Reduced dimensions",
+      "plot_tsne"
+    ]
+  },
+  {
+    "objectID": "reference/plot_clonotype_overlap.html",
+    "href": "reference/plot_clonotype_overlap.html",
+    "title": "plot_clonotype_overlap",
+    "section": "",
+    "text": "plot_clonotype_overlap\nplot_clonotype_overlap(\n    data,\n    clonotype_col,\n    sample_col,\n    method='jaccard',\n    title=None,\n)\nHeatmap of pairwise clonotype overlap between samples.\nArgs: data: DataFrame whose rows are cells. clonotype_col and sample_col are columns. clonotype_col: Column holding clonotype identifiers. sample_col: Column defining the samples to compare. method: One of \"jaccard\", \"morisita\", or \"overlap_coef\". title: Plot title.\nReturns: A :class:ggnomics._utils.HeatmapResult with .plot (a plotnine.ggplot) and .matrix (a square DataFrame).\nRaises: TypeError: If no implementation is registered for type(data). ValueError: If method is not supported. KeyError: If a requested column is absent.",
+    "crumbs": [
+      "API reference",
+      "Immune repertoire",
+      "plot_clonotype_overlap"
+    ]
+  },
+  {
+    "objectID": "reference/plot_box_stats.html",
+    "href": "reference/plot_box_stats.html",
+    "title": "plot_box_stats",
+    "section": "",
+    "text": "plot_box_stats\nplot_box_stats(\n    data,\n    feature,\n    group_by,\n    layer=None,\n    comparisons=None,\n    test='mannwhitney',\n    p_adjust='bonferroni',\n    sig_only=True,\n    annotation='stars',\n    add_points=False,\n    point_size=None,\n    palette=None,\n    order=None,\n    x_label=None,\n    y_label=None,\n    title=None,\n)\nBox plot with automatic statistical significance annotations.\nSame semantics as :func:plot_violin_stats but uses geom_boxplot as the base layer, sharing all stat-annotation logic.\nArgs: data: DataFrame whose rows are cells/samples. feature and group_by are columns. feature: Column holding the numeric value to plot. For a plain DataFrame this is simply a column; container adapters may also resolve it against an expression feature. group_by: Column whose categories define the x-axis groups. layer: Present for cross-container signature consistency. Has no effect for a plain DataFrame, which has no concept of layers. comparisons: Explicit list of (group_a, group_b) tuples to test. None auto-generates all pairs when there are &lt;= 5 groups. test: One of the tests supported by :func:ggnomics.signif.run_comparisons. p_adjust: Multiple-testing correction method. sig_only: Only draw brackets for significant comparisons. annotation: \"stars\", \"pvalue\", \"padj\", or a callable mapping a p-value to a label. add_points: Overlay jittered points. point_size: Jittered point size (None → adaptive). palette: {category: hex} fill color mapping. order: Explicit group ordering (unlisted groups appended at the end). x_label: Override x-axis label (defaults to group_by). y_label: Override y-axis label (defaults to feature). title: Plot title.\nReturns: A plotnine.ggplot object.\nRaises: TypeError: If no implementation is registered for type(data). KeyError: If a requested column is absent.",
+    "crumbs": [
+      "API reference",
+      "Statistics",
+      "plot_box_stats"
+    ]
+  },
+  {
+    "objectID": "reference/plot_abundance.html",
+    "href": "reference/plot_abundance.html",
+    "title": "plot_abundance",
+    "section": "",
+    "text": "plot_abundance\nplot_abundance(\n    data,\n    group_by,\n    color_by,\n    normalize=True,\n    palette=None,\n    title=None,\n)\nPlot category composition from an observation-metadata DataFrame.\nArgs: data: DataFrame whose rows are observations and columns are metadata. group_by: Column defining the x-axis groups. color_by: Column defining the stacked categories and fill colors. normalize: Show proportions when true, otherwise raw row counts. palette: Optional {category: color} mapping for color_by. title: Optional plot title.\nReturns: A plotnine.ggplot object.\nRaises: TypeError: If no implementation is registered for type(data). KeyError: If a requested column is absent.",
+    "crumbs": [
+      "API reference",
+      "Abundance and composition",
+      "plot_abundance"
+    ]
+  },
+  {
+    "objectID": "reference/index.html",
+    "href": "reference/index.html",
+    "title": "API reference",
+    "section": "",
+    "text": "plot_embedding\nPlot embedding columns from a pandas DataFrame.\n\n\nplot_reduced_dim\n\n\n\nplot_umap\nPlot the first two dimensions of the X_umap embedding.\n\n\nplot_pca\nPlot selected dimensions of the X_pca embedding.\n\n\nplot_tsne\nPlot the first two dimensions of the X_tsne embedding.\n\n\n\n\n\n\n\n\n\nplot_expression\nViolin plot of feature expression across cell/sample groups.\n\n\nplot_coldata\nPlot columns from a cell- or sample-metadata DataFrame.\n\n\nplot_rowdata\nScatter-plot columns from a feature-metadata DataFrame.\n\n\nplot_dot\nClassic dot plot: mean expression (color) and fraction expressing (size).\n\n\nplot_highest_exprs\nBoxplot of the top-n highest-expressed genes.\n\n\n\n\n\n\n\n\n\nplot_abundance\nPlot category composition from an observation-metadata DataFrame.\n\n\n\n\n\n\n\n\n\nplot_heatmap\nGene-expression heatmap using geom_tile.\n\n\n\n\n\n\n\n\n\nplot_volcano\nVolcano plot from a DE results DataFrame.\n\n\nplot_ma\nMA plot (mean expression vs log fold change).\n\n\nplot_coef_lollipop\nHorizontal lollipop plot of model coefficients.\n\n\nplot_coef_expression\nPlot expression of top-n features from a coefficient table.\n\n\n\n\n\n\n\n\n\nplot_pseudobulk_qc\nThree-panel QC figure for pseudobulk analysis setup.\n\n\nplot_pseudobulk_de\nVisualise DE results across multiple clusters or contrasts.\n\n\n\n\n\n\n\n\n\nplot_bimodal_scatter\nScatter plot of two features, typically from different modalities.\n\n\nplot_adt_qc\nADT / protein QC: overlay isotype-control distributions on real antibodies.\n\n\n\n\n\n\n\n\n\nplot_clonotype_abundance\nBarplot of clonotype abundance colored by expansion category.\n\n\nplot_clonotype_overlap\nHeatmap of pairwise clonotype overlap between samples.\n\n\nplot_clonotype_embedding\nEmbedding plot colored by clonotype expansion category.\n\n\n\n\n\n\n\n\n\nplot_violin_stats\nViolin plot with automatic statistical significance annotations.\n\n\nplot_box_stats\nBox plot with automatic statistical significance annotations.\n\n\ngeom_signif\nAdd significance brackets to a plotnine violin/box/bar plot.\n\n\nrun_comparisons\nRun pairwise statistical tests for specified comparisons.",
+    "crumbs": [
+      "API reference"
+    ]
+  },
+  {
+    "objectID": "reference/index.html#reduced-dimensions",
+    "href": "reference/index.html#reduced-dimensions",
+    "title": "API reference",
+    "section": "",
+    "text": "plot_embedding\nPlot embedding columns from a pandas DataFrame.\n\n\nplot_reduced_dim\n\n\n\nplot_umap\nPlot the first two dimensions of the X_umap embedding.\n\n\nplot_pca\nPlot selected dimensions of the X_pca embedding.\n\n\nplot_tsne\nPlot the first two dimensions of the X_tsne embedding.",
+    "crumbs": [
+      "API reference"
+    ]
+  },
+  {
+    "objectID": "reference/index.html#expression-and-metadata",
+    "href": "reference/index.html#expression-and-metadata",
+    "title": "API reference",
+    "section": "",
+    "text": "plot_expression\nViolin plot of feature expression across cell/sample groups.\n\n\nplot_coldata\nPlot columns from a cell- or sample-metadata DataFrame.\n\n\nplot_rowdata\nScatter-plot columns from a feature-metadata DataFrame.\n\n\nplot_dot\nClassic dot plot: mean expression (color) and fraction expressing (size).\n\n\nplot_highest_exprs\nBoxplot of the top-n highest-expressed genes.",
+    "crumbs": [
+      "API reference"
+    ]
+  },
+  {
+    "objectID": "reference/index.html#abundance-and-composition",
+    "href": "reference/index.html#abundance-and-composition",
+    "title": "API reference",
+    "section": "",
+    "text": "plot_abundance\nPlot category composition from an observation-metadata DataFrame.",
+    "crumbs": [
+      "API reference"
+    ]
+  },
+  {
+    "objectID": "reference/index.html#heatmaps",
+    "href": "reference/index.html#heatmaps",
+    "title": "API reference",
+    "section": "",
+    "text": "plot_heatmap\nGene-expression heatmap using geom_tile.",
+    "crumbs": [
+      "API reference"
+    ]
+  },
+  {
+    "objectID": "reference/index.html#differential-expression",
+    "href": "reference/index.html#differential-expression",
+    "title": "API reference",
+    "section": "",
+    "text": "plot_volcano\nVolcano plot from a DE results DataFrame.\n\n\nplot_ma\nMA plot (mean expression vs log fold change).\n\n\nplot_coef_lollipop\nHorizontal lollipop plot of model coefficients.\n\n\nplot_coef_expression\nPlot expression of top-n features from a coefficient table.",
+    "crumbs": [
+      "API reference"
+    ]
+  },
+  {
+    "objectID": "reference/index.html#pseudobulk",
+    "href": "reference/index.html#pseudobulk",
+    "title": "API reference",
+    "section": "",
+    "text": "plot_pseudobulk_qc\nThree-panel QC figure for pseudobulk analysis setup.\n\n\nplot_pseudobulk_de\nVisualise DE results across multiple clusters or contrasts.",
+    "crumbs": [
+      "API reference"
+    ]
+  },
+  {
+    "objectID": "reference/index.html#multimodal",
+    "href": "reference/index.html#multimodal",
+    "title": "API reference",
+    "section": "",
+    "text": "plot_bimodal_scatter\nScatter plot of two features, typically from different modalities.\n\n\nplot_adt_qc\nADT / protein QC: overlay isotype-control distributions on real antibodies.",
+    "crumbs": [
+      "API reference"
+    ]
+  },
+  {
+    "objectID": "reference/index.html#immune-repertoire",
+    "href": "reference/index.html#immune-repertoire",
+    "title": "API reference",
+    "section": "",
+    "text": "plot_clonotype_abundance\nBarplot of clonotype abundance colored by expansion category.\n\n\nplot_clonotype_overlap\nHeatmap of pairwise clonotype overlap between samples.\n\n\nplot_clonotype_embedding\nEmbedding plot colored by clonotype expansion category.",
+    "crumbs": [
+      "API reference"
+    ]
+  },
+  {
+    "objectID": "reference/index.html#statistics",
+    "href": "reference/index.html#statistics",
+    "title": "API reference",
+    "section": "",
+    "text": "plot_violin_stats\nViolin plot with automatic statistical significance annotations.\n\n\nplot_box_stats\nBox plot with automatic statistical significance annotations.\n\n\ngeom_signif\nAdd significance brackets to a plotnine violin/box/bar plot.\n\n\nrun_comparisons\nRun pairwise statistical tests for specified comparisons.",
+    "crumbs": [
+      "API reference"
+    ]
+  },
+  {
+    "objectID": "reference/plot_coef_lollipop.html",
+    "href": "reference/plot_coef_lollipop.html",
+    "title": "plot_coef_lollipop",
+    "section": "",
+    "text": "plot_coef_lollipop\nplot_coef_lollipop(\n    coefs,\n    top_n=20,\n    coef_col='coefficient',\n    se_col=None,\n    pos_color='#E41A1C',\n    neg_color='#377EB8',\n    zero_line=True,\n    title=None,\n    x_label='Coefficient',\n    feature_label='Feature',\n)\nHorizontal lollipop plot of model coefficients.\nFeatures are sorted by absolute coefficient magnitude; top-n are shown. Positive coefficients use pos_color, negative neg_color. If se_col is present, horizontal error bars are added.",
+    "crumbs": [
+      "API reference",
+      "Differential expression",
+      "plot_coef_lollipop"
+    ]
+  },
+  {
+    "objectID": "reference/plot_highest_exprs.html",
+    "href": "reference/plot_highest_exprs.html",
+    "title": "plot_highest_exprs",
+    "section": "",
+    "text": "plot_highest_exprs\nplot_highest_exprs(\n    data,\n    n=50,\n    layer=None,\n    features=None,\n    color_cells_by=None,\n    palette=None,\n    title=None,\n)\nBoxplot of the top-n highest-expressed genes.\nFor each candidate gene, expression is normalised as a fraction of each cell’s total library size (the summed expression of every candidate gene). Genes are ranked by their median normalised expression across cells and the top n are shown, ordered descending (highest-expressing gene at the top after coord_flip).\nArgs: data: DataFrame whose rows are cells/samples. features (or, if omitted, every numeric column) are treated as candidate genes. n: Number of top genes to display. Must be &gt;= 1. layer: Present for cross-container signature consistency. Has no effect for a plain DataFrame, which has no concept of layers. features: Explicit candidate gene columns. Recommended: omitting this relies on numeric-column auto-detection, which can silently include non-gene numeric metadata (e.g. QC columns). color_cells_by: Column used to color/fill individual boxes by category. Raises KeyError if supplied but absent. palette: {category: hex} color mapping for color_cells_by. title: Plot title.\nReturns: A plotnine.ggplot object.\nRaises: TypeError: If no implementation is registered for type(data). ValueError: If n &lt; 1 or no candidate gene columns are found. KeyError: If features or color_cells_by reference columns absent from data.",
+    "crumbs": [
+      "API reference",
+      "Expression and metadata",
+      "plot_highest_exprs"
+    ]
+  },
+  {
+    "objectID": "reference/plot_bimodal_scatter.html",
+    "href": "reference/plot_bimodal_scatter.html",
+    "title": "plot_bimodal_scatter",
+    "section": "",
+    "text": "plot_bimodal_scatter\nplot_bimodal_scatter(\n    data,\n    x_feature,\n    y_feature,\n    x_mod='rna',\n    y_mod='prot',\n    color=None,\n    size=None,\n    stroke=None,\n    alpha=0.7,\n    layer_x=None,\n    layer_y=None,\n    add_marginal=False,\n    palette=None,\n    cmap='viridis',\n    title=None,\n    x_label=None,\n    y_label=None,\n)\nScatter plot of two features, typically from different modalities.\nDesigned for CITE-seq-style data (e.g. RNA vs surface protein). If add_marginal=True, delegates to :func:ggnomics.plot_scatter_marginal and returns a plotnine.composition.Compose instead of a ggplot.\nArgs: data: DataFrame whose rows are cells. x_feature, y_feature, and color are ordinary columns in the same DataFrame. x_feature: Column mapped to the x-axis. y_feature: Column mapped to the y-axis. x_mod: Present for cross-container signature consistency (selects the modality/layer for x_feature in AnnData/MuData). Has no effect for a plain DataFrame. y_mod: Same as x_mod for y_feature. color: Optional column mapped to point color. size: Point size (None -&gt; adaptive). stroke: Point stroke width (None -&gt; adaptive). alpha: Point transparency. layer_x: Present for cross-container signature consistency. Has no effect for a plain DataFrame. layer_y: Same as layer_x for y_feature. add_marginal: Return a scatter-with-marginals composition instead of a bare scatter plot. palette: {category: hex} color mapping. cmap: Matplotlib colormap for a continuous color. title: Plot title. x_label: Override x-axis label (defaults to x_feature). y_label: Override y-axis label (defaults to y_feature).\nReturns: A plotnine.ggplot object, or a plotnine.composition.Compose when add_marginal=True.\nRaises: TypeError: If no implementation is registered for type(data). KeyError: If a requested column is absent.",
+    "crumbs": [
+      "API reference",
+      "Multimodal",
+      "plot_bimodal_scatter"
+    ]
+  },
+  {
+    "objectID": "reference/plot_reduced_dim.html",
+    "href": "reference/plot_reduced_dim.html",
+    "title": "plot_reduced_dim",
+    "section": "",
+    "text": "plot_reduced_dim\nplot_reduced_dim",
+    "crumbs": [
+      "API reference",
+      "Reduced dimensions",
+      "plot_reduced_dim"
+    ]
+  },
+  {
+    "objectID": "reference/plot_heatmap.html",
+    "href": "reference/plot_heatmap.html",
+    "title": "plot_heatmap",
+    "section": "",
+    "text": "plot_heatmap\nplot_heatmap(\n    data,\n    features,\n    group_by=None,\n    layer=None,\n    scale=True,\n    cluster_rows=True,\n    cluster_cols=False,\n    palette='RdBu_r',\n    title=None,\n    show_colnames=False,\n)\nGene-expression heatmap using geom_tile.\nRows correspond to features/genes and columns correspond to cells or, when group_by is provided, to group-level mean expression.\nArgs: data: DataFrame whose rows are cells/samples. Requested features and group_by are columns. features: Non-empty list of feature/gene column names to display. group_by: When supplied, average expression per group is plotted instead of per-cell values (much faster for large datasets). layer: Present for cross-container signature consistency. Has no effect for a plain DataFrame, which has no concept of layers. scale: Z-score each feature (row) before plotting. cluster_rows: Hierarchically cluster rows (features). Requires SciPy. cluster_cols: Hierarchically cluster columns (cells/groups). Requires SciPy. palette: Diverging Matplotlib colormap name (default \"RdBu_r\"). title: Plot title. show_colnames: Whether to render column axis text.\nReturns: A plotnine.ggplot object.\nRaises: TypeError: If no implementation is registered for type(data). ValueError: If features is empty or contains duplicates. KeyError: If a requested column is absent. ImportError: If clustering is requested and SciPy is not installed.",
+    "crumbs": [
+      "API reference",
+      "Heatmaps",
+      "plot_heatmap"
+    ]
+  },
+  {
+    "objectID": "reference/plot_rowdata.html",
+    "href": "reference/plot_rowdata.html",
+    "title": "plot_rowdata",
+    "section": "",
+    "text": "plot_rowdata\nplot_rowdata(data, x, y, color_by=None, size=None, title=None)\nScatter-plot columns from a feature-metadata DataFrame.\nArgs: data: DataFrame whose rows are features and columns are metadata. x: Column mapped to the x-axis. y: Column mapped to the y-axis. color_by: Optional column mapped to color. size: Point size. None chooses a size from the number of rows. title: Optional plot title.\nReturns: A plotnine.ggplot object.\nRaises: TypeError: If no implementation is registered for type(data). KeyError: If a requested column is absent.",
+    "crumbs": [
+      "API reference",
+      "Expression and metadata",
+      "plot_rowdata"
+    ]
+  },
+  {
+    "objectID": "getting-started.html",
+    "href": "getting-started.html",
+    "title": "Getting started",
+    "section": "",
+    "text": "This guide introduces the main ggnomics interface with cells from the Zeisel et al. (2015) mouse brain study. We will draw the same expression plot from a pandas.DataFrame, a BiocPy SingleCellExperiment, and an anndata.AnnData object, then customize the result with plotnine.\nimport sys, pathlib\nsys.path.insert(0, str(pathlib.Path(\"_includes\").resolve()))\n\nimport warnings\nfrom setup import configure_warnings, ensure_matplotlib_initialized\nensure_matplotlib_initialized()\nconfigure_warnings()\n\nimport numpy as np\nimport pandas as pd\nimport ggnomics as gg"
+  },
+  {
+    "objectID": "getting-started.html#loading-the-example-data",
+    "href": "getting-started.html#loading-the-example-data",
+    "title": "Getting started",
+    "section": "1. Loading the example data",
+    "text": "1. Loading the example data\nThe introductory examples use a small stratified subset of the Zeisel dataset. load_zeisel_subset() fetches version 2023-12-14 through scrnaseq and samples up to n_per_class cells from each broad cell class.\nThe fixed seed makes the example reproducible. Stratifying by cell class also keeps small populations such as microglia represented in the subset.\n\nfrom data import load_zeisel_subset\n\nzeisel = load_zeisel_subset(n_per_class=40, seed=0)\ntype(zeisel)\n\nsinglecellexperiment.SingleCellExperiment.SingleCellExperiment"
+  },
+  {
+    "objectID": "getting-started.html#inspecting-the-singlecellexperiment",
+    "href": "getting-started.html#inspecting-the-singlecellexperiment",
+    "title": "Getting started",
+    "section": "2. Inspecting the SingleCellExperiment",
+    "text": "2. Inspecting the SingleCellExperiment\nBiocPy provides public methods for retrieving assays and annotations:\n\nzeisel.shape\n\n(20006, 280)\n\n\n\nzeisel.get_column_data().get_column_names()\n\nNames(['tissue', 'group #', 'total mRNA mol', 'well', 'sex', 'age', 'diameter', 'level1class', 'level2class'])\n\n\n\nlist(zeisel.column_data.get_column(\"level1class\"))[:5]\n\n['interneurons',\n 'interneurons',\n 'interneurons',\n 'interneurons',\n 'interneurons']\n\n\n\nzeisel.get_assay_names()\n\n['counts']\n\n\nA plain SummarizedExperiment provides similar access to assays and metadata, but it has no reduced_dimensions. The Zeisel object also arrives without a precomputed embedding. The scranpy workflow shows how to calculate PCA and UMAP and store them in the SCE."
+  },
+  {
+    "objectID": "getting-started.html#the-equivalent-plotting-table",
+    "href": "getting-started.html#the-equivalent-plotting-table",
+    "title": "Getting started",
+    "section": "3. The equivalent plotting table",
+    "text": "3. The equivalent plotting table\nThe base plotting interface is a tidy pd.DataFrame: one row per cell or sample and one column per feature or annotation. Container adapters extract the same information automatically. Here is the corresponding table for one gene and two cell-level annotations:\n\nimport scipy.sparse as sp\n\ncounts = zeisel.get_assay(\"counts\")\ngene_names = zeisel.get_row_names()\ngfap_idx = list(gene_names).index(\"Gfap\")  # astrocyte marker\ngfap_expr = np.asarray(counts[gfap_idx, :].todense()).ravel() if sp.issparse(counts) else np.asarray(counts[gfap_idx, :]).ravel()\n\nplot_df = zeisel.get_column_data().to_pandas()\nplot_df[\"Gfap\"] = gfap_expr\nplot_df[[\"level1class\", \"total mRNA mol\", \"Gfap\"]].head()\n\n\n\n\n\n\n\n\nlevel1class\ntotal mRNA mol\nGfap\n\n\n\n\n1772067094_C05\ninterneurons\n28534.0\n0\n\n\n1772067059_B06\ninterneurons\n34216.0\n0\n\n\n1772071017_E10\ninterneurons\n14859.0\n0\n\n\n1772067066_E10\ninterneurons\n17201.0\n0\n\n\n1772067082_H11\ninterneurons\n16936.0\n0"
+  },
+  {
+    "objectID": "getting-started.html#plotting-from-pandas",
+    "href": "getting-started.html#plotting-from-pandas",
+    "title": "Getting started",
+    "section": "4. Plotting from pandas",
+    "text": "4. Plotting from pandas\n\ngg.plot_expression(plot_df, features=[\"Gfap\"], group_by=\"level1class\", log1p=True)"
+  },
+  {
+    "objectID": "getting-started.html#plotting-from-the-singlecellexperiment-directly",
+    "href": "getting-started.html#plotting-from-the-singlecellexperiment-directly",
+    "title": "Getting started",
+    "section": "5. Plotting from the SingleCellExperiment directly",
+    "text": "5. Plotting from the SingleCellExperiment directly\nThe same call accepts the SCE directly. Its registered adapter retrieves the assay and column data before delegating to the DataFrame implementation:\n\ngg.plot_expression(zeisel, features=[\"Gfap\"], group_by=\"level1class\", log1p=True)"
+  },
+  {
+    "objectID": "getting-started.html#converting-to-anndata-and-plotting-again",
+    "href": "getting-started.html#converting-to-anndata-and-plotting-again",
+    "title": "Getting started",
+    "section": "6. Converting to AnnData and plotting again",
+    "text": "6. Converting to AnnData and plotting again\nBiocPy containers convert to AnnData with a public .to_anndata() method:\n\nadata, _alt_exps = zeisel.to_anndata()\nadata\n\nAnnData object with n_obs × n_vars = 280 × 20006\n    obs: 'tissue', 'group #', 'total mRNA mol', 'well', 'sex', 'age', 'diameter', 'level1class', 'level2class', 'rownames'\n    var: 'featureType', 'rownames'\n    layers: 'counts'\n\n\nAfter this conversion, to_anndata() puts the assay into adata.layers[\"counts\"] and leaves adata.X as None (there was no assay explicitly marked as the SCE’s primary “X” equivalent). ggnomics’s AnnData adapter reads .X when layer=None. You can therefore pass layer=\"counts\" explicitly or assign the counts layer to .X after conversion:\n\nadata.X = adata.layers[\"counts\"]\ngg.plot_expression(adata, features=[\"Gfap\"], group_by=\"level1class\", log1p=True)\n\n\n\n\n\n\n\n\nAll three calls use the same underlying measurements and produce the same plot."
+  },
+  {
+    "objectID": "getting-started.html#how-dispatch-works",
+    "href": "getting-started.html#how-dispatch-works",
+    "title": "Getting started",
+    "section": "7. How dispatch works",
+    "text": "7. How dispatch works\nplot_expression, like the other public plot_* functions, is a functools.singledispatch generic. The base DataFrame implementation supplies the public docstring shown by ?gg.plot_expression, help(), and the API reference.\n\nhelp(gg.plot_expression)\n\nHelp on function plot_expression in module ggnomics.expression:\n\nplot_expression(data: 'pd.DataFrame', features: 'List[str]', group_by: 'str', layer: 'Optional[str]' = None, color_by: 'Optional[str]' = None, palette: 'Optional[Dict]' = None, ncol: 'Optional[int]' = None, log1p: 'bool' = False, add_points: 'bool' = False, point_size: 'Optional[float]' = None, title: 'Optional[str]' = None) -&gt; 'ggplot'\n    Violin plot of feature expression across cell/sample groups.\n\n    Each ``feature`` becomes one facet panel; the x-axis shows ``group_by``\n    categories and the y-axis shows expression level.\n\n    Args:\n        data: DataFrame whose rows are cells/samples. Requested ``features``\n            and ``group_by``/``color_by`` are columns.\n        features: Non-empty list of feature/gene column names to plot. Must\n            not contain duplicates or collide with ``group_by``/``color_by``.\n        group_by: Column whose categories define the x-axis groups.\n        layer: Present for cross-container signature consistency. Has no\n            effect for a plain DataFrame, which has no concept of layers.\n        color_by: Column to map to fill color. Defaults to ``group_by``.\n        palette: ``{category: hex}`` color mapping.\n        ncol: Number of columns in ``facet_wrap`` layout.\n        log1p: If ``True``, log1p-transform expression values before\n            plotting.\n        add_points: Overlay jittered points on violins.\n        point_size: Size of jittered points (``None`` → adaptive).\n        title: Plot title.\n\n    Returns:\n        A ``plotnine.ggplot`` object.\n\n    Raises:\n        TypeError: If no implementation is registered for ``type(data)``.\n        ValueError: If ``features`` is empty, contains duplicates, or\n            collides with ``group_by``/``color_by``.\n        KeyError: If a requested column is absent.\n\n\n\nAdapters for AnnData, SingleCellExperiment, SummarizedExperiment, and MuData are registered when their corresponding packages are available:\n\nimport ggnomics._backends as backends\nbackends._BACKENDS\n\n{'anndata': 'ggnomics._backends.anndata',\n 'singlecellexperiment': 'ggnomics._backends.singlecellexperiment',\n 'summarizedexperiment': 'ggnomics._backends.summarizedexperiment',\n 'mudata': 'ggnomics._backends.mudata'}\n\n\nThe core installation therefore works with DataFrames alone. Installing anndata or one of the BiocPy containers makes the matching implementation available without an additional registration step."
+  },
+  {
+    "objectID": "getting-started.html#inspecting-and-extending-the-returned-object",
+    "href": "getting-started.html#inspecting-and-extending-the-returned-object",
+    "title": "Getting started",
+    "section": "8. Inspecting and extending the returned object",
+    "text": "8. Inspecting and extending the returned object\nMost plot_* functions return a plotnine.ggplot. Multi-panel and matrix functions may instead return a plotnine.composition.Compose or a small result object; these cases are listed in the plot gallery. For a ggplot, ordinary plotnine layers can be added directly:\n\nfrom plotnine import theme_bw, theme, labs, facet_wrap, element_text\n\np = gg.plot_expression(plot_df, features=[\"Gfap\"], group_by=\"level1class\", log1p=True)\ntype(p)\n\nplotnine.ggplot.ggplot\n\n\n\n(\n    p\n    + labs(title=\"Gfap expression by cell class\", y=\"log1p(counts)\")\n    + theme_bw()\n    + theme(axis_text_x=element_text(rotation=45, hjust=1))\n)\n\n\n\n\n\n\n\n\nplot_expression facets over features. Its plotting data contain group_by, feature, and expression, so an external facet_wrap() can only use columns retained by that reshape. Pass several features to use the built-in feature facets:\n\ngg.plot_expression(\n    plot_df.assign(Snap25=np.asarray(\n        counts[list(gene_names).index(\"Snap25\"), :].todense()\n        if sp.issparse(counts) else counts[list(gene_names).index(\"Snap25\"), :]\n    ).ravel()),\n    features=[\"Gfap\", \"Snap25\"], group_by=\"level1class\", log1p=True, ncol=1,\n) + theme_bw() + theme(axis_text_x=element_text(rotation=45, hjust=1))"
+  },
+  {
+    "objectID": "getting-started.html#saving-a-plot",
+    "href": "getting-started.html#saving-a-plot",
+    "title": "Getting started",
+    "section": "9. Saving a plot",
+    "text": "9. Saving a plot\nUse plotnine’s ggplot.save() for a single panel. Multi-panel Compose objects can be saved with ggnomics.save_composition, as shown under Composed panels.\n\nout_path = pathlib.Path(\"_freeze_assets\")\nout_path.mkdir(exist_ok=True)\np.save(out_path / \"gfap_by_class.png\", width=6, height=4, dpi=150, verbose=False)"
+  },
+  {
+    "objectID": "getting-started.html#common-errors",
+    "href": "getting-started.html#common-errors",
+    "title": "Getting started",
+    "section": "10. Common errors",
+    "text": "10. Common errors\nUnknown column — container adapters raise a KeyError when a requested annotation is absent:\n\ntry:\n    gg.plot_expression(plot_df, features=[\"Gfap\"], group_by=\"not_a_real_column\")\nexcept KeyError as exc:\n    print(\"KeyError:\", exc)\n\nKeyError: \"Column(s) ['not_a_real_column'] not found in the DataFrame. Available: ['tissue', 'group #', 'total mRNA mol', 'well', 'sex', 'age', 'diameter', 'level1class', 'level2class', 'rownames', 'Gfap']\"\n\n\nNo stored embedding — plot_umap, plot_pca, and plot_reduced_dim require coordinates in the relevant reduced-dimension slot. A plain SummarizedExperiment, or an SCE before dimensionality reduction, cannot supply them:\n\ntry:\n    gg.plot_umap(zeisel, color=\"level1class\")\nexcept (TypeError, KeyError, AttributeError) as exc:\n    print(f\"{type(exc).__name__}:\", exc)\n\nKeyError: \"Embedding 'X_umap' not found in SCE reduced dimensions. Available: []\"\n\n\n(Zeisel has no stored UMAP/PCA — see Single-cell analysis with scranpy to compute one and make this call succeed.)\nOptional package not installed — an SCE, AnnData, or MuData implementation is only registered when its container package is importable. Without it, the generic function reports that no implementation exists for the supplied type."
+  },
+  {
+    "objectID": "getting-started.html#next-steps",
+    "href": "getting-started.html#next-steps",
+    "title": "Getting started",
+    "section": "Next steps",
+    "text": "Next steps\n\nSingle-cell analysis with scranpy — the full Zeisel dataset through QC → normalization → HVG → PCA → clustering → UMAP pipeline, with ggnomics plots at every stage.\nBulk RNA-seq — PyDESeq2 differential expression on a rice salt-stress experiment.\nMultimodal — RNA/ADT CITE-seq interoperability.\nSpecialized plots and the plot gallery for everything else."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "ggnomics",
+    "section": "",
+    "text": "ggnomics provides ggplot2-style visualizations for bulk, single-cell, and multimodal genomics in Python. Its plotting functions work with tidy pandas data and common genomics containers, including AnnData and BiocPy’s SingleCellExperiment and SummarizedExperiment.\nThe result is a plotnine plot that remains yours to adapt:\nStart with Getting started, follow one of the end-to-end workflows, or browse the plot gallery for a particular figure."
+  },
+  {
+    "objectID": "index.html#examples",
+    "href": "index.html#examples",
+    "title": "ggnomics",
+    "section": "Examples",
+    "text": "Examples\n\n\n\n\n\n\nCell classes in the Zeisel mouse brain dataset.\n\n\n\n\n\n\n\nDifferential expression after 24 hours of salt stress in rice.\n\n\n\n\n\n\n\n\n\nPancreatic cell-type composition across donors.\n\n\n\n\n\n\n\nRNA and protein abundance on a shared CITE-seq embedding."
+  },
+  {
+    "objectID": "index.html#workflows",
+    "href": "index.html#workflows",
+    "title": "ggnomics",
+    "section": "Workflows",
+    "text": "Workflows\n\nGetting started introduces DataFrame, SCE, and AnnData input and shows how to customize the returned plots.\nSingle-cell analysis with scranpy follows a mouse brain dataset from quality control to clustering and UMAP.\nBulk RNA-seq uses PyDESeq2 to analyse a rice salt-stress experiment.\nUpSet plots compares differentially expressed genes across the three E-MTAB-1625 timepoints with ggnomics.upset, a native Plotnine set-intersection plot; every plot it returns is an ordinary plotnine.composition.Compose object.\nMultimodal combines RNA and ADT measurements from CITE-seq data.\nSpecialized plots covers abundance, pseudobulk QC, statistics, significance brackets, palettes, heatmaps, and immune repertoires.\nPlot gallery provides a compact reference organized by plot family."
+  },
+  {
+    "objectID": "index.html#whats-supported",
+    "href": "index.html#whats-supported",
+    "title": "ggnomics",
+    "section": "What’s supported",
+    "text": "What’s supported\n\n\n\n\n\n\n\n\nContainer\nPackage\nTypical use\n\n\n\n\npd.DataFrame\npandas\nTidy plotting tables and model results\n\n\nAnnData\nanndata / scverse\nSingle-cell data in scverse workflows\n\n\nSingleCellExperiment\nBiocPy singlecellexperiment\nSingle-cell assays, metadata, and reduced dimensions\n\n\nSummarizedExperiment\nBiocPy summarizedexperiment\nBulk assays and sample metadata\n\n\nMuData\nmudata / scverse\nMeasurements across several modalities\n\n\n\nBecause SummarizedExperiment does not store reduced dimensions, embedding plots require either explicit coordinates or a richer container. For bulk assays, ggnomics.bulk_pca computes and plots PCA scores directly. The Getting started guide shows the supported paths in more detail."
+  },
+  {
+    "objectID": "index.html#one-plotting-interface",
+    "href": "index.html#one-plotting-interface",
+    "title": "ggnomics",
+    "section": "One plotting interface",
+    "text": "One plotting interface\nThe public plot_* functions use Python’s singledispatch: the function name and main arguments stay the same while the input container determines how data are extracted. The DataFrame implementation supplies the public docstring shown by help() and in Jupyter. Adapters for AnnData, BiocPy, and MuData register automatically when their corresponding packages are installed.\nGetting started §7 explains the design and shows how to inspect the registered implementations."
+  },
+  {
+    "objectID": "index.html#build-on-the-returned-plot",
+    "href": "index.html#build-on-the-returned-plot",
+    "title": "ggnomics",
+    "section": "Build on the returned plot",
+    "text": "Build on the returned plot\nMost functions return an ordinary ggplot, so plotnine layers, scales, themes, coordinates, and labels can be added directly. This keeps the convenient genomics defaults without limiting the final figure.\np = gg.plot_umap(adata, color=\"cluster\")\np + p9.theme_bw() + p9.labs(title=\"My figure\")\nMulti-panel functions such as plot_pseudobulk_qc, plot_scatter_marginal, and plot_embedding_panel return a plotnine.composition.Compose. They can be arranged with plotnine’s | and / operators or with ggnomics helpers such as hstack, vstack, and grid."
+  },
+  {
+    "objectID": "index.html#datasets-used-in-the-guides",
+    "href": "index.html#datasets-used-in-the-guides",
+    "title": "ggnomics",
+    "section": "Datasets used in the guides",
+    "text": "Datasets used in the guides\nThe worked examples use publicly available bulk, single-cell, multimodal, and immune-repertoire datasets distributed through BiocPy data-access packages.\n\nimport sys, pathlib\nsys.path.insert(0, str(pathlib.Path(\"_includes\").resolve()))\nfrom provenance import provenance_markdown\nfrom IPython.display import Markdown\n\nMarkdown(provenance_markdown())\n\n\n\n\n\n\n\n\n\n\n\n\nDataset\nProvider\nAccession\nVersion\nOrganism\nUsed in\n\n\n\n\nZeisel mouse brain (2015)\nscrnaseq (BiocPy)\nzeisel-brain-2015\n2023-12-14\nMus musculus\ngetting-started.qmd (deterministic stratified subset), single-cell-scranpy.qmd (full dataset), specialized-plots.qmd, plot-gallery.qmd\n\n\nBaron human pancreas (2016)\nscrnaseq (BiocPy)\nbaron-pancreas-2016\n2023-12-14\nHomo sapiens\nspecialized-plots.qmd (abundance/composition, pseudobulk), plot-gallery.qmd\n\n\nRice salt-stress bulk RNA-seq (E-MTAB-1625)\npyexpressionatlas (BiocPy, wraps EMBL-EBI Expression Atlas)\nE-MTAB-1625\n—\nOryza sativa Japonica Group (rice)\nbulk-rnaseq.qmd, specialized-plots.qmd (reused DE results), plot-gallery.qmd, upset.qmd (reused DE results across timepoints)\n\n\nCITEVizTestDataSC PBMC CITE-seq\nexperimenthub (BiocPy)\nEH7740\n—\nHomo sapiens\nmultimodal.qmd, plot-gallery.qmd\n\n\nCTCL TCR alpha/beta repertoire\nexperimenthub (BiocPy)\nEH4616\n—\nHomo sapiens\nspecialized-plots.qmd (repertoire section), plot-gallery.qmd\n\n\nControl TCR alpha/beta repertoire\nexperimenthub (BiocPy)\nEH4621\n—\nHomo sapiens\nspecialized-plots.qmd (repertoire section), plot-gallery.qmd\n\n\n\n\n\nAccessions, dataset versions, and resource notes are recorded in datasets.yml."
+  },
+  {
+    "objectID": "index.html#optional-backends",
+    "href": "index.html#optional-backends",
+    "title": "ggnomics",
+    "section": "Optional backends",
+    "text": "Optional backends\nThe core installation provides the DataFrame interface. Container-specific support can be added through optional extras:\npip install \"ggnomics[anndata]\"    # AnnData / scverse\npip install \"ggnomics[sce]\"        # SingleCellExperiment (BiocPy)\npip install \"ggnomics[se]\"         # SummarizedExperiment (BiocPy)\npip install \"ggnomics[multimodal]\" # MuData\npip install \"ggnomics[stats]\"      # significance brackets (scipy, statsmodels)\npip install \"ggnomics[pca]\"        # PCA utilities\npip install \"ggnomics[umap]\"       # ggnomics.sc_umap\npip install \"ggnomics[all]\"        # everything above\nThe workflow guides also use scranpy, PyDESeq2, Marsilea, scrnaseq, pyexpressionatlas, and experimenthub. These are analysis or data-access packages used alongside ggnomics rather than runtime dependencies of the plotting library."
+  },
+  {
+    "objectID": "bulk-rnaseq.html",
+    "href": "bulk-rnaseq.html",
+    "title": "Bulk RNA-seq differential expression",
+    "section": "",
+    "text": "Here we analyse the transcriptional response of rice seedlings to salt stress. Counts and sample annotations come from Expression Atlas experiment E-MTAB-1625; PyDESeq2 provides the differential-expression model, while ggnomics is used for quality control, PCA, and results visualization.\nimport sys, pathlib\nsys.path.insert(0, str(pathlib.Path(\"_includes\").resolve()))\nfrom setup import configure_warnings, ensure_matplotlib_initialized\nensure_matplotlib_initialized()  # see the import-order note in _includes/setup.py\nconfigure_warnings()\n\nimport numpy as np\nimport pandas as pd\nimport ggnomics as gg\nfrom plotnine import theme_bw, theme, labs, element_text"
+  },
+  {
+    "objectID": "bulk-rnaseq.html#study-and-design",
+    "href": "bulk-rnaseq.html#study-and-design",
+    "title": "Bulk RNA-seq differential expression",
+    "section": "1. Study and design",
+    "text": "1. Study and design\n\nAccession: E-MTAB-1625 (EMBL-EBI Expression Atlas, via pyexpressionatlas)\nOrganism: Oryza sativa Japonica Group (rice)\nBiological question: transcriptional response of 2-week-old rice seedlings to 300 mM NaCl salt stress, sampled at 1, 5, and 24 hours\nData used here: 38,866 genes x 18 shoot samples with raw integer counts\nCount assay: \"counts\" (raw), genes x samples orientation\nMetadata fields used: growth condition (2 levels), time (3 levels)"
+  },
+  {
+    "objectID": "bulk-rnaseq.html#loading-and-inspecting-the-experiment",
+    "href": "bulk-rnaseq.html#loading-and-inspecting-the-experiment",
+    "title": "Bulk RNA-seq differential expression",
+    "section": "2. Loading and inspecting the experiment",
+    "text": "2. Loading and inspecting the experiment\n\nfrom data import load_emtab1625\n\nse = load_emtab1625()\nse.shape\n\nPackage 'multiassayexperiment' is not installed.\n\n\n(38866, 18)\n\n\n\nse.get_assay_names()\n\n['counts']\n\n\n\ncd = se.get_column_data().to_pandas()\ncd[[\"growth condition\", \"time\"]]\n\n\n\n\n\n\n\n\ngrowth condition\ntime\n\n\n\n\nERR266228\nnormal watering\n1 hour\n\n\nERR266222\nnormal watering\n5 hour\n\n\nERR266221\n300 millimolar sodium chloride\n5 hour\n\n\nERR266225\nnormal watering\n24 hour\n\n\nERR266234\nnormal watering\n24 hour\n\n\nERR266238\n300 millimolar sodium chloride\n24 hour\n\n\nERR266237\n300 millimolar sodium chloride\n1 hour\n\n\nERR266235\n300 millimolar sodium chloride\n1 hour\n\n\nERR266227\n300 millimolar sodium chloride\n5 hour\n\n\nERR266231\n300 millimolar sodium chloride\n24 hour\n\n\nERR266232\nnormal watering\n24 hour\n\n\nERR266236\n300 millimolar sodium chloride\n1 hour\n\n\nERR266230\nnormal watering\n1 hour\n\n\nERR266226\n300 millimolar sodium chloride\n24 hour\n\n\nERR266229\nnormal watering\n5 hour\n\n\nERR266224\n300 millimolar sodium chloride\n5 hour\n\n\nERR266223\nnormal watering\n5 hour\n\n\nERR266233\nnormal watering\n1 hour\n\n\n\n\n\n\n\nThe cross-tabulation confirms a balanced 2 x 3 design with three replicates for each condition and time point:\n\npd.crosstab(cd[\"growth condition\"], cd[\"time\"])\n\n\n\n\n\n\n\ntime\n1 hour\n24 hour\n5 hour\n\n\ngrowth condition\n\n\n\n\n\n\n\n300 millimolar sodium chloride\n3\n3\n3\n\n\nnormal watering\n3\n3\n3"
+  },
+  {
+    "objectID": "bulk-rnaseq.html#library-size-and-count-distribution-qc",
+    "href": "bulk-rnaseq.html#library-size-and-count-distribution-qc",
+    "title": "Bulk RNA-seq differential expression",
+    "section": "3. Library size and count-distribution QC",
+    "text": "3. Library size and count-distribution QC\n\ncounts_raw = np.asarray(se.get_assay(\"counts\"))\nlib_sizes = pd.DataFrame({\n    \"sample\": se.get_column_names(),\n    \"library_size\": counts_raw.sum(axis=0),\n    \"growth_condition\": cd[\"growth condition\"].map({\n        \"300 millimolar sodium chloride\": \"salt\", \"normal watering\": \"control\",\n    }).to_numpy(),\n    \"time\": cd[\"time\"].to_numpy(),\n})\ngg.plot_coldata(lib_sizes, x=\"time\", y=\"library_size\", color_by=\"growth_condition\", shape=\"box\") + theme_bw() + labs(title=\"Library size by condition and time\", y=\"Total counts\")\n\n\n\n\n\n\n\n\n\ngene_names = se.get_row_names()\nlog_counts_long = pd.DataFrame(\n    np.log1p(counts_raw[:, :4]), columns=se.get_column_names()[:4]\n).melt(var_name=\"sample\", value_name=\"log1p_count\")\ngg.plot_coldata(log_counts_long, x=\"sample\", y=\"log1p_count\", shape=\"violin\") + theme_bw() + labs(title=\"Per-sample count distribution (first 4 samples)\", y=\"log1p(raw count)\")"
+  },
+  {
+    "objectID": "bulk-rnaseq.html#selecting-an-estimable-replicated-contrast",
+    "href": "bulk-rnaseq.html#selecting-an-estimable-replicated-contrast",
+    "title": "Bulk RNA-seq differential expression",
+    "section": "4. Selecting an estimable, replicated contrast",
+    "text": "4. Selecting an estimable, replicated contrast\nAll three time points support a matched salt-versus-control comparison. We use the 24-hour samples to examine the sustained response: three salt-treated and three control samples, with design = ~growth_condition, reference level \"control\", and contrast [\"growth_condition\", \"salt\", \"control\"].\n\nsel_cd = cd.copy()\nsel_cd[\"growth_condition\"] = sel_cd[\"growth condition\"].map({\n    \"300 millimolar sodium chloride\": \"salt\", \"normal watering\": \"control\",\n})\nsel_cd[\"time\"] = sel_cd[\"time\"].str.replace(\" \", \"_\")\nsub_cd = sel_cd.loc[sel_cd[\"time\"] == \"24_hour\"]\nsub_cd[[\"growth_condition\"]]\n\n\n\n\n\n\n\n\ngrowth_condition\n\n\n\n\nERR266225\ncontrol\n\n\nERR266234\ncontrol\n\n\nERR266238\nsalt\n\n\nERR266231\nsalt\n\n\nERR266232\ncontrol\n\n\nERR266226\nsalt"
+  },
+  {
+    "objectID": "bulk-rnaseq.html#fitting-pydeseq2-on-raw-integer-counts",
+    "href": "bulk-rnaseq.html#fitting-pydeseq2-on-raw-integer-counts",
+    "title": "Bulk RNA-seq differential expression",
+    "section": "5. Fitting PyDESeq2 on raw integer counts",
+    "text": "5. Fitting PyDESeq2 on raw integer counts\n\nfrom pydeseq2.dds import DeseqDataSet\nfrom pydeseq2.ds import DeseqStats\n\ncounts_df = pd.DataFrame(counts_raw, index=gene_names, columns=se.get_column_names()).T\ncounts_df = counts_df.loc[sub_cd.index].round().astype(int)  # raw integer counts, gene-by-sample transposed to sample-by-gene\n\nmetadata = sub_cd[[\"growth_condition\"]].copy()\nmetadata[\"growth_condition\"] = pd.Categorical(metadata[\"growth_condition\"], categories=[\"control\", \"salt\"])\n\ndds = DeseqDataSet(counts=counts_df, metadata=metadata, design=\"~growth_condition\", refit_cooks=True, quiet=True)\ndds.deseq2()\n\n\nds = DeseqStats(dds, contrast=[\"growth_condition\", \"salt\", \"control\"], alpha=0.05, quiet=True)\nds.summary()\nresults = ds.results_df\nresults.shape\n\n(38866, 6)\n\n\n\n(results[\"padj\"] &lt; 0.05).sum()\n\nnp.int64(832)"
+  },
+  {
+    "objectID": "bulk-rnaseq.html#variance-stabilizing-transformation-for-visualization-only",
+    "href": "bulk-rnaseq.html#variance-stabilizing-transformation-for-visualization-only",
+    "title": "Bulk RNA-seq differential expression",
+    "section": "6. Variance-stabilizing transformation — for visualization only",
+    "text": "6. Variance-stabilizing transformation — for visualization only\nThe Wald test above uses the raw counts together with DESeq2’s size-factor and dispersion model. Variance-stabilized values are calculated separately for PCA and heatmaps, where reducing the dependence of variance on the mean makes sample structure easier to visualize:\n\ndds.vst_fit()\nvst = pd.DataFrame(dds.vst_transform(), index=counts_df.index, columns=counts_df.columns)\nvst.iloc[:, :5].head()\n\n\n\n\n\n\n\n\nENSRNA049440515\nENSRNA049440716\nENSRNA049441102\nENSRNA049441259\nENSRNA049441339\n\n\n\n\nERR266225\n4.490715\n4.490715\n4.490715\n4.490715\n4.490715\n\n\nERR266234\n4.490715\n4.490715\n4.490715\n4.490715\n4.490715\n\n\nERR266238\n4.490715\n4.490715\n4.789900\n4.490715\n4.490715\n\n\nERR266231\n4.490715\n4.490715\n4.490715\n4.490715\n4.490715\n\n\nERR266232\n4.490715\n4.490715\n4.490715\n4.490715\n4.490715\n\n\n\n\n\n\n\nThe helper run_deseq2_on_emtab1625() caches the fitted model and transformed expression matrix so they can be reused by the other examples:\n\nfrom data import run_deseq2_on_emtab1625\n\nfit = run_deseq2_on_emtab1625()\nresults, vst, metadata = fit[\"results\"], fit[\"vst\"], fit[\"metadata\"]"
+  },
+  {
+    "objectID": "bulk-rnaseq.html#pca-on-the-vst-transformed-expression",
+    "href": "bulk-rnaseq.html#pca-on-the-vst-transformed-expression",
+    "title": "Bulk RNA-seq differential expression",
+    "section": "7. PCA on the VST-transformed expression",
+    "text": "7. PCA on the VST-transformed expression\nggnomics.bulk_pca computes PCA from an assay in a SummarizedExperiment. In contrast, the top-level ggnomics.plot_pca visualizes coordinates that have already been computed. The single-cell counterpart is shown in the scranpy workflow.\n\nfrom summarizedexperiment import SummarizedExperiment\n\nvst_se = SummarizedExperiment(\n    assays={\"vst\": vst.T.to_numpy()},  # genes x samples\n    row_data=pd.DataFrame(index=vst.columns),\n    column_data=metadata,\n)\ngg.bulk_pca.plot_pca(vst_se, assay_name=\"vst\", color=\"growth_condition\", n_components=5) + theme_bw() + labs(title=\"Bulk PCA (VST expression), 24h salt vs. control\")"
+  },
+  {
+    "objectID": "bulk-rnaseq.html#volcano-and-ma-plots",
+    "href": "bulk-rnaseq.html#volcano-and-ma-plots",
+    "title": "Bulk RNA-seq differential expression",
+    "section": "8. Volcano and MA plots",
+    "text": "8. Volcano and MA plots\n\ngg.plot_volcano(results, label_top_n=8) + theme_bw() + labs(title=\"24h salt vs. control (rice shoot, E-MTAB-1625)\")\n\n\n\n\n\n\n\n\n\ngg.plot_ma(results, label_top_n=8) + theme_bw()"
+  },
+  {
+    "objectID": "bulk-rnaseq.html#coefficient-lollipop-plot",
+    "href": "bulk-rnaseq.html#coefficient-lollipop-plot",
+    "title": "Bulk RNA-seq differential expression",
+    "section": "9. Coefficient (lollipop) plot",
+    "text": "9. Coefficient (lollipop) plot\nplot_coef_lollipop can rank and display the per-gene log2FoldChange coefficients returned by PyDESeq2:\n\ntop_genes = results.reindex(results[\"log2FoldChange\"].abs().sort_values(ascending=False).index).head(20)\ncoefs = top_genes[[\"log2FoldChange\"]].rename(columns={\"log2FoldChange\": \"coefficient\"})\ngene_label_map = fit[\"gene_names\"]\ncoefs.index = [gene_label_map.get(g) or g for g in coefs.index]\ngg.plot_coef_lollipop(coefs, top_n=20) + theme_bw() + labs(title=\"Top 20 genes by |log2FoldChange|, 24h salt vs. control\")"
+  },
+  {
+    "objectID": "bulk-rnaseq.html#heatmap-of-top-differentially-expressed-genes",
+    "href": "bulk-rnaseq.html#heatmap-of-top-differentially-expressed-genes",
+    "title": "Bulk RNA-seq differential expression",
+    "section": "10. Heatmap of top differentially expressed genes",
+    "text": "10. Heatmap of top differentially expressed genes\n\nsig_top = results.loc[results[\"padj\"] &lt; 0.05].sort_values(\"padj\").head(30)\nheat_df = vst[sig_top.index].copy()\nheat_df.columns = [gene_label_map.get(g) or g for g in heat_df.columns]\nheat_df[\"growth_condition\"] = metadata[\"growth_condition\"].to_numpy()\n\ngg.plot_heatmap(\n    heat_df, features=list(heat_df.columns[:-1]), group_by=\"growth_condition\",\n    cluster_rows=True, cluster_cols=True,\n) + theme(axis_text_x=element_text(rotation=45, hjust=1))"
+  },
+  {
+    "objectID": "bulk-rnaseq.html#extending-the-returned-objects",
+    "href": "bulk-rnaseq.html#extending-the-returned-objects",
+    "title": "Bulk RNA-seq differential expression",
+    "section": "11. Extending the returned objects",
+    "text": "11. Extending the returned objects\nThe volcano and MA plots can be combined directly with plotnine’s composition operators:\n\nvolcano = gg.plot_volcano(results, label_top_n=5) + theme_bw()\nma = gg.plot_ma(results, label_top_n=5) + theme_bw()\nvolcano | ma"
+  },
+  {
+    "objectID": "bulk-rnaseq.html#next",
+    "href": "bulk-rnaseq.html#next",
+    "title": "Bulk RNA-seq differential expression",
+    "section": "Next",
+    "text": "Next\n\nUpSet plots compares the significant/top-ranked DE genes across the three E-MTAB-1625 timepoints (1, 5, and 24 hours) fitted here.\nSpecialized plots uses the cached fit for additional volcano, MA, lollipop, and heatmap examples.\nSingle-cell analysis with scranpy for the single-cell analogue of this workflow."
+  },
+  {
+    "objectID": "upset.html",
+    "href": "upset.html",
+    "title": "Native UpSet plots",
+    "section": "",
+    "text": "ggnomics.upset is a native plotnine implementation of set-intersection (“UpSet”) plots, in the style of ComplexUpset. It has no runtime dependency on the Matplotlib-based upsetplot package — every plot it returns is an ordinary plotnine.composition.Compose object, buildable from panels you can inspect, theme, and recompose like any other plotnine figure.\nimport sys, pathlib\nsys.path.insert(0, str(pathlib.Path(\"_includes\").resolve()))\nfrom setup import configure_warnings, ensure_matplotlib_initialized\nensure_matplotlib_initialized()  # see the import-order note in _includes/setup.py\nconfigure_warnings()\n\nimport numpy as np\nimport pandas as pd\nimport ggnomics as gg\nimport ggnomics.upset as upset\nfrom plotnine import (\n    aes, geom_bar, geom_boxplot, geom_col, geom_point, geom_segment, ggplot,\n    labs, theme, theme_bw,\n)\nfrom plotnine.composition import plot_annotation"
+  },
+  {
+    "objectID": "upset.html#why-use-an-upset-plot",
+    "href": "upset.html#why-use-an-upset-plot",
+    "title": "Native UpSet plots",
+    "section": "1. Why use an UpSet plot?",
+    "text": "1. Why use an UpSet plot?\nA Venn diagram is unreadable past three or four sets: circle overlaps stop being legible, and areas cannot be made exactly proportional in general. UpSet plots trade the geometric layout for a matrix — one row per set, one column per intersection — annotated with bar charts of intersection size. This scales cleanly to many sets and makes exact set membership legible at a glance, at the cost of not being a familiar circle diagram.\nHere, we compare which genes are called differentially expressed (DE) at each of the three E-MTAB-1625 salt-stress timepoints — a natural three-to-many-set overlap question that a Venn diagram handles poorly once more timepoints or contrasts are added."
+  },
+  {
+    "objectID": "upset.html#data-source-and-selection-rule",
+    "href": "upset.html#data-source-and-selection-rule",
+    "title": "Native UpSet plots",
+    "section": "2. Data source and selection rule",
+    "text": "2. Data source and selection rule\nWe reuse the three matched salt-vs-control PyDESeq2 fits already computed for Bulk RNA-seq and Specialized plots, from the same E-MTAB-1625 rice salt-stress experiment (see datasets.yml):\n\nfrom data import run_deseq2_on_emtab1625\n\ntimepoints = [\"1 hour\", \"5 hour\", \"24 hour\"]\nfits = {timepoint: run_deseq2_on_emtab1625(timepoint) for timepoint in timepoints}\n\nThe package’s documented significance rule for mode=\"upset\" (see Section 13) is padj &lt; 0.05 and abs(log2FoldChange) &gt;= 1. Applying it here, before assuming any overlap is interesting:\n\nstrict_sig = {}\nfor timepoint, fit in fits.items():\n    res = fit[\"results\"].dropna(subset=[\"log2FoldChange\", \"padj\"])\n    sig = res.loc[(res[\"padj\"] &lt; 0.05) & (res[\"log2FoldChange\"].abs() &gt;= 1)]\n    strict_sig[timepoint] = set(sig.index)\n\n{timepoint: len(genes) for timepoint, genes in strict_sig.items()}\n\n{'1 hour': 10, '5 hour': 4, '24 hour': 487}\n\n\n\nprint(\"1h & 24h:\", len(strict_sig[\"1 hour\"] & strict_sig[\"24 hour\"]))\nprint(\"5h & 24h:\", len(strict_sig[\"5 hour\"] & strict_sig[\"24 hour\"]))\nprint(\"1h & 5h:\", len(strict_sig[\"1 hour\"] & strict_sig[\"5 hour\"]))\nprint(\"all three:\", len(strict_sig[\"1 hour\"] & strict_sig[\"5 hour\"] & strict_sig[\"24 hour\"]))\n\n1h & 24h: 2\n5h & 24h: 1\n1h & 5h: 0\nall three: 0\n\n\nThis is a real and biologically sensible result, not an artifact: the salt response strengthens substantially between 1 hour and 24 hours, so 1-hour (10 genes) and 5-hour (4 genes) contribute too few significant genes at this threshold to show an informative intersection structure — the overlaps above are 0-2 genes. Section 13 shows this exact, honest result via plot_pseudobulk_de.\nTo demonstrate the rest of the API’s features on a richer, still-real overlap, Sections 4-12 and 14 instead use a clearly labeled descriptive, top-ranked rule: the 300 genes with the largest abs(log2FoldChange) at each timepoint, regardless of padj. This is descriptive (a ranking), not a significance claim — it deliberately is not read as “these genes are DE”; see the callout in Section 15.\n\nTOP_N = 300\ntop_ranked = {}\nfor timepoint, fit in fits.items():\n    res = fit[\"results\"].dropna(subset=[\"log2FoldChange\"])\n    ranked = res.reindex(res[\"log2FoldChange\"].abs().sort_values(ascending=False).index)\n    top_ranked[timepoint] = set(ranked.head(TOP_N).index)\n\n{timepoint: len(genes) for timepoint, genes in top_ranked.items()}\n\n{'1 hour': 300, '5 hour': 300, '24 hour': 300}\n\n\n\nprint(\"1h & 24h:\", len(top_ranked[\"1 hour\"] & top_ranked[\"24 hour\"]))\nprint(\"5h & 24h:\", len(top_ranked[\"5 hour\"] & top_ranked[\"24 hour\"]))\nprint(\"1h & 5h:\", len(top_ranked[\"1 hour\"] & top_ranked[\"5 hour\"]))\nprint(\"all three:\", len(top_ranked[\"1 hour\"] & top_ranked[\"5 hour\"] & top_ranked[\"24 hour\"]))\n\n1h & 24h: 14\n5h & 24h: 34\n1h & 5h: 24\nall three: 2"
+  },
+  {
+    "objectID": "upset.html#constructing-the-boolean-membership-table",
+    "href": "upset.html#constructing-the-boolean-membership-table",
+    "title": "Native UpSet plots",
+    "section": "3. Constructing the Boolean membership table",
+    "text": "3. Constructing the Boolean membership table\nggnomics.upset takes one row per element (here, gene) and one Boolean column per set (here, timepoint) — plus any extra columns you want available to custom annotations.\n\ntimepoint_columns = [tp.replace(\" \", \"_\") for tp in timepoints]\nall_genes = sorted(set.union(*top_ranked.values()))\n\nmembership = pd.DataFrame({\"gene_id\": all_genes})\nfor timepoint, column in zip(timepoints, timepoint_columns):\n    membership[column] = membership[\"gene_id\"].isin(top_ranked[timepoint])\n\nlogfc_by_timepoint = pd.DataFrame(\n    {column: fits[tp][\"results\"][\"log2FoldChange\"] for tp, column in zip(timepoints, timepoint_columns)}\n).reindex(all_genes)\n# .to_numpy(): logfc_by_timepoint is indexed by gene ID (from reindex(all_genes)),\n# while `membership` has a plain positional index built in the same gene order —\n# a plain Series assignment here would align on (mismatched) index and produce NaN.\nmembership[\"max_abs_log2fc\"] = logfc_by_timepoint.abs().max(axis=1).to_numpy()\nmembership[\"timepoint_of_max_effect\"] = logfc_by_timepoint.abs().idxmax(axis=1).to_numpy()\n\nmembership.head()\n\n\n\n\n\n\n\n\ngene_id\n1_hour\n5_hour\n24_hour\nmax_abs_log2fc\ntimepoint_of_max_effect\n\n\n\n\n0\nENSRNA049448855\nFalse\nTrue\nFalse\n3.434670\n5_hour\n\n\n1\nENSRNA049464535\nTrue\nFalse\nFalse\n2.470414\n1_hour\n\n\n2\nENSRNA049465125\nTrue\nFalse\nFalse\n2.522875\n1_hour\n\n\n3\nENSRNA049465332\nTrue\nFalse\nFalse\n3.079564\n1_hour\n\n\n4\nENSRNA049467117\nTrue\nFalse\nFalse\n2.490650\n1_hour\n\n\n\n\n\n\n\n\nmembership.shape\n\n(830, 6)"
+  },
+  {
+    "objectID": "upset.html#basic-native-upset-plot",
+    "href": "upset.html#basic-native-upset-plot",
+    "title": "Native UpSet plots",
+    "section": "4. Basic native UpSet plot",
+    "text": "4. Basic native UpSet plot\n\nupset.upset(membership, timepoint_columns)"
+  },
+  {
+    "objectID": "upset.html#inspecting-the-computation",
+    "href": "upset.html#inspecting-the-computation",
+    "title": "Native UpSet plots",
+    "section": "5. Inspecting the computation",
+    "text": "5. Inspecting the computation\nupset() and upset_data() are convenience wrappers around three independently usable, independently testable steps: compute_intersections -&gt; select_intersections -&gt; apply_intersection_selection.\n\nstatistics = upset.compute_intersections(membership, intersect=timepoint_columns)\nstatistics.sizes\n\n\n\n\n\n\n\n\nexclusive_intersection\ninclusive_intersection\nexclusive_union\ninclusive_union\n\n\nintersection\n\n\n\n\n\n\n\n\nI0\n244\n300\n244\n300\n\n\nI1\n264\n300\n264\n300\n\n\nI2\n254\n300\n254\n300\n\n\nI3\n2\n2\n830\n830\n\n\nI4\n32\n34\n530\n566\n\n\nI5\n22\n24\n530\n576\n\n\nI6\n12\n14\n530\n586\n\n\n\n\n\n\n\n\nselection = upset.select_intersections(statistics, min_size=5, sort_intersections=\"descending\")\nselection.intersections\n\n('I1', 'I2', 'I0', 'I4', 'I5', 'I6')\n\n\n\nprepared = upset.apply_intersection_selection(statistics, selection=selection)\nupset.upset(prepared)"
+  },
+  {
+    "objectID": "upset.html#four-region-selection-modes",
+    "href": "upset.html#four-region-selection-modes",
+    "title": "Native UpSet plots",
+    "section": "6. Four region-selection modes",
+    "text": "6. Four region-selection modes\nComplexUpset (and ggnomics.upset) define four ways to count how an element relates to a target combination of sets, controlled by mode=. The exact semantics are easiest to see on create_upset_abc_example(), a fixed 325-row example with three sets A/B/C and known counts:\n\nabc_example = upset.create_upset_abc_example()\nabc_statistics = upset.compute_intersections(abc_example, intersect=[\"A\", \"B\", \"C\"], intersections=\"all\")\ntarget = next(\n    identifier for identifier, members in abc_statistics.intersection_members.items()\n    if members == (\"A\", \"B\")\n)\nabc_statistics.sizes.loc[[target]]\n\n\n\n\n\n\n\n\nexclusive_intersection\ninclusive_intersection\nexclusive_union\ninclusive_union\n\n\nintersection\n\n\n\n\n\n\n\n\nI4\n10\n11\n110\n123\n\n\n\n\n\n\n\nFor the target combination (\"A\", \"B\"):\n\n\n\n\n\n\n\n\nMode\nMeaning\nValue\n\n\n\n\nexclusive_intersection (“distinct”)\nelements in A and B, and nothing else\n10\n\n\ninclusive_intersection (“intersect”)\nelements in at least A and B (may also be in C)\n11\n\n\nexclusive_union\nelements in at least one of A, B, and nothing outside {A, B}\n110\n\n\ninclusive_union (“union”)\nelements in at least one of A or B\n123\n\n\n\nexclusive_intersection (“distinct”) is what the intersection-size bars show by default — it is what a reader expects an UpSet bar to mean; the other three answer related but different questions and are mainly used by the ratio annotation and the statistical helpers."
+  },
+  {
+    "objectID": "upset.html#filtering-and-sorting-intersections",
+    "href": "upset.html#filtering-and-sorting-intersections",
+    "title": "Native UpSet plots",
+    "section": "7. Filtering and sorting intersections",
+    "text": "7. Filtering and sorting intersections\n\nupset.upset(\n    membership,\n    timepoint_columns,\n    min_size=10,\n    sort_intersections_by=[\"cardinality\"],\n    sort_intersections=\"descending\",\n)\n\n\n\n\n\n\n\n\n\nupset.upset(membership, timepoint_columns, n_intersections=5)"
+  },
+  {
+    "objectID": "upset.html#set-and-intersection-highlighting",
+    "href": "upset.html#set-and-intersection-highlighting",
+    "title": "Native UpSet plots",
+    "section": "8. Set and intersection highlighting",
+    "text": "8. Set and intersection highlighting\nupset_query() highlights a specific set (set=) or intersection (intersect=) with extra plotting aesthetics, applied everywhere it is relevant (or restricted with only_components=).\n\nupset.upset(\n    membership,\n    timepoint_columns,\n    queries=[\n        upset.upset_query(intersect=[\"1_hour\", \"24_hour\"], color=\"#D55E00\"),\n        upset.upset_query(set=\"24_hour\", color=\"#0072B2\"),\n    ],\n)"
+  },
+  {
+    "objectID": "upset.html#intersection-size-and-ratio-annotations",
+    "href": "upset.html#intersection-size-and-ratio-annotations",
+    "title": "Native UpSet plots",
+    "section": "9. Intersection-size and ratio annotations",
+    "text": "9. Intersection-size and ratio annotations\nintersection_ratio() adds a second panel showing each intersection’s size relative to inclusive_union by default — how much of the total involved elements a given combination accounts for.\n\nupset.upset(\n    membership,\n    timepoint_columns,\n    base_annotations={\n        \"Intersection size\": upset.intersection_size(),\n        # counts=False: the default \"numerator/denominator\" labels overlap on\n        # the narrow low-ratio bars here; the bar heights already show the\n        # ratio clearly at this width.\n        \"Intersection ratio\": upset.intersection_ratio(counts=False),\n    },\n)"
+  },
+  {
+    "objectID": "upset.html#a-custom-annotation-based-on-log2-fold-change",
+    "href": "upset.html#a-custom-annotation-based-on-log2-fold-change",
+    "title": "Native UpSet plots",
+    "section": "10. A custom annotation based on log2 fold change",
+    "text": "10. A custom annotation based on log2 fold change\nupset_annotate() builds an annotation panel from any numeric column already present in the membership table plus any Plotnine geom(s) — here, a boxplot of max_abs_log2fc per intersection.\n\nupset.upset(\n    membership,\n    timepoint_columns,\n    annotations={\n        \"max |log2FC|\": upset.upset_annotate(\"max_abs_log2fc\", geom_boxplot()),\n    },\n)"
+  },
+  {
+    "objectID": "upset.html#matrix-stripes-and-set-size-customization",
+    "href": "upset.html#matrix-stripes-and-set-size-customization",
+    "title": "Native UpSet plots",
+    "section": "11. Matrix, stripes, and set-size customization",
+    "text": "11. Matrix, stripes, and set-size customization\nThe membership matrix, its background stripes, and the marginal set-size panel are each independently swappable specifications.\n\nstripe_metadata = pd.DataFrame({\n    \"set\": timepoint_columns,\n    \"phase\": [\"early\", \"early\", \"late\"],\n})\nupset.upset(\n    membership,\n    timepoint_columns,\n    matrix=upset.intersection_matrix(geom=geom_point(size=4)),\n    stripes=upset.upset_stripes(\n        mapping={\"color\": \"phase\"},\n        colors={\"early\": \"#E8E8E8\", \"late\": \"#D8E8F8\"},\n        data=stripe_metadata,\n    ),\n    set_sizes=upset.upset_set_size(position=\"right\", geom=geom_col(width=0.5, fill=\"#555555\")),\n)"
+  },
+  {
+    "objectID": "upset.html#composition-with-another-plotnine-plot",
+    "href": "upset.html#composition-with-another-plotnine-plot",
+    "title": "Native UpSet plots",
+    "section": "12. Composition with another Plotnine plot",
+    "text": "12. Composition with another Plotnine plot\nBecause upset() returns a plotnine.composition.Compose, it composes with ordinary plotnine plots using the same | and / operators as any other ggnomics composition:\n\noverlap_summary = pd.DataFrame({\n    \"timepoint\": timepoint_columns,\n    \"n_top_ranked\": [len(top_ranked[tp]) for tp in timepoints],\n})\nbar = (\n    ggplot(overlap_summary, aes(x=\"timepoint\", y=\"n_top_ranked\"))\n    + geom_bar(stat=\"identity\", fill=\"#4477AA\")\n    + theme_bw()\n    + labs(title=\"Top-ranked genes per timepoint\", y=\"n genes\")\n)\ncombined = (upset.upset(membership, timepoint_columns) | bar) + plot_annotation(\n    theme=theme(figure_size=(13, 6))\n)\ncombined"
+  },
+  {
+    "objectID": "upset.html#native-plot_pseudobulk_demodeupset",
+    "href": "upset.html#native-plot_pseudobulk_demodeupset",
+    "title": "Native UpSet plots",
+    "section": "13. Native plot_pseudobulk_de(mode=\"upset\")",
+    "text": "13. Native plot_pseudobulk_de(mode=\"upset\")\nplot_pseudobulk_de accepts a dict[str, DataFrame] of DE result tables directly (no pre-built membership table needed) and returns a native Compose object — the same underlying ggnomics.upset.upset() backend used throughout this vignette, with the default padj &lt; 0.05 / abs(log2FoldChange) &gt;= 1 significance rule from Section 2:\n\nper_timepoint_results = {\n    tp.replace(\" \", \"_\"): fit[\"results\"] for tp, fit in fits.items()\n}\ngg.plot_pseudobulk_de(\n    per_timepoint_results, mode=\"upset\", title=\"Significant DE genes by timepoint (strict threshold)\"\n)\n\n\n\n\n\n\n\n\nThis is the honest result at the package’s default significance threshold: almost no genes are called significant at 1 or 5 hours, so almost no cross-timepoint bars appear — a real finding about this dataset (the salt response has barely started at 1-5 hours), not a plotting limitation."
+  },
+  {
+    "objectID": "upset.html#venn-representation-for-a-small-two-three-set-comparison",
+    "href": "upset.html#venn-representation-for-a-small-two-three-set-comparison",
+    "title": "Native UpSet plots",
+    "section": "14. Venn representation for a small two-/three-set comparison",
+    "text": "14. Venn representation for a small two-/three-set comparison\nFor two or three sets, ggnomics.upset also provides an approximate geometric/raster Venn representation — useful as a familiar shape for small comparisons; region areas are visually indicative, not exactly proportional.\n\nvenn_membership = membership[[\"5_hour\", \"24_hour\"]].copy()\nvenn_layout = upset.arrange_venn(venn_membership, sets=[\"5_hour\", \"24_hour\"])\n(\n    ggplot()\n    + upset.geom_venn_region(venn_layout)\n    + upset.geom_venn_circle(venn_layout)\n    + upset.geom_venn_label_region(venn_layout)\n    + upset.geom_venn_label_set(venn_layout)\n    + upset.scale_fill_venn_mix(venn_layout, colors=[\"#4477AA\", \"#CC6677\"])\n)\n\n\n\n\n\n\n\n\n\nvenn_layout_3 = upset.arrange_venn(membership, sets=timepoint_columns)\n(\n    ggplot()\n    + upset.geom_venn_region(venn_layout_3)\n    + upset.geom_venn_circle(venn_layout_3)\n    + upset.geom_venn_label_region(venn_layout_3)\n    + upset.geom_venn_label_set(venn_layout_3)\n    + upset.scale_fill_venn_mix(venn_layout_3, colors=[\"#4477AA\", \"#CC6677\", \"#228833\"])\n)"
+  },
+  {
+    "objectID": "upset.html#statistical-helper-caution",
+    "href": "upset.html#statistical-helper-caution",
+    "title": "Native UpSet plots",
+    "section": "15. Statistical-helper caution",
+    "text": "15. Statistical-helper caution\ncompare_between_intersections() / upset_test() compare a covariate across intersections (Kruskal-Wallis for numeric, chi-square for categorical, by default). They are only inferentially valid when the rows supplied represent appropriate independent statistical units. Here, the rows are genes: this comparison is descriptive of the top-ranked gene table constructed above, not an inference about biological replicates — a per-gene p-value from this table must not be read as “timepoints differ” in the way a per-sample/per-patient p-value would be.\n\nupset.upset_test(membership, timepoint_columns, ignore_mode_columns=True, ignore=[\"gene_id\"])\n\n\n\n\n\n\n\n\nvariable\np_value\nstatistic\ntest\nfdr\n\n\n\n\n0\ntimepoint_of_max_effect\n0.000000e+00\n1504.116290\nPearson chi-square\n0.000000e+00\n\n\n1\nmax_abs_log2fc\n1.156895e-57\n280.620864\nKruskal-Wallis\n1.156895e-57"
+  },
+  {
+    "objectID": "upset.html#performance-and-combinatorial-growth",
+    "href": "upset.html#performance-and-combinatorial-growth",
+    "title": "Native UpSet plots",
+    "section": "16. Performance and combinatorial growth",
+    "text": "16. Performance and combinatorial growth\nintersections=\"all\" materializes every one of the 2^n possible combinations of n sets — fine for the 8 combinations of 3 sets used here, but it grows explosively (2^10 = 1024, 2^20 &gt; 10^6, …). For more than a handful of sets, prefer the default intersections=\"observed\" (only combinations that actually occur) or an explicit list of the combinations you care about; upset_data() also raises before materializing an intersections=\"all\" result that would exceed max_combinations_datapoints_n."
+  },
+  {
+    "objectID": "upset.html#see-also",
+    "href": "upset.html#see-also",
+    "title": "Native UpSet plots",
+    "section": "17. See also",
+    "text": "17. See also\n\nAPI reference — full signatures for every function used above.\nBulk RNA-seq — the PyDESeq2 fits reused here.\nPlot gallery — a compact function table for ggnomics.upset."
+  },
+  {
+    "objectID": "single-cell-scranpy.html",
+    "href": "single-cell-scranpy.html",
+    "title": "Single-cell analysis with scranpy",
+    "section": "",
+    "text": "This workflow follows the Zeisel et al. (2015) mouse brain dataset through quality control, normalization, feature selection, PCA, graph-based clustering, and UMAP. The analysis uses scranpy with the full dataset (20,006 genes and 3,005 cells), and ggnomics for visualization. For a shorter introduction based on a subset of these cells, see Getting started.\nimport sys, pathlib\nsys.path.insert(0, str(pathlib.Path(\"_includes\").resolve()))\nfrom setup import configure_warnings, ensure_matplotlib_initialized\nensure_matplotlib_initialized()\nconfigure_warnings()\n\nimport numpy as np\nimport pandas as pd\nimport scranpy\nimport ggnomics as gg\nfrom plotnine import theme_bw, theme, labs, facet_wrap, scale_color_gradient, element_text, coord_fixed"
+  },
+  {
+    "objectID": "single-cell-scranpy.html#fetching-and-inspecting-the-sce",
+    "href": "single-cell-scranpy.html#fetching-and-inspecting-the-sce",
+    "title": "Single-cell analysis with scranpy",
+    "section": "1. Fetching and inspecting the SCE",
+    "text": "1. Fetching and inspecting the SCE\n\nfrom data import load_zeisel_full\n\nsce = load_zeisel_full()\nsce.shape\n\n(20006, 3005)\n\n\n\nsce.get_assay_names()\n\n['counts']\n\n\n\nsce.get_column_data().get_column_names()\n\nNames(['tissue', 'group #', 'total mRNA mol', 'well', 'sex', 'age', 'diameter', 'level1class', 'level2class'])\n\n\n\nsce.get_alternative_experiment_names()\n\n['repeat', 'ERCC']\n\n\nThe object contains two alternative experiments, repeat and ERCC (spike-in) features. The analysis below uses the main 20,006-gene assay."
+  },
+  {
+    "objectID": "single-cell-scranpy.html#a-mitochondrial-gene-mask-from-verified-row-names",
+    "href": "single-cell-scranpy.html#a-mitochondrial-gene-mask-from-verified-row-names",
+    "title": "Single-cell analysis with scranpy",
+    "section": "2. A mitochondrial-gene mask from verified row names",
+    "text": "2. A mitochondrial-gene mask from verified row names\nMouse mitochondrial genes conventionally carry an mt- prefix. We derive the QC subset directly from the row names:\n\nrow_names = sce.get_row_names()\nmito_genes = [g for g in row_names if str(g).lower().startswith(\"mt-\")]\nlen(mito_genes), mito_genes[:5]\n\n(34, ['mt-Tl1', 'mt-Tn', 'mt-Tr', 'mt-Tq', 'mt-Ty'])\n\n\n\nmito_mask = [str(g).lower().startswith(\"mt-\") for g in row_names]"
+  },
+  {
+    "objectID": "single-cell-scranpy.html#rna-qc-metrics-and-cell-filtering",
+    "href": "single-cell-scranpy.html#rna-qc-metrics-and-cell-filtering",
+    "title": "Single-cell analysis with scranpy",
+    "section": "3. RNA QC metrics and cell filtering",
+    "text": "3. RNA QC metrics and cell filtering\nscranpy.compute_rna_qc_metrics computes per-cell library size (sum), number of detected genes (detected), and the mitochondrial proportion for the mito subset we just defined; suggest_rna_qc_thresholds derives outlier thresholds (median absolute deviation-based, scran-style) and filter_rna_qc_metrics turns them into a boolean keep-mask:\n\nqc = scranpy.compute_rna_qc_metrics(sce.get_assay(\"counts\"), subsets={\"mito\": mito_mask})\nqc_df = qc.to_pandas()\nqc_df.describe()\n\n\n\n\n\n\n\n\nsum\ndetected\nsubset_proportion.mito\n\n\n\n\ncount\n3005.000000\n3005.000000\n3005.000000\n\n\nmean\n14954.194343\n3776.732113\n0.079560\n\n\nstd\n9267.942024\n1576.251293\n0.060633\n\n\nmin\n2574.000000\n785.000000\n0.000000\n\n\n25%\n8130.000000\n2484.000000\n0.039921\n\n\n50%\n12913.000000\n3656.000000\n0.066528\n\n\n75%\n19284.000000\n4929.000000\n0.102898\n\n\nmax\n63505.000000\n8167.000000\n0.569549\n\n\n\n\n\n\n\n\nthresholds = scranpy.suggest_rna_qc_thresholds(qc)\nkeep = scranpy.filter_rna_qc_metrics(thresholds, qc)\nf\"{keep.sum()} / {len(keep)} cells retained\"\n\n'2874 / 3005 cells retained'\n\n\nPlotting the QC metrics with plot_coldata, colored by whether a cell passed filtering:\n\nqc_plot_df = qc_df.copy()\nqc_plot_df[\"status\"] = np.where(keep, \"kept\", \"filtered\")\n\n(\n    gg.plot_coldata(qc_plot_df, x=\"sum\", y=\"detected\", color_by=\"status\")\n    + labs(x=\"Library size (total counts)\", y=\"Genes detected\", title=\"Zeisel QC: library size vs. genes detected\")\n    + theme_bw()\n)"
+  },
+  {
+    "objectID": "single-cell-scranpy.html#filtering-normalization-and-size-factors",
+    "href": "single-cell-scranpy.html#filtering-normalization-and-size-factors",
+    "title": "Single-cell analysis with scranpy",
+    "section": "4. Filtering, normalization, and size factors",
+    "text": "4. Filtering, normalization, and size factors\n\nfiltered = sce[:, keep]\n\ncd = filtered.column_data\nfor col in (\"sum\", \"detected\", \"subset_proportion.mito\"):\n    cd = cd.set_column(col, qc_df.loc[keep, col].to_numpy())\nfiltered = filtered.set_column_data(cd)\n\nWe pass the QC-derived library sizes explicitly as size factors, following the normalize_rna_counts_se interface. This also avoids a sparse-matrix shape issue in the installed scranpy version’s default path:\n\nsize_factors = qc_df.loc[keep, \"sum\"].to_numpy()\nnormed = scranpy.normalize_rna_counts_se(filtered, assay_type=\"counts\", size_factors=size_factors)\nnormed.get_assay_names()\n\n['counts', 'logcounts']"
+  },
+  {
+    "objectID": "single-cell-scranpy.html#variance-modelling-and-highly-variable-genes",
+    "href": "single-cell-scranpy.html#variance-modelling-and-highly-variable-genes",
+    "title": "Single-cell analysis with scranpy",
+    "section": "5. Variance modelling and highly variable genes",
+    "text": "5. Variance modelling and highly variable genes\n\nhvg_out = scranpy.choose_rna_hvgs_se(normed, assay_type=\"logcounts\", top=4000)\nhvg_out.get_row_data().get_column_names()\n\nNames(['featureType', 'mean', 'variance', 'fitted', 'residual', 'hvg'])\n\n\n\nhvg_df = hvg_out.get_row_data().to_pandas()\n# pandas treats a bool column as numeric, which would otherwise route this\n# straight into plot_coldata's continuous-color branch - map to a category\n# label explicitly so it's treated (and legended) as discrete.\nhvg_df[\"HVG status\"] = hvg_df[\"hvg\"].map({True: \"highly variable\", False: \"other\"})\n(\n    gg.plot_coldata(hvg_df, x=\"mean\", y=\"variance\", color_by=\"HVG status\")\n    + labs(title=\"Mean-variance trend and chosen HVGs (scranpy)\", x=\"Mean log-expression\", y=\"Variance\")\n    + theme_bw()\n)"
+  },
+  {
+    "objectID": "single-cell-scranpy.html#pca",
+    "href": "single-cell-scranpy.html#pca",
+    "title": "Single-cell analysis with scranpy",
+    "section": "6. PCA",
+    "text": "6. PCA\n\nhvg_flags = hvg_out.get_row_data().get_column(\"hvg\")\npca_out = scranpy.run_pca_se(hvg_out, features=hvg_flags, number=25, assay_type=\"logcounts\")\npca_out.get_reduced_dim_names()\n\n['PCA']"
+  },
+  {
+    "objectID": "single-cell-scranpy.html#nearest-neighbor-graph-clustering-and-umap",
+    "href": "single-cell-scranpy.html#nearest-neighbor-graph-clustering-and-umap",
+    "title": "Single-cell analysis with scranpy",
+    "section": "7. Nearest-neighbor graph, clustering, and UMAP",
+    "text": "7. Nearest-neighbor graph, clustering, and UMAP\nrun_all_neighbor_steps_se builds the shared-nearest-neighbor graph, runs graph-based (Leiden/Louvain-style multilevel) clustering, and computes both UMAP and t-SNE embeddings in one call:\n\nfinal = scranpy.run_all_neighbor_steps_se(pca_out, reddim_type=\"PCA\")\nfinal.get_reduced_dim_names()\n\n['PCA', 'TSNE', 'UMAP']\n\n\n\nfinal.get_column_data().get_column_names()\n\nNames(['tissue', 'group #', 'total mRNA mol', 'well', 'sex', 'age', 'diameter', 'level1class', 'level2class', 'sum', 'detected', 'subset_proportion.mito', 'size_factor', 'clusters'])\n\n\n\nn_clusters = len(set(final.column_data.get_column(\"clusters\")))\nf\"{n_clusters} graph-based clusters\"\n\n'14 graph-based clusters'\n\n\nrun_scranpy_pipeline_on_zeisel() caches the processed SCE for later examples:\n\nfrom data import run_scranpy_pipeline_on_zeisel\n\nfinal = run_scranpy_pipeline_on_zeisel()"
+  },
+  {
+    "objectID": "single-cell-scranpy.html#plotting-pca-and-umap",
+    "href": "single-cell-scranpy.html#plotting-pca-and-umap",
+    "title": "Single-cell analysis with scranpy",
+    "section": "8. Plotting PCA and UMAP",
+    "text": "8. Plotting PCA and UMAP\nThe same plot_pca and plot_umap functions can colour cells by cluster, the supplied cell-class annotation, a QC metric, or expression of a selected gene. The SCE adapter retrieves coordinates, annotations, and assays from their corresponding slots.\n\ngg.plot_pca(final, color=\"clusters\") + labs(title=\"PCA, colored by graph cluster\")\n\n\n\n\n\n\n\n\n\ngg.plot_umap(final, color=\"level1class\") + labs(title=\"UMAP, colored by the original level1class annotation\")\n\n\n\n\n\n\n\n\n\ngg.plot_umap(final, color=\"subset_proportion.mito\") + scale_color_gradient(low=\"#dddddd\", high=\"#B2182B\") + labs(title=\"UMAP, colored by mitochondrial proportion\")\n\n/home/maximiliann/miniforge3/envs/ggnomics-docs/lib/python3.12/site-packages/plotnine/scales/scales.py:48: PlotnineWarning: Scale for 'color' is already present.\nAdding another scale for 'color',\nwhich will replace the existing scale.\n\n\n\n\n\n\n\n\n\n\n\ngg.plot_umap(final, color=\"Gad2\", layer=\"logcounts\") + labs(title=\"UMAP, colored by Gad2 (interneuron marker) expression\")\n\n\n\n\n\n\n\n\n\nPoint-order control\norder= draws selected categories last, which keeps small populations visible in dense embeddings:\n\ngg.plot_umap(final, color=\"level1class\", order=[\"microglia\", \"endothelial-mural\"]) + labs(title=\"UMAP with microglia/endothelial-mural drawn on top\")\n\n\n\n\n\n\n\n\n\n\nFaceting\nUse facet_by= when splitting an embedding by a metadata field. The plotting frame built by plot_umap contains only the coordinates and requested annotations, so a post-hoc facet_wrap() cannot refer to other SCE columns.\n\ngg.plot_umap(final, color=\"clusters\", facet_by=\"level1class\") + theme_bw() + theme(legend_position=\"none\")"
+  },
+  {
+    "objectID": "single-cell-scranpy.html#descriptive-comparison-to-the-original-annotation",
+    "href": "single-cell-scranpy.html#descriptive-comparison-to-the-original-annotation",
+    "title": "Single-cell analysis with scranpy",
+    "section": "9. Descriptive comparison to the original annotation",
+    "text": "9. Descriptive comparison to the original annotation\nThe graph-based clusters were calculated without using Zeisel’s curated level1class or level2class labels. A cross-tabulation provides a useful descriptive comparison, although it is not a formal measure of clustering accuracy:\n\ncd = final.column_data.to_pandas()\ncomparison = pd.crosstab(cd[\"clusters\"], cd[\"level1class\"])\ncomparison\n\n\n\n\n\n\n\nlevel1class\nastrocytes_ependymal\nendothelial-mural\ninterneurons\nmicroglia\noligodendrocytes\npyramidal CA1\npyramidal SS\n\n\nclusters\n\n\n\n\n\n\n\n\n\n\n\n0\n2\n4\n276\n0\n0\n4\n0\n\n\n1\n0\n0\n7\n0\n163\n44\n33\n\n\n2\n4\n2\n2\n2\n1\n2\n187\n\n\n3\n0\n0\n3\n0\n0\n479\n4\n\n\n4\n2\n0\n1\n0\n0\n17\n170\n\n\n5\n0\n0\n1\n0\n0\n235\n1\n\n\n6\n25\n168\n0\n4\n4\n0\n2\n\n\n7\n11\n1\n0\n0\n0\n157\n0\n\n\n8\n0\n0\n0\n0\n189\n0\n0\n\n\n9\n0\n0\n0\n1\n125\n0\n0\n\n\n10\n0\n0\n0\n0\n239\n0\n0\n\n\n11\n11\n0\n0\n1\n75\n0\n0\n\n\n12\n0\n0\n0\n80\n0\n0\n0\n\n\n13\n132\n2\n0\n1\n0\n0\n0\n\n\n\n\n\n\n\n\ngg.plot_abundance(cd, group_by=\"clusters\", color_by=\"level1class\") + labs(\n    title=\"Composition of each graph cluster by original cell-class label\",\n    x=\"Graph cluster\", y=\"Fraction of cells\",\n)\n\n\n\n\n\n\n\n\nSeveral clusters are dominated by a single broad class, including oligodendrocyte- and astrocyte-rich clusters. Larger classes such as pyramidal neurons are distributed across several clusters, reflecting variation below the broad level1class annotation."
+  },
+  {
+    "objectID": "single-cell-scranpy.html#expression-violins-and-dot-plots",
+    "href": "single-cell-scranpy.html#expression-violins-and-dot-plots",
+    "title": "Single-cell analysis with scranpy",
+    "section": "10. Expression violins and dot plots",
+    "text": "10. Expression violins and dot plots\n\nmarkers = [\"Gfap\", \"Mog\", \"Gad2\", \"Snap25\", \"Aif1\", \"Cldn5\"]\ngg.plot_expression(final, features=markers, group_by=\"level1class\", layer=\"logcounts\", log1p=False, ncol=2) + theme_bw() + theme(axis_text_x=element_text(rotation=45, hjust=1))\n\n\n\n\n\n\n\n\n\ngg.plot_dot(final, features=markers, group_by=\"level1class\", layer=\"logcounts\") + theme_bw() + theme(axis_text_x=element_text(rotation=45, hjust=1))"
+  },
+  {
+    "objectID": "single-cell-scranpy.html#heatmap",
+    "href": "single-cell-scranpy.html#heatmap",
+    "title": "Single-cell analysis with scranpy",
+    "section": "11. Heatmap",
+    "text": "11. Heatmap\n\ngg.plot_heatmap(final, features=markers, group_by=\"clusters\", layer=\"logcounts\", cluster_rows=True, cluster_cols=True)"
+  },
+  {
+    "objectID": "single-cell-scranpy.html#converting-to-anndata-and-reproducing-the-umap",
+    "href": "single-cell-scranpy.html#converting-to-anndata-and-reproducing-the-umap",
+    "title": "Single-cell analysis with scranpy",
+    "section": "12. Converting to AnnData and reproducing the UMAP",
+    "text": "12. Converting to AnnData and reproducing the UMAP\nIn the installed versions, PCA metadata are stored as a biocutils.NamedList, whereas .to_anndata() expects a mutable mapping for AnnData’s .uns. The UMAP plot does not require those PCA metadata, so we omit them during conversion:\n\nfinal_for_export = final.set_metadata({})\nadata, _alt = final_for_export.to_anndata()\nadata.X = adata.layers[\"logcounts\"]\ngg.plot_umap(adata, color=\"level1class\") + labs(title=\"Same UMAP, plotted from the converted AnnData\")\n\n/home/maximiliann/miniforge3/envs/ggnomics-docs/lib/python3.12/site-packages/summarizedexperiment/base.py:1167: RuntimeWarning: Converting delayedarray into sparse, may require more memory"
+  },
+  {
+    "objectID": "single-cell-scranpy.html#a-custom-plotnine-extension",
+    "href": "single-cell-scranpy.html#a-custom-plotnine-extension",
+    "title": "Single-cell analysis with scranpy",
+    "section": "13. A custom plotnine extension",
+    "text": "13. A custom plotnine extension\nThe returned UMAP can be extended with ordinary plotnine components. Here we fix the aspect ratio and add a caption from values calculated above:\n\ngg.plot_umap(final, color=\"clusters\") + coord_fixed() + labs(\n    caption=f\"{n_clusters} clusters, {final.shape[1]} cells passing QC out of {sce.shape[1]} total\"\n) + theme_bw()"
+  },
+  {
+    "objectID": "single-cell-scranpy.html#next",
+    "href": "single-cell-scranpy.html#next",
+    "title": "Single-cell analysis with scranpy",
+    "section": "Next",
+    "text": "Next\n\nBulk RNA-seq for PyDESeq2-based differential expression.\nMultimodal for RNA/ADT CITE-seq data.\nSpecialized plots uses the processed Zeisel object for statistics, significance brackets, and palette examples."
+  },
+  {
+    "objectID": "specialized-plots.html",
+    "href": "specialized-plots.html",
+    "title": "Specialized plots",
+    "section": "",
+    "text": "These examples collect plot families that complement the full analysis workflows: donor-aware abundance and pseudobulk summaries from human pancreas, significance annotations in mouse brain data, differential- expression visualizations from the rice experiment, and immune-repertoire plots from ECCITE-seq TCR data. The page also covers palettes and Marsilea heatmaps.\nimport sys, pathlib\nsys.path.insert(0, str(pathlib.Path(\"_includes\").resolve()))\nfrom setup import configure_warnings, ensure_matplotlib_initialized\nensure_matplotlib_initialized()\nconfigure_warnings()\n\nimport numpy as np\nimport pandas as pd\nimport ggnomics as gg\nfrom plotnine import theme_bw, theme, labs, element_text"
+  },
+  {
+    "objectID": "specialized-plots.html#baron-pancreas-abundance-composition-and-pseudobulk",
+    "href": "specialized-plots.html#baron-pancreas-abundance-composition-and-pseudobulk",
+    "title": "Specialized plots",
+    "section": "Baron pancreas: abundance, composition, and pseudobulk",
+    "text": "Baron pancreas: abundance, composition, and pseudobulk\n\nfrom data import load_baron\n\nbaron = load_baron()\nbaron.shape\n\n(20125, 8569)\n\n\n\nAbundance by donor and cell type\n\nbaron_cd = baron.get_column_data().to_pandas()\ngg.plot_abundance(baron_cd, group_by=\"donor\", color_by=\"label\") + theme_bw() + labs(title=\"Pancreatic cell-type composition per donor (fraction)\", x=\"Donor\", y=\"Fraction of cells\")\n\n/home/maximiliann/miniforge3/envs/ggnomics-docs/lib/python3.12/site-packages/mizani/palettes.py:547: UserWarning: Warning message:Brewer palette Set2 has a maximum of 8 colors Returning the palette you asked for with that many colors\n/home/maximiliann/miniforge3/envs/ggnomics-docs/lib/python3.12/site-packages/mizani/palettes.py:547: UserWarning: Warning message:Brewer palette Set2 has a maximum of 8 colors Returning the palette you asked for with that many colors\n\n\n\n\n\n\n\n\n\n\n\nCounts vs. proportions\n\ngg.plot_abundance(baron_cd, group_by=\"donor\", color_by=\"label\", normalize=False) + theme_bw() + labs(title=\"Same composition, raw cell counts\", x=\"Donor\", y=\"Number of cells\")\n\n/home/maximiliann/miniforge3/envs/ggnomics-docs/lib/python3.12/site-packages/mizani/palettes.py:547: UserWarning: Warning message:Brewer palette Set2 has a maximum of 8 colors Returning the palette you asked for with that many colors\n/home/maximiliann/miniforge3/envs/ggnomics-docs/lib/python3.12/site-packages/mizani/palettes.py:547: UserWarning: Warning message:Brewer palette Set2 has a maximum of 8 colors Returning the palette you asked for with that many colors\n\n\n\n\n\n\n\n\n\n\n\nDonor-aware grouping and pseudobulk QC\nIndividual cells are not biological replicates. For sample-aware summaries, the donor identifies the replicate and label identifies the cell type. plot_pseudobulk_qc displays cell counts for each donor/group combination, library sizes, and a pseudobulk PCA across the four donors:\n\ngg.plot_pseudobulk_qc(baron, sample_by=\"donor\", group_by=\"label\", min_cells=10)\n\n/home/maximiliann/miniforge3/envs/ggnomics-docs/lib/python3.12/site-packages/mizani/palettes.py:547: UserWarning: Warning message:Brewer palette Set2 has a maximum of 8 colors Returning the palette you asked for with that many colors\n/home/maximiliann/miniforge3/envs/ggnomics-docs/lib/python3.12/site-packages/mizani/palettes.py:547: UserWarning: Warning message:Brewer palette Set2 has a maximum of 8 colors Returning the palette you asked for with that many colors\n\n\n\n\n\n\n\n\n\n\n\nGrouped, clustered heatmap\n\nmarkers = [\"INS\", \"GCG\", \"SST\", \"PPY\", \"KRT19\", \"CPA1\", \"PDGFRB\", \"PECAM1\"]\nrow_names = baron.get_row_names()\navailable = [m for m in markers if m in row_names]\ngg.plot_heatmap(baron, features=available, group_by=\"label\", layer=\"counts\", cluster_rows=True, cluster_cols=True) + theme(axis_text_x=element_text(rotation=45, hjust=1))"
+  },
+  {
+    "objectID": "specialized-plots.html#zeisel-statistics-significance-brackets-dot-plots-palettes",
+    "href": "specialized-plots.html#zeisel-statistics-significance-brackets-dot-plots-palettes",
+    "title": "Specialized plots",
+    "section": "Zeisel: statistics, significance brackets, dot plots, palettes",
+    "text": "Zeisel: statistics, significance brackets, dot plots, palettes\nWe use the processed Zeisel object from the scranpy workflow:\n\nfrom data import run_scranpy_pipeline_on_zeisel\n\nfinal = run_scranpy_pipeline_on_zeisel()\n\n\nGrouped statistics with automatic significance brackets\nplot_violin_stats and plot_box_stats can run pairwise tests and add ggsignif-style brackets. The examples below use the default Mann–Whitney test across cells. These p-values describe the profiled cells and should not be interpreted as inference across independent animals; a biological-replicate analysis would require sample-level observations.\n\ncd = final.column_data.to_pandas()\ngfap_idx = list(final.get_row_names()).index(\"Gfap\")\ncd[\"Gfap\"] = np.asarray(final.get_assay(\"logcounts\")[gfap_idx, :]).ravel()\ntwo_classes = cd[cd[\"level1class\"].isin([\"astrocytes_ependymal\", \"oligodendrocytes\"])]\n\ngg.plot_violin_stats(\n    two_classes, \"Gfap\", group_by=\"level1class\",\n    comparisons=[(\"astrocytes_ependymal\", \"oligodendrocytes\")],\n    annotation=\"stars\",\n) + theme_bw() + labs(title=\"Gfap: astrocytes vs. oligodendrocytes (per-cell Mann-Whitney)\", y=\"logcounts\")\n\n\n\n\n\n\n\n\n\ngg.plot_box_stats(\n    cd, \"Gfap\", group_by=\"level1class\",\n    comparisons=[(\"astrocytes_ependymal\", c) for c in [\"oligodendrocytes\", \"microglia\", \"endothelial-mural\"]],\n    annotation=\"pvalue\", sig_only=False,\n) + theme_bw() + theme(axis_text_x=element_text(rotation=30, hjust=1)) + labs(title=\"Gfap across classes, raw p-values shown\")\n\n\n\n\n\n\n\n\n\n\nA minimal geometry example for geom_signif\nThe next example focuses on bracket placement—stacking, tip length, and star mapping—using three Zeisel cell classes. It illustrates the geometry rather than making a biological comparison.\nIn automatic mode, geom_signif(comparisons=...) returns a deferred _DeferredSignif object. Calling .resolve(df, x_col, y_col) supplies the data needed for the tests and returns plotnine layers that can be added to the plot.\n\nfrom ggnomics import geom_signif\nfrom plotnine import ggplot, aes, geom_boxplot\n\ngeom_df = cd[cd[\"level1class\"].isin([\"microglia\", \"endothelial-mural\", \"astrocytes_ependymal\"])][[\"level1class\", \"Gfap\"]]\nbracket_layers = geom_signif(\n    comparisons=[(\"microglia\", \"endothelial-mural\"), (\"microglia\", \"astrocytes_ependymal\")]\n).resolve(geom_df, \"level1class\", \"Gfap\")\n\n(\n    ggplot(geom_df, aes(x=\"level1class\", y=\"Gfap\"))\n    + geom_boxplot()\n    + bracket_layers\n    + theme_bw()\n    + labs(title=\"geom_signif bracket-stacking geometry check\")\n)\n\n\n\n\n\n\n\n\n\n\nDot plot\n\nmarkers = [\"Gfap\", \"Mog\", \"Gad2\", \"Snap25\", \"Aif1\", \"Cldn5\", \"Pdgfrb\"]\ngg.plot_dot(final, features=markers, group_by=\"level1class\", layer=\"logcounts\") + theme_bw() + theme(axis_text_x=element_text(rotation=45, hjust=1))\n\n\n\n\n\n\n\n\n\n\nSelected scatter plot\n\ncd[\"n_genes\"] = cd[\"detected\"]\ngg.plot_coldata(cd, x=\"sum\", y=\"n_genes\", color_by=\"level1class\") + theme_bw() + labs(title=\"Library size vs. genes detected, colored by cell class\", x=\"Total counts\")\n\n\n\n\n\n\n\n\n\n\nCustom palettes and the IGV palette\n\ncustom = {\"astrocytes_ependymal\": \"#1B9E77\", \"oligodendrocytes\": \"#D95F02\", \"microglia\": \"#7570B3\"}\ngg.plot_umap(final, color=\"level1class\", palette=custom) + theme_bw() + labs(title=\"Custom 3-color override; remaining classes fall back to the default palette\")\n\n/home/maximiliann/miniforge3/envs/ggnomics-docs/lib/python3.12/site-packages/plotnine/scales/scale_manual.py:49: PlotnineWarning: The palette of scale_color_manual can return a maximum of 3 values. 7 were requested from it.\n/home/maximiliann/miniforge3/envs/ggnomics-docs/lib/python3.12/site-packages/plotnine/scales/scale_manual.py:49: PlotnineWarning: The palette of scale_color_manual can return a maximum of 3 values. 7 were requested from it.\n\n\n\n\n\n\n\n\n\nThe IGV palette follows the chromosome-colour convention from the Integrative Genomics Viewer, using values published by the R package ggsci in ggsci::pal_igv(). See Robinson et al., Nature Biotechnology 29, 24–26 (2011).\n\nigv_preview = pd.DataFrame({\"chrom\": list(gg.IGV_DEFAULT.keys())[:12], \"value\": 1})\ngg.plot_coldata(igv_preview, x=\"chrom\", y=\"value\", color_by=\"chrom\", shape=\"bar\", palette=gg.IGV_DEFAULT) + theme_bw() + theme(legend_position=\"none\", axis_text_x=element_text(rotation=45, hjust=1)) + labs(title=\"IGV chromosome-color palette (first 12 entries)\", y=\"\")"
+  },
+  {
+    "objectID": "specialized-plots.html#e-mtab-1625-differential-expression-results",
+    "href": "specialized-plots.html#e-mtab-1625-differential-expression-results",
+    "title": "Specialized plots",
+    "section": "E-MTAB-1625: differential-expression results",
+    "text": "E-MTAB-1625: differential-expression results\nThe following plots use the PyDESeq2 fit introduced in the bulk RNA-seq workflow:\n\nfrom data import run_deseq2_on_emtab1625\n\nfit = run_deseq2_on_emtab1625()\nresults, vst, gene_names = fit[\"results\"], fit[\"vst\"], fit[\"gene_names\"]\n\n\nSample metadata plot\n\nlib_sizes = fit[\"counts\"].sum(axis=1).rename(\"library_size\").reset_index().rename(columns={\"index\": \"sample\"})\nlib_sizes[\"growth_condition\"] = fit[\"metadata\"][\"growth_condition\"].to_numpy()\ngg.plot_coldata(lib_sizes, x=\"growth_condition\", y=\"library_size\", shape=\"point\") + theme_bw() + labs(title=\"Library size, 24h salt vs. control\", y=\"Total raw counts\")\n\n\n\n\n\n\n\n\n\n\nVolcano, MA, and coefficient plots — alternate styling\n\ngg.plot_volcano(results, label_top_n=15, logfc_threshold=1.5) + theme_bw() + labs(title=\"Stricter |log2FC| &gt; 1.5 threshold\")\n\n\n\n\n\n\n\n\n\ngg.plot_ma(results, label_top_n=6, logfc_threshold=1.0) + theme_bw()\n\n\n\n\n\n\n\n\n\n\nMarsilea-backed heatmap\nThe transformed expression matrix can also be passed directly to Marsilea for a composable heatmap with dendrograms. Marsilea is used alongside ggnomics here rather than wrapped by it.\n\nimport marsilea as ma\n\nsig_top = results.loc[results[\"padj\"] &lt; 0.05].sort_values(\"padj\").head(25)\nmat = vst[sig_top.index]\nz = (mat - mat.mean()) / mat.std()\nz.columns = [gene_names.get(g) or g for g in z.columns]\n\nh = ma.Heatmap(z.T.to_numpy(), cmap=\"RdBu_r\", label=\"z-score\")\nh.add_dendrogram(\"right\")\nh.add_dendrogram(\"top\")\nh.add_left(ma.plotter.Labels(z.T.index.tolist()), pad=0.1)\nh.add_top(ma.plotter.Labels(z.T.columns.tolist()), pad=0.1)\nh.render()\nh.save(str(pathlib.Path(\"_freeze_assets\") / \"marsilea_emtab1625.png\"))\n\n&lt;marsilea.heatmap.Heatmap at 0x70c02bb60ec0&gt;\n\n\n\n\n\nMarsilea heatmap of the top 25 significant genes, 24h salt vs. control"
+  },
+  {
+    "objectID": "specialized-plots.html#eccite-seq-tcr-repertoire-eh4616-ctcl-eh4621-control",
+    "href": "specialized-plots.html#eccite-seq-tcr-repertoire-eh4616-ctcl-eh4621-control",
+    "title": "Specialized plots",
+    "section": "ECCITE-seq TCR repertoire (EH4616 CTCL, EH4621 control)",
+    "text": "ECCITE-seq TCR repertoire (EH4616 CTCL, EH4621 control)\n\nfrom data import load_tcr_repertoire\n\ntcr = load_tcr_repertoire()\ntcr[\"chain\"].value_counts()\n\nPackage 'multiassayexperiment' is not installed.\n\n\nchain\nTRB      8581\nTRA      6243\nMulti    2159\nIGL       399\nIGH       302\nIGK       185\nTRG        56\nTRD        44\nNone       16\nName: count, dtype: int64\n\n\n\ntrb = tcr[(tcr[\"chain\"] == \"TRB\") & (tcr[\"raw_clonotype_id\"] != \"None\")].dropna(subset=[\"v_gene\", \"j_gene\"])\ncell_level = trb.drop_duplicates(subset=[\"barcode\", \"condition\"])\ncell_level.shape\n\n(6601, 20)\n\n\n\nClonotype abundance\n\ngg.plot_clonotype_abundance(cell_level, clonotype_col=\"clonotype_id\", sample_col=\"condition\", top_n=15) + theme_bw() + theme(axis_text_x=element_text(rotation=45, hjust=1))\n\n\n\n\n\n\n\n\n\n\nClonotype overlap\nThe loading helper prefixes clonotype_id by condition because native 10x clonotype labels are only unique within a run. Cross-condition overlap is therefore calculated from CDR3 amino-acid sequences instead:\n\nproductive_trb = tcr[(tcr[\"chain\"] == \"TRB\") & (tcr[\"productive\"] == \"True\") & tcr[\"cdr3\"].notna()]\nctcl_cdr3 = set(productive_trb.loc[productive_trb[\"condition\"] == \"CTCL\", \"cdr3\"])\ncontrol_cdr3 = set(productive_trb.loc[productive_trb[\"condition\"] == \"control\", \"cdr3\"])\nf\"{len(ctcl_cdr3)} unique productive TRB CDR3s (CTCL), {len(control_cdr3)} (control), {len(ctcl_cdr3 & control_cdr3)} shared\"\n\n'1568 unique productive TRB CDR3s (CTCL), 1394 (control), 0 shared'\n\n\nNo exact CDR3 sequence is shared between the CTCL and control samples in these resources. Exact overlap between unrelated individuals is expected to be sparse because of the diversity of the TCR repertoire. The Jaccard matrix summarizes the comparison. For more than two groups, a set-intersection matrix is often more legible than pairwise Jaccard values — see UpSet plots, which also covers plot_pseudobulk_de’s mode=\"upset\".\n\ncdr3_level = productive_trb.drop_duplicates(subset=[\"cdr3\", \"condition\"])[[\"cdr3\", \"condition\"]]\nresult = gg.plot_clonotype_overlap(cdr3_level, clonotype_col=\"cdr3\", sample_col=\"condition\", method=\"jaccard\")\nresult.matrix\n\n\n\n\n\n\n\n\nCTCL\ncontrol\n\n\n\n\nCTCL\n1.0\n0.0\n\n\ncontrol\n0.0\n1.0\n\n\n\n\n\n\n\n\n\nV/J gene usage\n\nv_usage = cell_level.groupby([\"condition\", \"v_gene\"]).size().reset_index(name=\"n_cells\")\ntop_v = v_usage.groupby(\"v_gene\")[\"n_cells\"].sum().nlargest(15).index\ngg.plot_coldata(\n    v_usage[v_usage[\"v_gene\"].isin(top_v)], x=\"v_gene\", y=\"n_cells\", color_by=\"condition\", shape=\"bar\",\n) + theme_bw() + theme(axis_text_x=element_text(rotation=45, hjust=1)) + labs(title=\"TRB V-gene usage (top 15 by cell count)\")\n\n\n\n\n\n\n\n\n\n\nRepertoire-feature embedding\nThese TCR resources do not include matched expression coordinates. We therefore calculate a repertoire-feature PCA from one-hot-encoded V/J gene usage per clonotype. It should be interpreted as an embedding of receptor features, not as a transcriptomic UMAP.\n\nfrom sklearn.decomposition import PCA\n\nclonotype_summary = (\n    trb.groupby(\"clonotype_id\")\n    .agg(v_gene=(\"v_gene\", \"first\"), j_gene=(\"j_gene\", \"first\"), condition=(\"condition\", \"first\"), n_cells=(\"barcode\", \"nunique\"))\n    .reset_index()\n)\nonehot = pd.get_dummies(clonotype_summary[[\"v_gene\", \"j_gene\"]])\ncoords = PCA(n_components=2, random_state=0).fit_transform(onehot.to_numpy())\nclonotype_summary[\"X_pca_1\"], clonotype_summary[\"X_pca_2\"] = coords[:, 0], coords[:, 1]\n\ngg.plot_clonotype_embedding(clonotype_summary, clonotype_col=\"clonotype_id\", dimred=\"X_pca\") + theme_bw() + labs(title=\"Repertoire-feature embedding (PCA of V/J gene usage), colored by clonal expansion\")"
+  },
+  {
+    "objectID": "specialized-plots.html#composed-multi-panel-figure",
+    "href": "specialized-plots.html#composed-multi-panel-figure",
+    "title": "Specialized plots",
+    "section": "Composed multi-panel figure",
+    "text": "Composed multi-panel figure\n\np1 = gg.plot_abundance(baron_cd, group_by=\"donor\", color_by=\"label\") + theme_bw() + theme(legend_position=\"none\", axis_text_x=element_text(rotation=45, hjust=1, size=7)) + labs(title=\"Baron composition\")\np2 = gg.plot_volcano(results, label_top_n=5) + theme_bw() + labs(title=\"E-MTAB-1625 volcano\")\np3 = gg.plot_clonotype_abundance(cell_level, clonotype_col=\"clonotype_id\", sample_col=\"condition\", top_n=8) + theme_bw() + theme(legend_position=\"none\", axis_text_x=element_text(rotation=45, hjust=1)) + labs(title=\"TCR clonotype abundance\")\n\n(p1 | p2) / p3\n\n/home/maximiliann/miniforge3/envs/ggnomics-docs/lib/python3.12/site-packages/mizani/palettes.py:547: UserWarning: Warning message:Brewer palette Set2 has a maximum of 8 colors Returning the palette you asked for with that many colors"
+  },
+  {
+    "objectID": "specialized-plots.html#next",
+    "href": "specialized-plots.html#next",
+    "title": "Specialized plots",
+    "section": "Next",
+    "text": "Next\n\nUpSet plots covers plot_pseudobulk_de(mode=\"upset\") and the full native set-intersection API in depth.\nThe plot gallery provides a function-oriented index to these and the other plotting examples."
+  },
+  {
+    "objectID": "plot-gallery.html",
+    "href": "plot-gallery.html",
+    "title": "Plot gallery",
+    "section": "",
+    "text": "Use this gallery to find a plot by analysis task. Each section gives the relevant functions, the input type used in the example, and a compact code example. Links point to the workflow pages when more biological or technical context is useful.\nimport sys, pathlib\nsys.path.insert(0, str(pathlib.Path(\"_includes\").resolve()))\nfrom setup import configure_warnings, ensure_matplotlib_initialized\nensure_matplotlib_initialized()\nconfigure_warnings()\n\nimport numpy as np\nimport pandas as pd\nimport ggnomics as gg\nfrom plotnine import theme_bw, theme, labs, element_text\nfrom data import (\n    load_zeisel_subset, run_scranpy_pipeline_on_zeisel, load_baron,\n    run_deseq2_on_emtab1625, load_pbmc_cite_seq, run_scranpy_pipeline_on_cite_seq_rna,\n    load_tcr_repertoire,\n)\n\nzeisel_subset = load_zeisel_subset()\nzeisel_final = run_scranpy_pipeline_on_zeisel()\nbaron = load_baron()\nbaron_cd = baron.get_column_data().to_pandas()\nbulk_fit = run_deseq2_on_emtab1625()\nmods, _note = load_pbmc_cite_seq()\ncite_final = run_scranpy_pipeline_on_cite_seq_rna()\ntcr = load_tcr_repertoire()\n\nPackage 'multiassayexperiment' is not installed."
+  },
+  {
+    "objectID": "plot-gallery.html#reduced-dimensions",
+    "href": "plot-gallery.html#reduced-dimensions",
+    "title": "Plot gallery",
+    "section": "Reduced dimensions",
+    "text": "Reduced dimensions\n\n\n\n\n\n\n\n\n\nFunction\nPurpose\nType used\nDataset\n\n\n\n\nplot_umap\nUMAP scatter\nSingleCellExperiment\nZeisel\n\n\nplot_pca\nPCA scatter\nSingleCellExperiment\nZeisel\n\n\nplot_reduced_dim / dim_plot\nGeneric embedding plot (any key)\nSingleCellExperiment\nZeisel\n\n\nsc_pca.run_pca / sc_pca.plot_pca\nSingle-cell PCA computed via scikit-learn (no scranpy)\nSingleCellExperiment\nZeisel subset\n\n\nsc_umap.run_umap / sc_umap.plot_umap\nSingle-cell UMAP via umap-learn\nSingleCellExperiment\nZeisel subset\n\n\nbulk_pca.plot_pca\nBulk/SE PCA\nSummarizedExperiment\nE-MTAB-1625 (VST)\n\n\n\n\ngg.plot_umap(zeisel_final, color=\"clusters\") + theme_bw() + labs(title=\"plot_umap — full workflow: single-cell-scranpy.qmd\")\n\n\n\n\n\n\n\n\nplot_reduced_dim and dim_plot are aliases of plot_embedding. plot_tsne selects X_tsne; here those coordinates were calculated by run_all_neighbor_steps_se together with PCA and UMAP:\n\np_reduced = gg.plot_reduced_dim(zeisel_final, dimred=\"X_pca\", color=\"clusters\") + theme_bw() + labs(title=\"plot_reduced_dim\")\np_dim = gg.dim_plot(zeisel_final, dimred=\"X_umap\", color=\"clusters\") + theme_bw() + labs(title=\"dim_plot (alias)\")\np_tsne = gg.plot_tsne(zeisel_final, color=\"clusters\") + theme_bw() + labs(title=\"plot_tsne\")\np_reduced / p_dim / p_tsne\n\n\n\n\n\n\n\n\nggnomics.sc_pca and ggnomics.sc_umap provide PCA and UMAP through scikit-learn and umap-learn, without a scranpy dependency. The top-level ggnomics.plot_pca only displays coordinates already stored in the input object.\n\nsub2 = load_zeisel_subset()\ngg.sc_pca.run_pca(sub2, assay_name=\"counts\", dest_key=\"PCA\", n_components=10)\ngg.sc_umap.run_umap(sub2, assay_name=\"counts\", dest_key=\"UMAP\")\np_pca = gg.sc_pca.plot_pca(sub2, color=\"level1class\") + theme_bw() + labs(title=\"sc_pca (sklearn)\")\np_umap = gg.sc_umap.plot_umap(sub2, color=\"level1class\") + theme_bw() + labs(title=\"sc_umap (umap-learn)\")\np_pca | p_umap\n\n/home/maximiliann/miniforge3/envs/ggnomics-docs/lib/python3.12/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html\n\n\n\n\n\n\n\n\n\nbulk_pca.plot_pca is demonstrated in full in Bulk RNA-seq §7."
+  },
+  {
+    "objectID": "plot-gallery.html#expression-distributions",
+    "href": "plot-gallery.html#expression-distributions",
+    "title": "Plot gallery",
+    "section": "Expression distributions",
+    "text": "Expression distributions\n\n\n\n\n\n\n\n\n\nFunction\nPurpose\nType used\nDataset\n\n\n\n\nplot_expression\nFaceted violin per feature/group\nSingleCellExperiment\nZeisel\n\n\nplot_violin_stats\nViolin + automatic significance brackets\npd.DataFrame\nZeisel\n\n\nplot_box_stats\nBox + automatic significance brackets\npd.DataFrame\nZeisel\n\n\nexpression_violin (legacy)\nPredecessor of plot_expression\npd.DataFrame\nZeisel\n\n\nridge_density (legacy, no modern replacement)\nKDE ridge plot per group\npd.DataFrame\nZeisel\n\n\n\nSee Specialized plots for statistical annotations and significance brackets.\n\ncd = zeisel_final.column_data.to_pandas()\ngg.expression_violin(cd.assign(Snap25=np.asarray(zeisel_final.get_assay(\"logcounts\")[list(zeisel_final.get_row_names()).index(\"Snap25\"), :]).ravel()), value=\"Snap25\", group=\"level1class\") + theme_bw() + theme(axis_text_x=element_text(rotation=45, hjust=1)) + labs(title=\"expression_violin (legacy API)\")\n\n\n\n\n\n\n\n\n\ngg.ridge_density(cd, value=\"detected\", group=\"level1class\") + theme_bw() + theme(axis_text_x=element_text(rotation=45, hjust=1)) + labs(title=\"ridge_density — genes detected per class\")"
+  },
+  {
+    "objectID": "plot-gallery.html#metadata-plots",
+    "href": "plot-gallery.html#metadata-plots",
+    "title": "Plot gallery",
+    "section": "Metadata plots",
+    "text": "Metadata plots\n\n\n\n\n\n\n\n\n\nFunction\nPurpose\nType used\nDataset\n\n\n\n\nplot_coldata\nobs/colData scatter, violin, box, bar, strip\nSingleCellExperiment\nZeisel\n\n\nplot_rowdata\nvar/rowData scatter\nSingleCellExperiment\nZeisel (HVG stats)\n\n\nqc_scatter (legacy)\nSimple QC scatter\npd.DataFrame\nZeisel\n\n\nqc_histogram (legacy)\nHistogram of one column\npd.DataFrame\nZeisel\n\n\n\n\ngg.plot_rowdata(zeisel_final, x=\"mean\", y=\"variance\") + theme_bw() + labs(title=\"plot_rowdata — HVG mean-variance trend (row_data)\")\n\n\n\n\n\n\n\n\n\ngg.qc_scatter(cd, x=\"sum\", y=\"detected\") + theme_bw() + labs(title=\"qc_scatter (legacy)\")\n\n\n\n\n\n\n\n\n\ngg.qc_histogram(cd, value=\"subset_proportion.mito\", bins=40) + theme_bw() + labs(title=\"qc_histogram (legacy) — mitochondrial proportion\")"
+  },
+  {
+    "objectID": "plot-gallery.html#scatter-plots",
+    "href": "plot-gallery.html#scatter-plots",
+    "title": "Plot gallery",
+    "section": "Scatter plots",
+    "text": "Scatter plots\n\n\n\n\n\n\n\n\n\nFunction\nPurpose\nType used\nDataset\n\n\n\n\nplot_scatter\nGeneral x/y scatter\nSingleCellExperiment\nZeisel\n\n\nplot_scatter_marginal\nScatter + marginal densities (Compose)\npd.DataFrame\nZeisel\n\n\nplot_pairs\nScatterplot matrix of embedding components\nSingleCellExperiment\nZeisel subset\n\n\nplot_embedding_panel\nGrid of embedding panels, one per feature (Compose)\nSingleCellExperiment\nZeisel\n\n\n\n\ngg.plot_scatter(cd, x=\"sum\", y=\"detected\", color=\"level1class\") + theme_bw() + labs(title=\"plot_scatter\")\n\n\n\n\n\n\n\n\n\ngg.plot_scatter_marginal(cd, x=\"sum\", y=\"detected\", color=\"level1class\")\n\n\n\n\n\n\n\n\n\ngg.plot_pairs(sub2, dimred=\"X_pca\", n_components=4, color_by=\"level1class\")\n\n\n\n\n\n\n\n\n\ngg.plot_embedding_panel(zeisel_final, features=[\"Gfap\", \"Mog\", \"Gad2\", \"Aif1\"], dimred=\"X_umap\", ncol=2)"
+  },
+  {
+    "objectID": "plot-gallery.html#abundance-and-composition",
+    "href": "plot-gallery.html#abundance-and-composition",
+    "title": "Plot gallery",
+    "section": "Abundance and composition",
+    "text": "Abundance and composition\nCounts, fractions, and donor-aware grouping are shown in Specialized plots.\n\n\n\n\n\n\n\n\n\nFunction\nPurpose\nType used\nDataset\n\n\n\n\nplot_abundance\nStacked composition bar\npd.DataFrame\nBaron\n\n\ncluster_composition_barplot (legacy)\nPredecessor of plot_abundance\npd.DataFrame\nBaron\n\n\n\n\ngg.cluster_composition_barplot(baron_cd, cluster_col=\"label\", group_col=\"donor\") + theme_bw() + theme(axis_text_x=element_text(rotation=45, hjust=1)) + labs(title=\"cluster_composition_barplot (legacy)\")"
+  },
+  {
+    "objectID": "plot-gallery.html#qc",
+    "href": "plot-gallery.html#qc",
+    "title": "Plot gallery",
+    "section": "QC",
+    "text": "QC\nplot_pseudobulk_qc is demonstrated with the four Baron donors in Specialized plots. RNA and ADT quality-control plots are covered separately in Multimodal."
+  },
+  {
+    "objectID": "plot-gallery.html#dot-plots",
+    "href": "plot-gallery.html#dot-plots",
+    "title": "Plot gallery",
+    "section": "Dot plots",
+    "text": "Dot plots\n\n\n\n\n\n\n\n\n\nFunction\nPurpose\nType used\nDataset\n\n\n\n\nplot_dot\nMean expression x fraction expressing\nSingleCellExperiment\nZeisel\n\n\nmarker_dotplot (legacy)\nTidy-table dot plot\npd.DataFrame\nZeisel\n\n\nmarker_dotplot_from_matrix (legacy)\nMatrix-in dot plot\nnp.ndarray\nZeisel\n\n\n\n\nmarkers = [\"Gfap\", \"Mog\", \"Gad2\", \"Snap25\"]\ngfap_idx = [list(zeisel_final.get_row_names()).index(g) for g in markers]\nexpr_mat = np.asarray(zeisel_final.get_assay(\"logcounts\")[gfap_idx, :])\nexpr_df = pd.DataFrame(expr_mat.T, columns=markers)\np = gg.marker_dotplot_from_matrix(expr_df, groups=cd[\"level1class\"].to_numpy(), genes=markers, expr_threshold=0.1)\np + theme_bw() + theme(axis_text_x=element_text(rotation=45, hjust=1)) + labs(title=\"marker_dotplot_from_matrix (legacy)\")"
+  },
+  {
+    "objectID": "plot-gallery.html#highest-expressed-features",
+    "href": "plot-gallery.html#highest-expressed-features",
+    "title": "Plot gallery",
+    "section": "Highest-expressed features",
+    "text": "Highest-expressed features\n\ngg.plot_highest_exprs(zeisel_final, n=15, layer=\"counts\") + theme_bw() + labs(title=\"plot_highest_exprs — Zeisel\")"
+  },
+  {
+    "objectID": "plot-gallery.html#heatmaps",
+    "href": "plot-gallery.html#heatmaps",
+    "title": "Plot gallery",
+    "section": "Heatmaps",
+    "text": "Heatmaps\n\n\n\n\n\n\n\n\n\nFunction\nPurpose\nType used\nDataset\n\n\n\n\nplot_heatmap\nExpression heatmap, optional clustering\nSingleCellExperiment/pd.DataFrame\nZeisel, Baron, E-MTAB-1625\n\n\nheatmap_from_matrix (legacy)\nMatrix-in heatmap\nnp.ndarray\nZeisel\n\n\nheatmap_long (legacy)\nTidy long-format heatmap\npd.DataFrame\nZeisel\n\n\nMarsilea (ma.Heatmap)\nComposable clustered heatmap (interop, not wrapped by ggnomics)\nnp.ndarray\nE-MTAB-1625\n\n\n\nFor grouped, bulk, and Marsilea heatmaps, see: Single-cell analysis §11, Bulk RNA-seq §10, Specialized plots.\n\ngg.heatmap_from_matrix(expr_mat, row_names=markers, col_names=None, zscore_rows=True) + theme(axis_text_x=element_text(size=3))"
+  },
+  {
+    "objectID": "plot-gallery.html#differential-expression",
+    "href": "plot-gallery.html#differential-expression",
+    "title": "Plot gallery",
+    "section": "Differential expression",
+    "text": "Differential expression\nThe complete analysis is shown in Bulk RNA-seq, with additional visualizations in Specialized plots.\n\n\n\n\n\n\n\n\n\nFunction\nPurpose\nType used\nDataset\n\n\n\n\nplot_volcano\nVolcano plot\npd.DataFrame (PyDESeq2 results)\nE-MTAB-1625\n\n\nplot_ma\nMA plot\npd.DataFrame\nE-MTAB-1625\n\n\nplot_coef_lollipop\nTop-n coefficients, lollipop\npd.Series/pd.DataFrame\nE-MTAB-1625\n\n\nplot_coef_expression\nExpression of top-coefficient features\npd.DataFrame\nE-MTAB-1625\n\n\nvolcano_plot (legacy)\nPredecessor of plot_volcano\npd.DataFrame\nE-MTAB-1625\n\n\n\n\nresults = bulk_fit[\"results\"]\ngg.volcano_plot(results.rename(columns={\"log2FoldChange\": \"log2fc\", \"padj\": \"padj\"}), log2fc=\"log2fc\", padj=\"padj\") + theme_bw() + labs(title=\"volcano_plot (legacy)\")\n\n/home/maximiliann/miniforge3/envs/ggnomics-docs/lib/python3.12/site-packages/plotnine/layer.py:419: PlotnineWarning: geom_point : Removed 17273 rows containing missing values.\n\n\n\n\n\n\n\n\n\n\ncoefs = results[[\"log2FoldChange\"]].rename(columns={\"log2FoldChange\": \"coefficient\"}).dropna()\ndata = bulk_fit[\"vst\"].copy()\ndata[\"growth_condition\"] = bulk_fit[\"metadata\"][\"growth_condition\"].to_numpy()\ngg.plot_coef_expression(data, coefs, group_by=\"growth_condition\", top_n=10, plot_type=\"dot\") + theme_bw() + theme(axis_text_x=element_text(rotation=45, hjust=1)) + labs(title=\"plot_coef_expression\")"
+  },
+  {
+    "objectID": "plot-gallery.html#pseudobulk",
+    "href": "plot-gallery.html#pseudobulk",
+    "title": "Plot gallery",
+    "section": "Pseudobulk",
+    "text": "Pseudobulk\nplot_pseudobulk_qc is fully covered on Baron in Specialized plots. plot_pseudobulk_de accepts a dict[str, DataFrame] of differential- expression results. Here the keys identify the three E-MTAB-1625 time points:\n\nper_timepoint = {tp: run_deseq2_on_emtab1625(tp)[\"results\"] for tp in [\"1 hour\", \"5 hour\", \"24 hour\"]}\nresults_by_tp = {tp.replace(\" \", \"_\"): df for tp, df in per_timepoint.items()}\n{k: int((df[\"padj\"] &lt; 0.05).sum()) for k, df in results_by_tp.items()}\n\n{'1_hour': 14, '5_hour': 8, '24_hour': 832}\n\n\n\ngg.plot_pseudobulk_de(results_by_tp, mode=\"volcano\", ncol=3)\n\n\n\n\n\n\n\n\n\ngg.plot_pseudobulk_de(results_by_tp, mode=\"summary_bar\") + theme_bw()\n\n\n\n\n\n\n\n\nmode=\"upset\" uses the native ggnomics.upset backend (part of the normal package — no extra install required for plotting) and returns an ordinary plotnine.composition.Compose, showing which significant genes are shared across timepoints:\n\ngg.plot_pseudobulk_de(results_by_tp, mode=\"upset\")"
+  },
+  {
+    "objectID": "plot-gallery.html#native-upset-plots",
+    "href": "plot-gallery.html#native-upset-plots",
+    "title": "Plot gallery",
+    "section": "Native UpSet plots",
+    "text": "Native UpSet plots\nggnomics.upset is a native Plotnine set-intersection (“UpSet”) plot implementation — no Matplotlib-based upsetplot dependency. See UpSet plots for the full workflow (computation internals, region-selection modes, highlighting, custom annotations, Venn helpers, and the statistical-comparison caveats); this table is a compact function index.\n\n\n\n\n\n\n\nFunction\nPurpose\n\n\n\n\nupset.upset\nHigh-level plot: raw data or prepared UpSetData -&gt; Compose\n\n\nupset.upset_data / compute_intersections / select_intersections / apply_intersection_selection\nThe compute -&gt; select -&gt; apply pipeline behind upset()\n\n\nupset.intersection_size, upset.intersection_ratio, upset.upset_annotate\nBuilt-in and custom annotation panels\n\n\nupset.intersection_matrix, upset.upset_set_size, upset.upset_stripes\nMatrix, marginal set-size, and stripe styling\n\n\nupset.upset_query\nHighlight a set, intersection, or (not yet implemented) group\n\n\nupset.upset_themes, upset.upset_default_themes, upset.upset_modify_themes\nPer-component theme collections\n\n\nupset.compare_between_intersections, upset.upset_test\nOptional (ggnomics[upset]) statistical comparisons across intersections\n\n\nupset.arrange_venn, upset.geom_venn_circle, upset.geom_venn_region, upset.scale_fill_venn_mix, …\nApproximate 2-4 set Venn diagrams"
+  },
+  {
+    "objectID": "plot-gallery.html#multimodal",
+    "href": "plot-gallery.html#multimodal",
+    "title": "Plot gallery",
+    "section": "Multimodal",
+    "text": "Multimodal\nSee Multimodal for the RNA/ADT workflow and the input requirements of plot_adt_qc.\n\nimport mudata as mu\n\nmu.set_options(pull_on_update=False)\nmdata = mu.MuData({\"rna\": mods[\"rna\"], \"prot\": mods[\"adt\"]})\ngg.plot_bimodal_scatter(mdata, x_feature=\"CD3E\", y_feature=\"CD3\", x_mod=\"rna\", y_mod=\"prot\") + theme_bw() + labs(title=\"plot_bimodal_scatter — reused from multimodal.qmd\")\n\n/home/maximiliann/miniforge3/envs/ggnomics-docs/lib/python3.12/site-packages/mudata/_core/mudata.py:1471: UserWarning: var_names are not unique. To make them unique, call `.var_names_make_unique`."
+  },
+  {
+    "objectID": "plot-gallery.html#repertoire",
+    "href": "plot-gallery.html#repertoire",
+    "title": "Plot gallery",
+    "section": "Repertoire",
+    "text": "Repertoire\nThe repertoire workflow is described in Specialized plots.\n\ntrb = tcr[(tcr[\"chain\"] == \"TRB\") & (tcr[\"raw_clonotype_id\"] != \"None\")].dropna(subset=[\"v_gene\", \"j_gene\"])\ncell_level = trb.drop_duplicates(subset=[\"barcode\", \"condition\"])\ngg.plot_clonotype_abundance(cell_level, clonotype_col=\"clonotype_id\", sample_col=\"condition\", top_n=10) + theme_bw() + theme(axis_text_x=element_text(rotation=45, hjust=1))"
+  },
+  {
+    "objectID": "plot-gallery.html#significance-brackets-ggnomics.signif",
+    "href": "plot-gallery.html#significance-brackets-ggnomics.signif",
+    "title": "Plot gallery",
+    "section": "Significance brackets (ggnomics.signif)",
+    "text": "Significance brackets (ggnomics.signif)\n\n\n\nFunction\nPurpose\n\n\n\n\ngeom_signif\nggsignif-style bracket layer/geom\n\n\nrun_comparisons\nPairwise statistical tests\n\n\nmap_pvalue_to_stars\np-value -&gt; star label\n\n\n\n\nfrom ggnomics import run_comparisons, map_pvalue_to_stars\n\ntwo_classes = cd[cd[\"level1class\"].isin([\"astrocytes_ependymal\", \"oligodendrocytes\"])].copy()\ngfap_idx = list(zeisel_final.get_row_names()).index(\"Gfap\")\ntwo_classes[\"Gfap\"] = np.asarray(zeisel_final.get_assay(\"logcounts\")[gfap_idx, :])[cd[\"level1class\"].isin([\"astrocytes_ependymal\", \"oligodendrocytes\"]).to_numpy()]\n\nstats_table = run_comparisons(two_classes[\"Gfap\"], two_classes[\"level1class\"], comparisons=[(\"astrocytes_ependymal\", \"oligodendrocytes\")])\nstats_table\n\n\n\n\n\n\n\n\ngroup1\ngroup2\nstatistic\npvalue\npadj\nn1\nn2\n\n\n\n\n0\nastrocytes_ependymal\noligodendrocytes\n102597.0\n2.935794e-56\n2.935794e-56\n187\n796\n\n\n\n\n\n\n\n\n[map_pvalue_to_stars(p) for p in [0.5, 0.03, 0.005, 0.0005, 0.00001]]\n\n['ns', '*', '**', '***', '****']\n\n\nBrackets remain compatible with facets and themes, as shown in Specialized plots."
+  },
+  {
+    "objectID": "plot-gallery.html#palettes-and-themes",
+    "href": "plot-gallery.html#palettes-and-themes",
+    "title": "Plot gallery",
+    "section": "Palettes and themes",
+    "text": "Palettes and themes\nPalette examples and IGV attribution are provided in Specialized plots.\n\ntableau = gg.get_palette(8, name=\"tableau\")\nbioc = gg.get_palette(8, name=\"bioc\")\npreview = pd.DataFrame({\"i\": [f\"c{i}\" for i in range(8)] * 2, \"pal\": [\"tableau\"] * 8 + [\"bioc\"] * 8, \"v\": 1})\npreview[\"color\"] = [tableau[i] for i in range(8)] + [bioc[i] for i in range(8)]\ngg.plot_coldata(preview, x=\"i\", y=\"pal\", color_by=\"i\", shape=\"point\", size=8, palette={f\"c{i}\": tableau[i] for i in range(8)}) + theme_bw() + theme(legend_position=\"none\") + labs(title=\"Tableau-10 palette preview\")\n\n\n\n\n\n\n\n\n\ncategories = pd.Series([\"astrocytes_ependymal\", \"oligodendrocytes\", \"microglia\"])\ngg.resolve_palette(categories, palette={\"microglia\": \"#000000\"})\n\n/tmp/ipykernel_29448/425963833.py:2: UserWarning: resolve_palette: ['astrocytes_ependymal', 'oligodendrocytes'] not found in the given palette; filled from the 'tableau10' default palette.\n\n\n{'microglia': '#000000',\n 'astrocytes_ependymal': '#4E79A7',\n 'oligodendrocytes': '#F28E2B'}"
+  },
+  {
+    "objectID": "plot-gallery.html#composed-panels",
+    "href": "plot-gallery.html#composed-panels",
+    "title": "Plot gallery",
+    "section": "Composed panels",
+    "text": "Composed panels\n\n\n\nFunction\nPurpose\n\n\n\n\nhstack\nSide-by-side composition\n\n\nvstack\nVertical composition\n\n\ngrid\nGrid layout\n\n\nannotate_composition\nTitle/subtitle/caption on a composition\n\n\nsave_composition\nSave any composition to a file\n\n\n\n\nfrom ggnomics import hstack, vstack, grid, annotate_composition, save_composition\n\numap_p = gg.plot_umap(zeisel_final, color=\"clusters\") + theme_bw()\nviolin_p = gg.plot_expression(zeisel_final, features=[\"Gfap\"], group_by=\"level1class\", layer=\"logcounts\") + theme_bw() + theme(axis_text_x=element_text(rotation=45, hjust=1))\n\nhstack(umap_p, violin_p)\n\n\n\n\n\n\n\n\n\ncomposed = grid([umap_p, violin_p, gg.plot_dot(zeisel_final, features=markers, group_by=\"level1class\", layer=\"logcounts\")], ncol=2)\nannotated = annotate_composition(composed, title=\"Figure 1\", caption=\"Zeisel mouse brain, ggnomics + scranpy\")\nannotated\n\n\n\n\n\n\n\n\n\nsave_composition(annotated, str(pathlib.Path(\"_freeze_assets\") / \"composed_figure_1.png\"), dpi=100)"
+  },
+  {
+    "objectID": "plot-gallery.html#additional-api-notes",
+    "href": "plot-gallery.html#additional-api-notes",
+    "title": "Plot gallery",
+    "section": "Additional API notes",
+    "text": "Additional API notes\n\nplot_adt_qc requires annotated isotype controls. The CITE-seq panel used here does not contain them; Multimodal §5 shows the validation behaviour and a control-free ADT QC plot.\nThe generic ggnomics.pca layer (run_pca_sklearn, run_pca_svd, and PcaResult) is used internally by bulk_pca.run_pca and sc_pca.run_pca. It is not re-exported from the top-level namespace."
+  },
+  {
+    "objectID": "multimodal.html",
+    "href": "multimodal.html",
+    "title": "Multimodal: RNA + protein (CITE-seq)",
+    "section": "",
+    "text": "CITE-seq measures transcripts and surface proteins in the same cells. This workflow uses a PBMC dataset to combine RNA and antibody-derived tag (ADT) measurements with BiocPy, AnnData, MuData, and ggnomics.\nimport sys, pathlib\nsys.path.insert(0, str(pathlib.Path(\"_includes\").resolve()))\nfrom setup import configure_warnings, ensure_matplotlib_initialized\nensure_matplotlib_initialized()\nconfigure_warnings()\n\nimport numpy as np\nimport pandas as pd\nimport ggnomics as gg\nfrom plotnine import theme_bw, labs, theme"
+  },
+  {
+    "objectID": "multimodal.html#data-source",
+    "href": "multimodal.html#data-source",
+    "title": "Multimodal: RNA + protein (CITE-seq)",
+    "section": "1. Data source",
+    "text": "1. Data source\nExperimentHub resource EH7740 (CITEVizTestDataSCE, approximately 2,500 cells) is distributed as a multimodal SingleCellExperiment. With the current experimenthub/rds2py versions, its nested int_colData structure cannot be parsed:\n\nfrom experimenthub import ExperimentHubRegistry\nfrom setup import EXPERIMENTHUB_CACHE\n\nhub = ExperimentHubRegistry(cache_dir=str(EXPERIMENTHUB_CACHE))\ntry:\n    hub.load(\"EH7740\")\nexcept Exception as exc:\n    print(f\"{type(exc).__name__}: {str(exc)[:200]}...\")\n\nPackage 'multiassayexperiment' is not installed.\nRuntimeError: Failed to load R data from /home/maximiliann/.cache/ggnomics-docs/experimenthub/39284e0ebbff45269ed5ad6956a86002_pbmc-cite-seq-2500-sce.rds: Error initializing 'PyRdsParser': Error in 'RdsObject' cons...\n\n\nWe therefore use the Mair et al. BD Rhapsody PBMC resources EH3534–EH3538, which provide 499 RNA features, 42 ADT features, and 29,033 droplets from three main donors. The individual ExperimentHub resources are assembled by load_pbmc_cite_seq().\n\nfrom data import load_pbmc_cite_seq\n\nmods, note = load_pbmc_cite_seq()\nnote\n\n\"EH7740 failed to load (RuntimeError: Failed to load R data from /home/maximiliann/.cache/ggnomics-docs/experimenthub/39284e0ebbff45269ed5ad6956a86002_pbmc-cite-seq-2500-sce.rds: Error initializing 'PyRdsParser': Error in 'RdsObject' constructor: failed to parse an S4 object's body\\n  - failed to parse a pairlist body\\n  - failed to parse pairlist element 'int_colData'\\n  - failed to parse an S4 object's body\\n  - failed to parse a pairlist body\\n  - failed to parse pairlist element 'listData'\\n  - failed to parse an R list body\\n  - failed to parse list element 2\\n  - failed to parse an S4 object's body\\n  - failed to parse a pairlist body\\n  - failed to parse pairlist element 'listData'\\n  - failed to parse an R list body\\n  - failed to parse list element 1\\n  - failed to parse an S4 object's body\\n  - class attribute in an S4 object should have a 'package' character attribute); using EH3534-EH3538 fallback\""
+  },
+  {
+    "objectID": "multimodal.html#discovering-the-rna-and-adt-representations",
+    "href": "multimodal.html#discovering-the-rna-and-adt-representations",
+    "title": "Multimodal: RNA + protein (CITE-seq)",
+    "section": "2. Discovering the RNA and ADT representations",
+    "text": "2. Discovering the RNA and ADT representations\n\nrna, adt = mods[\"rna\"], mods[\"adt\"]\nrna\n\nAnnData object with n_obs × n_vars = 27258 × 499\n    obs: 'sample_tag', 'donor', 'cartridge'\n    var: 'RefSeq', 'Type'\n    layers: None (.X)\n\n\n\nadt\n\nAnnData object with n_obs × n_vars = 27258 × 42\n    obs: 'sample_tag', 'donor', 'cartridge'\n    var: 'Alternative', 'ID'\n    layers: None (.X)\n\n\n\nadt.obs[\"donor\"].value_counts()\n\ndonor\nDonor2_Bulk    9150\nDonor1_Bulk    8932\nDonor3_Bulk    8843\nDonor2_EBV      168\nDonor3_EBV      113\nDonor1_EBV       52\nName: count, dtype: int64"
+  },
+  {
+    "objectID": "multimodal.html#validating-shared-cell-identifiers",
+    "href": "multimodal.html#validating-shared-cell-identifiers",
+    "title": "Multimodal: RNA + protein (CITE-seq)",
+    "section": "3. Validating shared cell identifiers",
+    "text": "3. Validating shared cell identifiers\nThe two cartridges reuse some numeric barcodes, so a barcode alone is not a unique cell identifier. The loader combines barcode and cartridge, verifies the correspondence between modalities, and preserves the resulting order. After assembly, the RNA and ADT observation names should match:\n\n(rna.obs_names == adt.obs_names).all()\n\nnp.True_"
+  },
+  {
+    "objectID": "multimodal.html#mapping-rna-genes-to-adt-proteins",
+    "href": "multimodal.html#mapping-rna-genes-to-adt-proteins",
+    "title": "Multimodal: RNA + protein (CITE-seq)",
+    "section": "4. Mapping RNA genes to ADT proteins",
+    "text": "4. Mapping RNA genes to ADT proteins\nProtein names do not always match their corresponding gene symbols. adt.var[\"Alternative\"] provides the mapping used here:\n\nrna_genes = set(rna.var_names)\nmatched = [(protein, gene) for protein, gene in adt.var[\"Alternative\"].items() if gene in rna_genes]\nlen(matched), matched[:8]\n\n(38,\n [('CD103', 'ITGAE'),\n  ('CD11b', 'ITGAM'),\n  ('CD11c', 'ITGAX'),\n  ('CD123', 'IL3RA'),\n  ('CD127', 'IL7R'),\n  ('CD134', 'TNFRSF4'),\n  ('CD137', 'TNFRSF9'),\n  ('CD141', 'THBD')])"
+  },
+  {
+    "objectID": "multimodal.html#rna-qc-and-adt-qc",
+    "href": "multimodal.html#rna-qc-and-adt-qc",
+    "title": "Multimodal: RNA + protein (CITE-seq)",
+    "section": "5. RNA QC and ADT QC",
+    "text": "5. RNA QC and ADT QC\n\nrna_qc = pd.DataFrame({\n    \"n_counts\": np.asarray(rna.X.sum(axis=1)).ravel(),\n    \"n_features\": (rna.X &gt; 0).sum(axis=1),\n    \"donor\": rna.obs[\"donor\"].to_numpy(),\n})\ngg.plot_coldata(rna_qc, x=\"n_counts\", y=\"n_features\", color_by=\"donor\") + theme_bw() + labs(title=\"RNA QC (targeted 499-gene panel)\")\n\n\n\n\n\n\n\n\nplot_adt_qc uses isotype controls to estimate background signal. This panel contains immune markers but no annotated isotype-control antibodies, as seen from its feature names:\n\nsorted(adt.var_names)\n\n['CD103',\n 'CD11b',\n 'CD11c',\n 'CD123',\n 'CD127',\n 'CD134',\n 'CD137',\n 'CD14',\n 'CD141',\n 'CD16',\n 'CD161',\n 'CD163',\n 'CD183',\n 'CD184',\n 'CD19',\n 'CD194',\n 'CD196',\n 'CD197',\n 'CD1c',\n 'CD206',\n 'CD223',\n 'CD25',\n 'CD27',\n 'CD278',\n 'CD279',\n 'CD28',\n 'CD3',\n 'CD32',\n 'CD38',\n 'CD39',\n 'CD4',\n 'CD40',\n 'CD45RA',\n 'CD45RO',\n 'CD56',\n 'CD69',\n 'CD8',\n 'CD80',\n 'CD86',\n 'HLA-DR',\n 'TCRgd',\n 'Tim3']\n\n\n\ntry:\n    gg.plot_adt_qc(adt, isotype_controls=[])\nexcept ValueError as exc:\n    print(\"ValueError:\", exc)\n\nValueError: isotype_controls must be a non-empty list.\n\n\nThe function therefore cannot calculate an isotype-based QC summary for this dataset. The empty control list in the check above shows the corresponding validation error; the API reference documents the required input.\nA control-free library-size check can still be drawn with plot_coldata:\n\nadt_qc = pd.DataFrame({\n    \"adt_counts\": np.asarray(adt.X.sum(axis=1)).ravel(),\n    \"donor\": adt.obs[\"donor\"].to_numpy(),\n})\ngg.plot_coldata(adt_qc, x=\"donor\", y=\"adt_counts\", shape=\"violin\") + theme_bw() + labs(title=\"ADT library size by donor\", y=\"Total ADT counts\")\n\n\n\n\n\n\n\n\nThe raw ADT counts are strongly right-skewed, so the scatter and embedding plots below use a log1p-transformed copy of the ADT modality:\n\nadt_log = adt.copy()\nadt_log.X = np.log1p(adt_log.X)"
+  },
+  {
+    "objectID": "multimodal.html#rna-versus-protein-scatter-mudata",
+    "href": "multimodal.html#rna-versus-protein-scatter-mudata",
+    "title": "Multimodal: RNA + protein (CITE-seq)",
+    "section": "6. RNA-versus-protein scatter (MuData)",
+    "text": "6. RNA-versus-protein scatter (MuData)\n\nimport mudata as mu\n\nmu.set_options(pull_on_update=False)\nmdata = mu.MuData({\"rna\": rna, \"prot\": adt_log})\nmdata\n\n/home/maximiliann/miniforge3/envs/ggnomics-docs/lib/python3.12/site-packages/mudata/_core/mudata.py:1471: UserWarning: var_names are not unique. To make them unique, call `.var_names_make_unique`.\n\n\nMuData object with n_obs × n_vars = 27258 × 541\n  2 modalities\n    rna:    27258 × 499\n      obs:  'sample_tag', 'donor', 'cartridge'\n      var:  'RefSeq', 'Type'\n      layers:   None\n    prot:   27258 × 42\n      obs:  'sample_tag', 'donor', 'cartridge'\n      var:  'Alternative', 'ID'\n      layers:   None\n\n\n\ngg.plot_bimodal_scatter(mdata, x_feature=\"CD3E\", y_feature=\"CD3\", x_mod=\"rna\", y_mod=\"prot\") + theme_bw() + labs(title=\"CD3E (RNA) vs. CD3 (protein)\", y=\"log1p(CD3 ADT counts)\")"
+  },
+  {
+    "objectID": "multimodal.html#matched-geneprotein-panel",
+    "href": "multimodal.html#matched-geneprotein-panel",
+    "title": "Multimodal: RNA + protein (CITE-seq)",
+    "section": "7. Matched gene/protein panel",
+    "text": "7. Matched gene/protein panel\n\npairs = [(gene, protein) for protein, gene in matched if protein in (\"CD3\", \"CD4\", \"CD8\", \"CD38\")]\npairs\n\n[('CD38', 'CD38'), ('CD3E', 'CD3'), ('CD4', 'CD4'), ('CD8A', 'CD8')]\n\n\n\npanels = [\n    gg.plot_bimodal_scatter(mdata, x_feature=g, y_feature=p, x_mod=\"rna\", y_mod=\"prot\") + theme_bw() + theme(figure_size=(3, 3))\n    for g, p in pairs\n]\npanels[0] | panels[1] | panels[2] | panels[3]"
+  },
+  {
+    "objectID": "multimodal.html#an-embedding-computed-from-rna-colored-by-rna-and-by-protein",
+    "href": "multimodal.html#an-embedding-computed-from-rna-colored-by-rna-and-by-protein",
+    "title": "Multimodal: RNA + protein (CITE-seq)",
+    "section": "8. An embedding computed from RNA, colored by RNA and by protein",
+    "text": "8. An embedding computed from RNA, colored by RNA and by protein\nThe ExperimentHub bundle does not include an embedding. We calculate QC metrics, normalize the RNA counts, and run PCA and UMAP with scranpy, following the single-cell workflow. HVG selection is omitted because this is already a targeted 499-gene panel. The processed object is cached by run_scranpy_pipeline_on_cite_seq_rna().\n\nfrom data import run_scranpy_pipeline_on_cite_seq_rna\n\nfinal_rna = run_scranpy_pipeline_on_cite_seq_rna()\nfinal_rna.get_reduced_dim_names()\n\n['PCA', 'TSNE', 'UMAP']\n\n\n\nfinal_for_export = final_rna.set_metadata({})\nadata_final, _alt = final_for_export.to_anndata()\nadata_final.X = adata_final.layers[\"counts\"]\n\n# Align the ADT modality to exactly the QC-passing RNA cells (order preserved).\nadt_aligned = adt_log[adata_final.obs_names, :]\nfor protein in (\"CD3\", \"CD4\", \"CD8\", \"CD38\"):\n    adata_final.obs[f\"ADT_{protein}\"] = np.asarray(adt_aligned[:, protein].X).ravel()\n\ngg.plot_umap(adata_final, color=\"donor\") + theme_bw() + labs(title=\"RNA-derived UMAP, colored by donor\")\n\n/home/maximiliann/miniforge3/envs/ggnomics-docs/lib/python3.12/site-packages/summarizedexperiment/base.py:1174: RuntimeWarning: Converting delayedarray into dense, may require more memory\n\n\n\n\n\n\n\n\n\n\ngg.plot_umap(adata_final, color=\"CD3E\", layer=\"counts\") + theme_bw() + labs(title=\"Same UMAP, colored by CD3E RNA expression\")\n\n\n\n\n\n\n\n\n\ngg.plot_umap(adata_final, color=\"ADT_CD3\") + theme_bw() + labs(title=\"Same UMAP, colored by CD3 protein (ADT) abundance\", colour=\"log1p(CD3 ADT)\")\n\n\n\n\n\n\n\n\nRNA and protein measurements both highlight the CD3-high T-cell region, providing a simple visual comparison across modalities."
+  },
+  {
+    "objectID": "multimodal.html#composability",
+    "href": "multimodal.html#composability",
+    "title": "Multimodal: RNA + protein (CITE-seq)",
+    "section": "9. Composability",
+    "text": "9. Composability\nBecause both embeddings are returned as ggplot objects, they can be placed side by side with plotnine’s composition operator:\n\numap_rna = gg.plot_umap(adata_final, color=\"CD3E\", layer=\"counts\") + theme_bw() + labs(title=\"RNA: CD3E\")\numap_adt = gg.plot_umap(adata_final, color=\"ADT_CD3\") + theme_bw() + labs(title=\"Protein: CD3\")\numap_rna | umap_adt"
+  },
+  {
+    "objectID": "multimodal.html#next",
+    "href": "multimodal.html#next",
+    "title": "Multimodal: RNA + protein (CITE-seq)",
+    "section": "Next",
+    "text": "Next\n\nSpecialized plots and the plot gallery for everything else, including the repertoire and significance-bracket functionality."
+  },
+  {
+    "objectID": "reference/plot_embedding.html",
+    "href": "reference/plot_embedding.html",
+    "title": "plot_embedding",
+    "section": "",
+    "text": "plot_embedding\nplot_embedding(\n    data,\n    dimred='X_umap',\n    components=(1, 2),\n    color=None,\n    layer=None,\n    size=None,\n    stroke=None,\n    alpha=0.8,\n    palette=None,\n    cmap='viridis',\n    vmin=None,\n    vmax=None,\n    facet_by=None,\n    order=None,\n    title=None,\n    color_label=None,\n)\nPlot embedding columns from a pandas DataFrame.\nDataFrame embedding columns may use names such as UMAP1, UMAP2, umap_1, or X_umap_1. components is one-indexed.\nOptional container backends resolve dimred from AnnData.obsm or SingleCellExperiment.reduced_dimensions and delegate here. layer is ignored for DataFrames and used by those backends for feature coloring.",
+    "crumbs": [
+      "API reference",
+      "Reduced dimensions",
+      "plot_embedding"
+    ]
+  },
+  {
+    "objectID": "reference/plot_expression.html",
+    "href": "reference/plot_expression.html",
+    "title": "plot_expression",
+    "section": "",
+    "text": "plot_expression\nplot_expression(\n    data,\n    features,\n    group_by,\n    layer=None,\n    color_by=None,\n    palette=None,\n    ncol=None,\n    log1p=False,\n    add_points=False,\n    point_size=None,\n    title=None,\n)\nViolin plot of feature expression across cell/sample groups.\nEach feature becomes one facet panel; the x-axis shows group_by categories and the y-axis shows expression level.\nArgs: data: DataFrame whose rows are cells/samples. Requested features and group_by/color_by are columns. features: Non-empty list of feature/gene column names to plot. Must not contain duplicates or collide with group_by/color_by. group_by: Column whose categories define the x-axis groups. layer: Present for cross-container signature consistency. Has no effect for a plain DataFrame, which has no concept of layers. color_by: Column to map to fill color. Defaults to group_by. palette: {category: hex} color mapping. ncol: Number of columns in facet_wrap layout. log1p: If True, log1p-transform expression values before plotting. add_points: Overlay jittered points on violins. point_size: Size of jittered points (None → adaptive). title: Plot title.\nReturns: A plotnine.ggplot object.\nRaises: TypeError: If no implementation is registered for type(data). ValueError: If features is empty, contains duplicates, or collides with group_by/color_by. KeyError: If a requested column is absent.",
+    "crumbs": [
+      "API reference",
+      "Expression and metadata",
+      "plot_expression"
+    ]
+  },
+  {
+    "objectID": "reference/plot_coldata.html",
+    "href": "reference/plot_coldata.html",
+    "title": "plot_coldata",
+    "section": "",
+    "text": "plot_coldata\nplot_coldata(\n    data,\n    x,\n    y,\n    color_by=None,\n    size=None,\n    shape='point',\n    palette=None,\n    facet_by=None,\n    title=None,\n)\nPlot columns from a cell- or sample-metadata DataFrame.\nBoth numeric columns produce a scatter plot. With a categorical x, shape selects a point, violin, box, or bar geometry. Container-specific implementations convert their column metadata to a DataFrame and then use this implementation.\nArgs: data: DataFrame whose rows are observations and columns are metadata. x: Column mapped to the x-axis. y: Column mapped to the y-axis. color_by: Optional column mapped to color or fill. size: Point size. None chooses a size from the number of rows. shape: One of \"point\", \"violin\", \"box\", or \"bar\". palette: Optional {category: color} mapping. facet_by: Optional column used to facet the plot. title: Optional plot title.\nReturns: A plotnine.ggplot object.\nRaises: TypeError: If no implementation is registered for type(data). KeyError: If a requested column is absent.",
+    "crumbs": [
+      "API reference",
+      "Expression and metadata",
+      "plot_coldata"
+    ]
+  },
+  {
+    "objectID": "reference/plot_ma.html",
+    "href": "reference/plot_ma.html",
+    "title": "plot_ma",
+    "section": "",
+    "text": "plot_ma\nplot_ma(\n    data,\n    mean_col='baseMean',\n    logfc_col='log2FoldChange',\n    pval_col='padj',\n    gene_col=None,\n    pval_threshold=0.05,\n    logfc_threshold=0.0,\n    label_top_n=10,\n    label_genes=None,\n    up_color='#E41A1C',\n    down_color='#377EB8',\n    ns_color='#AAAAAA',\n    point_size=1.0,\n    alpha=0.7,\n    title=None,\n)\nMA plot (mean expression vs log fold change).\nPoints colored by significance + direction. Horizontal reference line at logFC = 0.",
+    "crumbs": [
+      "API reference",
+      "Differential expression",
+      "plot_ma"
+    ]
+  },
+  {
+    "objectID": "reference/plot_coef_expression.html",
+    "href": "reference/plot_coef_expression.html",
+    "title": "plot_coef_expression",
+    "section": "",
+    "text": "plot_coef_expression\nplot_coef_expression(\n    data,\n    coefs,\n    group_by,\n    top_n=20,\n    coef_col='coefficient',\n    layer=None,\n    plot_type='dot',\n    order_by_coef=True,\n    title=None,\n)\nPlot expression of top-n features from a coefficient table.\nSelects top_n features by absolute coefficient value, then plots their expression using plot_dot, plot_expression, or plot_heatmap depending on plot_type. Returns a HeatmapResult for plot_type=“heatmap”.",
+    "crumbs": [
+      "API reference",
+      "Differential expression",
+      "plot_coef_expression"
+    ]
+  },
+  {
+    "objectID": "reference/plot_clonotype_embedding.html",
+    "href": "reference/plot_clonotype_embedding.html",
+    "title": "plot_clonotype_embedding",
+    "section": "",
+    "text": "plot_clonotype_embedding\nplot_clonotype_embedding(\n    data,\n    clonotype_col,\n    dimred='X_umap',\n    components=(1, 2),\n    expansion_thresholds=None,\n    non_tcell_color='#DDDDDD',\n    palette=None,\n    size=None,\n    stroke=None,\n    alpha=0.8,\n    title=None,\n)\nEmbedding plot colored by clonotype expansion category.\nCells without a clonotype (NaN in clonotype_col) are drawn first (underneath expanded clones) in non_tcell_color.\nArgs: data: DataFrame with embedding columns matched against dimred (see :func:ggnomics.plot_embedding) plus clonotype_col. clonotype_col: Column holding clonotype identifiers. dimred: Embedding key (e.g. \"X_pca\", \"X_umap\"). components: One-indexed (x, y) component pair to plot. expansion_thresholds: {min_clone_size: category_label} mapping. non_tcell_color: Fill color for cells without a clonotype. palette: {category: hex} mapping overriding the default expansion palette. size: Point size (None -&gt; adaptive). stroke: Point stroke width (None -&gt; adaptive). alpha: Point transparency. title: Plot title.\nReturns: A plotnine.ggplot object.\nRaises: TypeError: If no implementation is registered for type(data). KeyError: If clonotype_col or the embedding is not found.",
+    "crumbs": [
+      "API reference",
+      "Immune repertoire",
+      "plot_clonotype_embedding"
+    ]
+  },
+  {
+    "objectID": "reference/plot_umap.html",
+    "href": "reference/plot_umap.html",
+    "title": "plot_umap",
+    "section": "",
+    "text": "plot_umap\nplot_umap(data, color=None, **kwargs)\nPlot the first two dimensions of the X_umap embedding.",
+    "crumbs": [
+      "API reference",
+      "Reduced dimensions",
+      "plot_umap"
+    ]
+  },
+  {
+    "objectID": "reference/plot_clonotype_abundance.html",
+    "href": "reference/plot_clonotype_abundance.html",
+    "title": "plot_clonotype_abundance",
+    "section": "",
+    "text": "plot_clonotype_abundance\nplot_clonotype_abundance(\n    data,\n    clonotype_col,\n    sample_col=None,\n    top_n=20,\n    expansion_col=None,\n    expansion_thresholds=None,\n    palette=None,\n    facet_by=None,\n    title=None,\n)\nBarplot of clonotype abundance colored by expansion category.\nx-axis: clonotype rank (1 = most abundant, computed within each facet group when facet_by/sample_col is given). y-axis: cell count. Fill: expansion category (computed from clone sizes if expansion_col is None).\nArgs: data: DataFrame whose rows are cells. clonotype_col and any of sample_col/expansion_col/facet_by are columns. clonotype_col: Column holding clonotype identifiers (NaN for cells without a clonotype). sample_col: Column used to facet the plot, and to rank/count clonotypes within each sample rather than globally. Ignored if facet_by is also given (facet_by takes precedence). top_n: Number of top clonotypes to show per facet. Must be &gt;= 1. expansion_col: Column with a precomputed expansion category. When None, categories are computed from clone sizes. expansion_thresholds: {min_clone_size: category_label} mapping. Defaults to the scRepertoire-style thresholds. palette: {category: hex} fill color mapping. Defaults to the built-in expansion palette. facet_by: Column used to facet the plot (and to rank within each facet). Defaults to sample_col when omitted. title: Plot title.\nReturns: A plotnine.ggplot object.\nRaises: TypeError: If no implementation is registered for type(data). ValueError: If top_n &lt; 1. KeyError: If a requested column is absent.",
+    "crumbs": [
+      "API reference",
+      "Immune repertoire",
+      "plot_clonotype_abundance"
+    ]
+  },
+  {
+    "objectID": "reference/run_comparisons.html",
+    "href": "reference/run_comparisons.html",
+    "title": "run_comparisons",
+    "section": "",
+    "text": "run_comparisons(\n    data,\n    groups,\n    comparisons,\n    test='mannwhitney',\n    p_adjust='bonferroni',\n)\nRun pairwise statistical tests for specified comparisons.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\ndata\npd.Series\nNumeric values.\nrequired\n\n\ngroups\npd.Series\nGroup labels, same index as data.\nrequired\n\n\ncomparisons\nlist[tuple[str, str]] | None\nList of (g1, g2) pairs. None → all pairwise combinations.\nrequired\n\n\ntest\nstr\nKey in TESTS dict.\n'mannwhitney'\n\n\np_adjust\nstr\n“bonferroni” | “fdr_bh” | “none”\n'bonferroni'\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\nDataFrame with columns: group1, group2, statistic, pvalue, padj, n1, n2",
+    "crumbs": [
+      "API reference",
+      "Statistics",
+      "run_comparisons"
+    ]
+  },
+  {
+    "objectID": "reference/run_comparisons.html#parameters",
+    "href": "reference/run_comparisons.html#parameters",
+    "title": "run_comparisons",
+    "section": "",
+    "text": "Name\nType\nDescription\nDefault\n\n\n\n\ndata\npd.Series\nNumeric values.\nrequired\n\n\ngroups\npd.Series\nGroup labels, same index as data.\nrequired\n\n\ncomparisons\nlist[tuple[str, str]] | None\nList of (g1, g2) pairs. None → all pairwise combinations.\nrequired\n\n\ntest\nstr\nKey in TESTS dict.\n'mannwhitney'\n\n\np_adjust\nstr\n“bonferroni” | “fdr_bh” | “none”\n'bonferroni'",
+    "crumbs": [
+      "API reference",
+      "Statistics",
+      "run_comparisons"
+    ]
+  },
+  {
+    "objectID": "reference/run_comparisons.html#returns",
+    "href": "reference/run_comparisons.html#returns",
+    "title": "run_comparisons",
+    "section": "",
+    "text": "Name\nType\nDescription\n\n\n\n\n\nDataFrame with columns: group1, group2, statistic, pvalue, padj, n1, n2",
+    "crumbs": [
+      "API reference",
+      "Statistics",
+      "run_comparisons"
+    ]
+  },
+  {
+    "objectID": "reference/plot_pseudobulk_de.html",
+    "href": "reference/plot_pseudobulk_de.html",
+    "title": "plot_pseudobulk_de",
+    "section": "",
+    "text": "plot_pseudobulk_de\nplot_pseudobulk_de(\n    results,\n    logfc_col='log2FoldChange',\n    pval_col='padj',\n    gene_col=None,\n    pval_threshold=0.05,\n    logfc_threshold=1.0,\n    top_n_label=5,\n    mode='volcano',\n    ncol=3,\n    title=None,\n)\nVisualise DE results across multiple clusters or contrasts.\nArgs: results: Mapping of cluster/contrast name to a DESeq2-style DE DataFrame. This function is DataFrame/result-table based and does not need container dispatch. logfc_col: Log2 fold-change column. pval_col: Adjusted p-value column used for significance. gene_col: Column with gene names (None uses the index). pval_threshold: Significance threshold on pval_col. logfc_threshold: Absolute log2FC threshold for “significant”. top_n_label: Number of top genes labeled per volcano panel. mode: \"volcano\" – one volcano panel per cluster, arranged in a grid (plotnine composition, requires plotnine &gt;= 0.15). \"summary_bar\" – barplot of n_up / n_down per cluster. \"upset\" – native Plotnine UpSet plot (via :mod:ggnomics.upset) of shared significant genes across clusters/contrasts. ncol: Grid columns for mode=\"volcano\". title: Overall title.\nReturns: A plotnine.composition.Compose (mode=\"volcano\" or mode=\"upset\"), or a plotnine.ggplot (mode=\"summary_bar\").\nRaises: ValueError: If results is empty, mode is unknown, or no significant genes remain in any cluster/contrast under the given thresholds (mode=\"upset\").",
+    "crumbs": [
+      "API reference",
+      "Pseudobulk",
+      "plot_pseudobulk_de"
+    ]
+  },
+  {
+    "objectID": "reference/plot_dot.html",
+    "href": "reference/plot_dot.html",
+    "title": "plot_dot",
+    "section": "",
+    "text": "plot_dot\nplot_dot(\n    data,\n    features,\n    group_by,\n    layer=None,\n    scale=True,\n    dot_max=1.0,\n    dot_min=0.0,\n    col_min=-2.5,\n    col_max=2.5,\n    palette='viridis',\n    title=None,\n)\nClassic dot plot: mean expression (color) and fraction expressing (size).\nEach dot’s color encodes the mean expression of that feature in that group; dot size encodes the fraction of cells with non-zero expression.\nArgs: data: DataFrame whose rows are cells/samples. Requested features and group_by are columns. features: Non-empty list of feature/gene column names to display (y-axis). Must not contain duplicates or collide with group_by. group_by: Column for groups (x-axis). layer: Present for cross-container signature consistency. Has no effect for a plain DataFrame, which has no concept of layers. scale: If True, scale mean expression per gene to [col_min, col_max] before plotting. dot_max: Maximum dot size (mapped to 100% expressing). dot_min: Minimum dot size. col_min: Clip scaled expression below this value. col_max: Clip scaled expression above this value. palette: Matplotlib colormap name for the color scale. title: Plot title.\nReturns: A plotnine.ggplot object.\nRaises: TypeError: If no implementation is registered for type(data). ValueError: If features is empty, contains duplicates, or collides with group_by. KeyError: If a requested column is absent.",
+    "crumbs": [
+      "API reference",
+      "Expression and metadata",
+      "plot_dot"
+    ]
+  },
+  {
+    "objectID": "reference/plot_pca.html",
+    "href": "reference/plot_pca.html",
+    "title": "plot_pca",
+    "section": "",
+    "text": "plot_pca\nplot_pca(data, color=None, components=(1, 2), **kwargs)\nPlot selected dimensions of the X_pca embedding.",
+    "crumbs": [
+      "API reference",
+      "Reduced dimensions",
+      "plot_pca"
+    ]
+  },
+  {
+    "objectID": "reference/plot_pseudobulk_qc.html",
+    "href": "reference/plot_pseudobulk_qc.html",
+    "title": "plot_pseudobulk_qc",
+    "section": "",
+    "text": "plot_pseudobulk_qc\nplot_pseudobulk_qc(\n    data,\n    sample_by,\n    group_by,\n    condition_by=None,\n    features=None,\n    min_cells=10,\n    palette=None,\n    ncol=2,\n)\nThree-panel QC figure for pseudobulk analysis setup.\nPanel 1 – Cells per sample-group combination (barplot, fill = group_by). Panel 2 – Library size distribution (violin of log10 total counts per sample). Panel 3 – Pseudobulk sample PCA (PC1 vs PC2 scatter colored by condition_by).\nComposed with plotnine’s native composition system (requires plotnine &gt;= 0.15). Returns a plotnine.composition.Compose object.\nArgs: data: DataFrame whose rows are cells. sample_by, group_by, and condition_by are metadata columns; features are expression columns. sample_by: Column identifying the pseudobulk sample each cell belongs to. group_by: Column used to color/stack cell counts within each sample. condition_by: Optional column used to color the PCA panel and the library-size panel. Must be constant within each sample. features: Expression columns used for library size (when no n_counts column is present) and for the pseudobulk PCA matrix. Required for the PCA panel; metadata columns are never guessed as expression. min_cells: Dashed reference line in the cell-count panel. palette: {category: hex} color mapping. ncol: Present for cross-container signature consistency (the panel layout is fixed at (p1 | p2) / p3).\nReturns: A plotnine.composition.Compose object.\nRaises: TypeError: If no implementation is registered for type(data). KeyError: If a requested column is absent. ValueError: If library size or the PCA matrix cannot be determined, if a sample maps to multiple condition_by values, or if fewer than 2 samples are available for PCA. ImportError: If scikit-learn is not installed.",
+    "crumbs": [
+      "API reference",
+      "Pseudobulk",
+      "plot_pseudobulk_qc"
+    ]
+  },
+  {
+    "objectID": "reference/plot_volcano.html",
+    "href": "reference/plot_volcano.html",
+    "title": "plot_volcano",
+    "section": "",
+    "text": "plot_volcano\nplot_volcano(\n    data,\n    logfc_col='log2FoldChange',\n    pval_col='padj',\n    gene_col=None,\n    logfc_threshold=1.0,\n    pval_threshold=0.05,\n    label_top_n=10,\n    label_genes=None,\n    label_col=None,\n    up_color='#E41A1C',\n    down_color='#377EB8',\n    ns_color='#AAAAAA',\n    point_size=1.2,\n    alpha=0.7,\n    x_label='log2 Fold Change',\n    y_label='-log10(adj. p-value)',\n    title=None,\n    xlim=None,\n    ylim=None,\n)\nVolcano plot from a DE results DataFrame.\nPoints are colored by significance + direction. Top-n significant genes by -log10(pval) are labeled with nudged geom_text.",
+    "crumbs": [
+      "API reference",
+      "Differential expression",
+      "plot_volcano"
+    ]
+  }
+]
