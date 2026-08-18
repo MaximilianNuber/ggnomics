@@ -4,7 +4,7 @@ site_url: https://maximiliannuber.github.io/ggnomics/
 repo_url: https://github.com/MaximilianNuber/ggnomics
 
 theme:
-  name: cluster
+  name: readthedocs
   # name: material
   features:
     - navigation.sections
