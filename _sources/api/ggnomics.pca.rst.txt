@@ -1,0 +1,13 @@
+ggnomics.pca namespace
+======================
+
+.. py:module:: ggnomics.pca
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   ggnomics.pca.methods
+   ggnomics.pca.result

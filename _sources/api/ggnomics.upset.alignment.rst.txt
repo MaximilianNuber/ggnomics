@@ -1,0 +1,7 @@
+ggnomics.upset.alignment module
+===============================
+
+.. automodule:: ggnomics.upset.alignment
+   :members:
+   :show-inheritance:
+   :undoc-members:

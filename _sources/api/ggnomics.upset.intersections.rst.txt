@@ -1,0 +1,7 @@
+ggnomics.upset.intersections module
+===================================
+
+.. automodule:: ggnomics.upset.intersections
+   :members:
+   :show-inheritance:
+   :undoc-members:

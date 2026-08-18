@@ -1,0 +1,7 @@
+ggnomics.upset.plot module
+==========================
+
+.. automodule:: ggnomics.upset.plot
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -1,0 +1,7 @@
+ggnomics.upset.stripes module
+=============================
+
+.. automodule:: ggnomics.upset.stripes
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -1,0 +1,24 @@
+ggnomics.upset namespace
+========================
+
+.. py:module:: ggnomics.upset
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   ggnomics.upset.alignment
+   ggnomics.upset.annotations
+   ggnomics.upset.examples
+   ggnomics.upset.intersections
+   ggnomics.upset.matrix
+   ggnomics.upset.modes
+   ggnomics.upset.plot
+   ggnomics.upset.queries
+   ggnomics.upset.set_size
+   ggnomics.upset.stripes
+   ggnomics.upset.testing
+   ggnomics.upset.themes
+   ggnomics.upset.venn

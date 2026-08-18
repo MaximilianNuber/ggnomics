@@ -1,0 +1,7 @@
+ggnomics.upset.themes module
+============================
+
+.. automodule:: ggnomics.upset.themes
+   :members:
+   :show-inheritance:
+   :undoc-members:

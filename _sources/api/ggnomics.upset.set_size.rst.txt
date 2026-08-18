@@ -1,0 +1,7 @@
+ggnomics.upset.set\_size module
+===============================
+
+.. automodule:: ggnomics.upset.set_size
+   :members:
+   :show-inheritance:
+   :undoc-members:

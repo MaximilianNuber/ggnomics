@@ -1,0 +1,7 @@
+ggnomics.upset.testing module
+=============================
+
+.. automodule:: ggnomics.upset.testing
+   :members:
+   :show-inheritance:
+   :undoc-members:

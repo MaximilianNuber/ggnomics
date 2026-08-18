@@ -1,0 +1,7 @@
+ggnomics.pca.result module
+==========================
+
+.. automodule:: ggnomics.pca.result
+   :members:
+   :show-inheritance:
+   :undoc-members:

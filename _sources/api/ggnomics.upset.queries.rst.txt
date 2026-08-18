@@ -1,0 +1,7 @@
+ggnomics.upset.queries module
+=============================
+
+.. automodule:: ggnomics.upset.queries
+   :members:
+   :show-inheritance:
+   :undoc-members:

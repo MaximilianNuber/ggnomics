@@ -1,0 +1,22 @@
+ggnomics namespace
+==================
+
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   ggnomics.bulk
+   ggnomics.pca
+   ggnomics.singlecell
+   ggnomics.upset
+
+Public API
+----------
+
+.. automodule:: ggnomics
+   :members:
+   :imported-members:
+   :show-inheritance:

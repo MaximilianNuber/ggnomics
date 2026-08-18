@@ -1,0 +1,7 @@
+ggnomics.upset.venn module
+==========================
+
+.. automodule:: ggnomics.upset.venn
+   :members:
+   :show-inheritance:
+   :undoc-members:

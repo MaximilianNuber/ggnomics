@@ -1,0 +1,7 @@
+ggnomics.upset.examples module
+==============================
+
+.. automodule:: ggnomics.upset.examples
+   :members:
+   :show-inheritance:
+   :undoc-members:

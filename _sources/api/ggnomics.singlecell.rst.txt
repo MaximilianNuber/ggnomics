@@ -1,0 +1,13 @@
+ggnomics.singlecell namespace
+=============================
+
+.. py:module:: ggnomics.singlecell
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   ggnomics.singlecell.pca
+   ggnomics.singlecell.umap

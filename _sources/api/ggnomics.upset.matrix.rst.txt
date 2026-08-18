@@ -1,0 +1,7 @@
+ggnomics.upset.matrix module
+============================
+
+.. automodule:: ggnomics.upset.matrix
+   :members:
+   :show-inheritance:
+   :undoc-members:

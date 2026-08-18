@@ -1,0 +1,1632 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Plot gallery" href="plot-gallery.html"><link rel="prev" title="Multimodal: RNA + protein (CITE-seq)" href="multimodal.html">
+
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>Specialized plots - ggnomics 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">ggnomics 0.1.0</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <span class="sidebar-brand-text">ggnomics 0.1.0</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">Overview</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Tutorials</a><input aria-label="Toggle navigation of Tutorials" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html">Getting started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="single-cell-scranpy.html">Single-cell analysis with scranpy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bulk-rnaseq.html">Bulk RNA-seq differential expression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="upset.html">Native UpSet plots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multimodal.html">Multimodal: RNA + protein (CITE-seq)</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Specialized plots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot-gallery.html">Plot gallery</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/modules.html">Module Reference</a><input aria-label="Toggle navigation of Module Reference" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../api/ggnomics.html">ggnomics namespace</a><input aria-label="Toggle navigation of ggnomics namespace" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/ggnomics.bulk.html">ggnomics.bulk namespace</a><input aria-label="Toggle navigation of ggnomics.bulk namespace" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/ggnomics.bulk.pca.html">ggnomics.bulk.pca module</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/ggnomics.pca.html">ggnomics.pca namespace</a><input aria-label="Toggle navigation of ggnomics.pca namespace" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/ggnomics.pca.methods.html">ggnomics.pca.methods module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/ggnomics.pca.result.html">ggnomics.pca.result module</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/ggnomics.singlecell.html">ggnomics.singlecell namespace</a><input aria-label="Toggle navigation of ggnomics.singlecell namespace" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/ggnomics.singlecell.pca.html">ggnomics.singlecell.pca module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/ggnomics.singlecell.umap.html">ggnomics.singlecell.umap module</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/ggnomics.upset.html">ggnomics.upset namespace</a><input aria-label="Toggle navigation of ggnomics.upset namespace" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/ggnomics.upset.alignment.html">ggnomics.upset.alignment module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/ggnomics.upset.annotations.html">ggnomics.upset.annotations module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/ggnomics.upset.examples.html">ggnomics.upset.examples module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/ggnomics.upset.intersections.html">ggnomics.upset.intersections module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/ggnomics.upset.matrix.html">ggnomics.upset.matrix module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/ggnomics.upset.modes.html">ggnomics.upset.modes module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/ggnomics.upset.plot.html">ggnomics.upset.plot module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/ggnomics.upset.queries.html">ggnomics.upset.queries module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/ggnomics.upset.set_size.html">ggnomics.upset.set_size module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/ggnomics.upset.stripes.html">ggnomics.upset.stripes module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/ggnomics.upset.testing.html">ggnomics.upset.testing module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/ggnomics.upset.themes.html">ggnomics.upset.themes module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/ggnomics.upset.venn.html">ggnomics.upset.venn module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code_of_conduct.html">Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/MaximilianNuber/ggnomics/blob/main/docs/tutorials/specialized-plots.ipynb?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/MaximilianNuber/ggnomics/edit/main/docs/tutorials/specialized-plots.ipynb" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <div class="admonition note">
+  <p class="admonition-title">Notebook</p>
+  <p>
+    This page is generated from a Quarto vignette executed against real
+    public datasets. The source lives in
+    <code>vignettes/</code> in the repository.
+  </p>
+</div><section id="Specialized-plots">
+<h1>Specialized plots<a class="headerlink" href="#Specialized-plots" title="Link to this heading">¶</a></h1>
+<p>Abundance, statistics, palettes, heatmaps, and immune repertoire</p>
+<p>These examples collect plot families that complement the full analysis workflows: donor-aware abundance and pseudobulk summaries from human pancreas, significance annotations in mouse brain data, differential- expression visualizations from the rice experiment, and immune-repertoire plots from ECCITE-seq TCR data. The page also covers palettes and Marsilea heatmaps.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span><span class="o">,</span><span class="w"> </span><span class="nn">pathlib</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s2">"_includes"</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()))</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">setup</span><span class="w"> </span><span class="kn">import</span> <span class="n">configure_warnings</span><span class="p">,</span> <span class="n">ensure_matplotlib_initialized</span>
+<span class="n">ensure_matplotlib_initialized</span><span class="p">()</span>
+<span class="n">configure_warnings</span><span class="p">()</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ggnomics</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gg</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">plotnine</span><span class="w"> </span><span class="kn">import</span> <span class="n">theme_bw</span><span class="p">,</span> <span class="n">theme</span><span class="p">,</span> <span class="n">labs</span><span class="p">,</span> <span class="n">element_text</span>
+</pre></div>
+</div>
+</div>
+<section id="Baron-pancreas:-abundance,-composition,-and-pseudobulk">
+<h2>Baron pancreas: abundance, composition, and pseudobulk<a class="headerlink" href="#Baron-pancreas:-abundance,-composition,-and-pseudobulk" title="Link to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">data</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_baron</span>
+
+<span class="n">baron</span> <span class="o">=</span> <span class="n">load_baron</span><span class="p">()</span>
+<span class="n">baron</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(20125, 8569)
+</pre></div></div>
+</div>
+<section id="Abundance-by-donor-and-cell-type">
+<h3>Abundance by donor and cell type<a class="headerlink" href="#Abundance-by-donor-and-cell-type" title="Link to this heading">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">baron_cd</span> <span class="o">=</span> <span class="n">baron</span><span class="o">.</span><span class="n">get_column_data</span><span class="p">()</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
+<span class="n">gg</span><span class="o">.</span><span class="n">plot_abundance</span><span class="p">(</span><span class="n">baron_cd</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="s2">"donor"</span><span class="p">,</span> <span class="n">color_by</span><span class="o">=</span><span class="s2">"label"</span><span class="p">)</span> <span class="o">+</span> <span class="n">theme_bw</span><span class="p">()</span> <span class="o">+</span> <span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"Pancreatic cell-type composition per donor (fraction)"</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">"Donor"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"Fraction of cells"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_specialized-plots_5_0.png" src="../_images/tutorials_specialized-plots_5_0.png" />
+</div>
+</div>
+</section>
+<section id="Counts-vs. proportions">
+<h3>Counts vs. proportions<a class="headerlink" href="#Counts-vs. proportions" title="Link to this heading">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gg</span><span class="o">.</span><span class="n">plot_abundance</span><span class="p">(</span><span class="n">baron_cd</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="s2">"donor"</span><span class="p">,</span> <span class="n">color_by</span><span class="o">=</span><span class="s2">"label"</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="n">theme_bw</span><span class="p">()</span> <span class="o">+</span> <span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"Same composition, raw cell counts"</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">"Donor"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"Number of cells"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_specialized-plots_7_0.png" src="../_images/tutorials_specialized-plots_7_0.png" />
+</div>
+</div>
+</section>
+<section id="Donor-aware-grouping-and-pseudobulk-QC">
+<h3>Donor-aware grouping and pseudobulk QC<a class="headerlink" href="#Donor-aware-grouping-and-pseudobulk-QC" title="Link to this heading">¶</a></h3>
+<p>Individual cells are not biological replicates. For sample-aware summaries, the donor identifies the replicate and <code class="docutils literal notranslate"><span class="pre">label</span></code> identifies the cell type. <code class="docutils literal notranslate"><span class="pre">plot_pseudobulk_qc</span></code> displays cell counts for each donor/group combination, library sizes, and a pseudobulk PCA across the four donors:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gg</span><span class="o">.</span><span class="n">plot_pseudobulk_qc</span><span class="p">(</span><span class="n">baron</span><span class="p">,</span> <span class="n">sample_by</span><span class="o">=</span><span class="s2">"donor"</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="s2">"label"</span><span class="p">,</span> <span class="n">min_cells</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_specialized-plots_9_0.png" src="../_images/tutorials_specialized-plots_9_0.png" />
+</div>
+</div>
+</section>
+<section id="Grouped,-clustered-heatmap">
+<h3>Grouped, clustered heatmap<a class="headerlink" href="#Grouped,-clustered-heatmap" title="Link to this heading">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">markers</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"INS"</span><span class="p">,</span> <span class="s2">"GCG"</span><span class="p">,</span> <span class="s2">"SST"</span><span class="p">,</span> <span class="s2">"PPY"</span><span class="p">,</span> <span class="s2">"KRT19"</span><span class="p">,</span> <span class="s2">"CPA1"</span><span class="p">,</span> <span class="s2">"PDGFRB"</span><span class="p">,</span> <span class="s2">"PECAM1"</span><span class="p">]</span>
+<span class="n">row_names</span> <span class="o">=</span> <span class="n">baron</span><span class="o">.</span><span class="n">get_row_names</span><span class="p">()</span>
+<span class="n">available</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">markers</span> <span class="k">if</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">row_names</span><span class="p">]</span>
+<span class="n">gg</span><span class="o">.</span><span class="n">plot_heatmap</span><span class="p">(</span><span class="n">baron</span><span class="p">,</span> <span class="n">features</span><span class="o">=</span><span class="n">available</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="s2">"label"</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="s2">"counts"</span><span class="p">,</span> <span class="n">cluster_rows</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cluster_cols</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">+</span> <span class="n">theme</span><span class="p">(</span><span class="n">axis_text_x</span><span class="o">=</span><span class="n">element_text</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span> <span class="n">hjust</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_specialized-plots_11_0.png" src="../_images/tutorials_specialized-plots_11_0.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="Zeisel:-statistics,-significance-brackets,-dot-plots,-palettes">
+<h2>Zeisel: statistics, significance brackets, dot plots, palettes<a class="headerlink" href="#Zeisel:-statistics,-significance-brackets,-dot-plots,-palettes" title="Link to this heading">¶</a></h2>
+<p>We use the processed Zeisel object from the <a class="reference internal" href="single-cell-scranpy.html"><span class="doc">scranpy workflow</span></a>:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">data</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_scranpy_pipeline_on_zeisel</span>
+
+<span class="n">final</span> <span class="o">=</span> <span class="n">run_scranpy_pipeline_on_zeisel</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<section id="Grouped-statistics-with-automatic-significance-brackets">
+<h3>Grouped statistics with automatic significance brackets<a class="headerlink" href="#Grouped-statistics-with-automatic-significance-brackets" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">plot_violin_stats</span></code> and <code class="docutils literal notranslate"><span class="pre">plot_box_stats</span></code> can run pairwise tests and add ggsignif-style brackets. The examples below use the default Mann–Whitney test across cells. These p-values describe the profiled cells and should not be interpreted as inference across independent animals; a biological-replicate analysis would require sample-level observations.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="o">=</span> <span class="n">final</span><span class="o">.</span><span class="n">column_data</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
+<span class="n">gfap_idx</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">final</span><span class="o">.</span><span class="n">get_row_names</span><span class="p">())</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">"Gfap"</span><span class="p">)</span>
+<span class="n">cd</span><span class="p">[</span><span class="s2">"Gfap"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">final</span><span class="o">.</span><span class="n">get_assay</span><span class="p">(</span><span class="s2">"logcounts"</span><span class="p">)[</span><span class="n">gfap_idx</span><span class="p">,</span> <span class="p">:])</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+<span class="n">two_classes</span> <span class="o">=</span> <span class="n">cd</span><span class="p">[</span><span class="n">cd</span><span class="p">[</span><span class="s2">"level1class"</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="s2">"astrocytes_ependymal"</span><span class="p">,</span> <span class="s2">"oligodendrocytes"</span><span class="p">])]</span>
+
+<span class="n">gg</span><span class="o">.</span><span class="n">plot_violin_stats</span><span class="p">(</span>
+    <span class="n">two_classes</span><span class="p">,</span> <span class="s2">"Gfap"</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="s2">"level1class"</span><span class="p">,</span>
+    <span class="n">comparisons</span><span class="o">=</span><span class="p">[(</span><span class="s2">"astrocytes_ependymal"</span><span class="p">,</span> <span class="s2">"oligodendrocytes"</span><span class="p">)],</span>
+    <span class="n">annotation</span><span class="o">=</span><span class="s2">"stars"</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">+</span> <span class="n">theme_bw</span><span class="p">()</span> <span class="o">+</span> <span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"Gfap: astrocytes vs. oligodendrocytes (per-cell Mann-Whitney)"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"logcounts"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_specialized-plots_15_0.png" src="../_images/tutorials_specialized-plots_15_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gg</span><span class="o">.</span><span class="n">plot_box_stats</span><span class="p">(</span>
+    <span class="n">cd</span><span class="p">,</span> <span class="s2">"Gfap"</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="s2">"level1class"</span><span class="p">,</span>
+    <span class="n">comparisons</span><span class="o">=</span><span class="p">[(</span><span class="s2">"astrocytes_ependymal"</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"oligodendrocytes"</span><span class="p">,</span> <span class="s2">"microglia"</span><span class="p">,</span> <span class="s2">"endothelial-mural"</span><span class="p">]],</span>
+    <span class="n">annotation</span><span class="o">=</span><span class="s2">"pvalue"</span><span class="p">,</span> <span class="n">sig_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">+</span> <span class="n">theme_bw</span><span class="p">()</span> <span class="o">+</span> <span class="n">theme</span><span class="p">(</span><span class="n">axis_text_x</span><span class="o">=</span><span class="n">element_text</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">hjust</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span> <span class="o">+</span> <span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"Gfap across classes, raw p-values shown"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_specialized-plots_16_0.png" src="../_images/tutorials_specialized-plots_16_0.png" />
+</div>
+</div>
+</section>
+<section id="A-minimal-geometry-example-for-geom_signif">
+<h3>A minimal geometry example for <code class="docutils literal notranslate"><span class="pre">geom_signif</span></code><a class="headerlink" href="#A-minimal-geometry-example-for-geom_signif" title="Link to this heading">¶</a></h3>
+<p>The next example focuses on bracket placement—stacking, tip length, and star mapping—using three Zeisel cell classes. It illustrates the geometry rather than making a biological comparison.</p>
+<p>In automatic mode, <code class="docutils literal notranslate"><span class="pre">geom_signif(comparisons=...)</span></code> returns a deferred <code class="docutils literal notranslate"><span class="pre">_DeferredSignif</span></code> object. Calling <code class="docutils literal notranslate"><span class="pre">.resolve(df,</span> <span class="pre">x_col,</span> <span class="pre">y_col)</span></code> supplies the data needed for the tests and returns plotnine layers that can be added to the plot.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ggnomics</span><span class="w"> </span><span class="kn">import</span> <span class="n">geom_signif</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">plotnine</span><span class="w"> </span><span class="kn">import</span> <span class="n">ggplot</span><span class="p">,</span> <span class="n">aes</span><span class="p">,</span> <span class="n">geom_boxplot</span>
+
+<span class="n">geom_df</span> <span class="o">=</span> <span class="n">cd</span><span class="p">[</span><span class="n">cd</span><span class="p">[</span><span class="s2">"level1class"</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="s2">"microglia"</span><span class="p">,</span> <span class="s2">"endothelial-mural"</span><span class="p">,</span> <span class="s2">"astrocytes_ependymal"</span><span class="p">])][[</span><span class="s2">"level1class"</span><span class="p">,</span> <span class="s2">"Gfap"</span><span class="p">]]</span>
+<span class="n">bracket_layers</span> <span class="o">=</span> <span class="n">geom_signif</span><span class="p">(</span>
+    <span class="n">comparisons</span><span class="o">=</span><span class="p">[(</span><span class="s2">"microglia"</span><span class="p">,</span> <span class="s2">"endothelial-mural"</span><span class="p">),</span> <span class="p">(</span><span class="s2">"microglia"</span><span class="p">,</span> <span class="s2">"astrocytes_ependymal"</span><span class="p">)]</span>
+<span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">geom_df</span><span class="p">,</span> <span class="s2">"level1class"</span><span class="p">,</span> <span class="s2">"Gfap"</span><span class="p">)</span>
+
+<span class="p">(</span>
+    <span class="n">ggplot</span><span class="p">(</span><span class="n">geom_df</span><span class="p">,</span> <span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">"level1class"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"Gfap"</span><span class="p">))</span>
+    <span class="o">+</span> <span class="n">geom_boxplot</span><span class="p">()</span>
+    <span class="o">+</span> <span class="n">bracket_layers</span>
+    <span class="o">+</span> <span class="n">theme_bw</span><span class="p">()</span>
+    <span class="o">+</span> <span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"geom_signif bracket-stacking geometry check"</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_specialized-plots_18_0.png" src="../_images/tutorials_specialized-plots_18_0.png" />
+</div>
+</div>
+</section>
+<section id="Dot-plot">
+<h3>Dot plot<a class="headerlink" href="#Dot-plot" title="Link to this heading">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">markers</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"Gfap"</span><span class="p">,</span> <span class="s2">"Mog"</span><span class="p">,</span> <span class="s2">"Gad2"</span><span class="p">,</span> <span class="s2">"Snap25"</span><span class="p">,</span> <span class="s2">"Aif1"</span><span class="p">,</span> <span class="s2">"Cldn5"</span><span class="p">,</span> <span class="s2">"Pdgfrb"</span><span class="p">]</span>
+<span class="n">gg</span><span class="o">.</span><span class="n">plot_dot</span><span class="p">(</span><span class="n">final</span><span class="p">,</span> <span class="n">features</span><span class="o">=</span><span class="n">markers</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="s2">"level1class"</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="s2">"logcounts"</span><span class="p">)</span> <span class="o">+</span> <span class="n">theme_bw</span><span class="p">()</span> <span class="o">+</span> <span class="n">theme</span><span class="p">(</span><span class="n">axis_text_x</span><span class="o">=</span><span class="n">element_text</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span> <span class="n">hjust</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_specialized-plots_20_0.png" src="../_images/tutorials_specialized-plots_20_0.png" />
+</div>
+</div>
+</section>
+<section id="Selected-scatter-plot">
+<h3>Selected scatter plot<a class="headerlink" href="#Selected-scatter-plot" title="Link to this heading">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span><span class="p">[</span><span class="s2">"n_genes"</span><span class="p">]</span> <span class="o">=</span> <span class="n">cd</span><span class="p">[</span><span class="s2">"detected"</span><span class="p">]</span>
+<span class="n">gg</span><span class="o">.</span><span class="n">plot_coldata</span><span class="p">(</span><span class="n">cd</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">"sum"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"n_genes"</span><span class="p">,</span> <span class="n">color_by</span><span class="o">=</span><span class="s2">"level1class"</span><span class="p">)</span> <span class="o">+</span> <span class="n">theme_bw</span><span class="p">()</span> <span class="o">+</span> <span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"Library size vs. genes detected, colored by cell class"</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">"Total counts"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_specialized-plots_22_0.png" src="../_images/tutorials_specialized-plots_22_0.png" />
+</div>
+</div>
+</section>
+<section id="Custom-palettes-and-the-IGV-palette">
+<h3>Custom palettes and the IGV palette<a class="headerlink" href="#Custom-palettes-and-the-IGV-palette" title="Link to this heading">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">custom</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"astrocytes_ependymal"</span><span class="p">:</span> <span class="s2">"#1B9E77"</span><span class="p">,</span> <span class="s2">"oligodendrocytes"</span><span class="p">:</span> <span class="s2">"#D95F02"</span><span class="p">,</span> <span class="s2">"microglia"</span><span class="p">:</span> <span class="s2">"#7570B3"</span><span class="p">}</span>
+<span class="n">gg</span><span class="o">.</span><span class="n">plot_umap</span><span class="p">(</span><span class="n">final</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"level1class"</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="n">custom</span><span class="p">)</span> <span class="o">+</span> <span class="n">theme_bw</span><span class="p">()</span> <span class="o">+</span> <span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"Custom 3-color override; remaining classes fall back to the default palette"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_specialized-plots_24_0.png" src="../_images/tutorials_specialized-plots_24_0.png" />
+</div>
+</div>
+<p>The IGV palette follows the chromosome-colour convention from the <a class="reference external" href="https://software.broadinstitute.org/software/igv/">Integrative Genomics Viewer</a>, using values published by the R package <code class="docutils literal notranslate"><span class="pre">`ggsci</span></code> &lt;<a class="reference external" href="https://cran.r-project.org/package=ggsci">https://cran.r-project.org/package=ggsci</a>&gt;`__ in <code class="docutils literal notranslate"><span class="pre">ggsci::pal_igv()</span></code>. See Robinson et al., <em>Nature Biotechnology</em> 29, 24–26 (2011).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">igv_preview</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">"chrom"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">gg</span><span class="o">.</span><span class="n">IGV_DEFAULT</span><span class="o">.</span><span class="n">keys</span><span class="p">())[:</span><span class="mi">12</span><span class="p">],</span> <span class="s2">"value"</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="n">gg</span><span class="o">.</span><span class="n">plot_coldata</span><span class="p">(</span><span class="n">igv_preview</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">"chrom"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"value"</span><span class="p">,</span> <span class="n">color_by</span><span class="o">=</span><span class="s2">"chrom"</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s2">"bar"</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="n">gg</span><span class="o">.</span><span class="n">IGV_DEFAULT</span><span class="p">)</span> <span class="o">+</span> <span class="n">theme_bw</span><span class="p">()</span> <span class="o">+</span> <span class="n">theme</span><span class="p">(</span><span class="n">legend_position</span><span class="o">=</span><span class="s2">"none"</span><span class="p">,</span> <span class="n">axis_text_x</span><span class="o">=</span><span class="n">element_text</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span> <span class="n">hjust</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span> <span class="o">+</span> <span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"IGV chromosome-color palette (first 12 entries)"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">""</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_specialized-plots_26_0.png" src="../_images/tutorials_specialized-plots_26_0.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="E-MTAB-1625:-differential-expression-results">
+<h2>E-MTAB-1625: differential-expression results<a class="headerlink" href="#E-MTAB-1625:-differential-expression-results" title="Link to this heading">¶</a></h2>
+<p>The following plots use the PyDESeq2 fit introduced in the <a class="reference internal" href="bulk-rnaseq.html"><span class="doc">bulk RNA-seq workflow</span></a>:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">data</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_deseq2_on_emtab1625</span>
+
+<span class="n">fit</span> <span class="o">=</span> <span class="n">run_deseq2_on_emtab1625</span><span class="p">()</span>
+<span class="n">results</span><span class="p">,</span> <span class="n">vst</span><span class="p">,</span> <span class="n">gene_names</span> <span class="o">=</span> <span class="n">fit</span><span class="p">[</span><span class="s2">"results"</span><span class="p">],</span> <span class="n">fit</span><span class="p">[</span><span class="s2">"vst"</span><span class="p">],</span> <span class="n">fit</span><span class="p">[</span><span class="s2">"gene_names"</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<section id="Sample-metadata-plot">
+<h3>Sample metadata plot<a class="headerlink" href="#Sample-metadata-plot" title="Link to this heading">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lib_sizes</span> <span class="o">=</span> <span class="n">fit</span><span class="p">[</span><span class="s2">"counts"</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">"library_size"</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">"index"</span><span class="p">:</span> <span class="s2">"sample"</span><span class="p">})</span>
+<span class="n">lib_sizes</span><span class="p">[</span><span class="s2">"growth_condition"</span><span class="p">]</span> <span class="o">=</span> <span class="n">fit</span><span class="p">[</span><span class="s2">"metadata"</span><span class="p">][</span><span class="s2">"growth_condition"</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+<span class="n">gg</span><span class="o">.</span><span class="n">plot_coldata</span><span class="p">(</span><span class="n">lib_sizes</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">"growth_condition"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"library_size"</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s2">"point"</span><span class="p">)</span> <span class="o">+</span> <span class="n">theme_bw</span><span class="p">()</span> <span class="o">+</span> <span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"Library size, 24h salt vs. control"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"Total raw counts"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_specialized-plots_30_0.png" src="../_images/tutorials_specialized-plots_30_0.png" />
+</div>
+</div>
+</section>
+<section id="Volcano,-MA,-and-coefficient-plots-—-alternate-styling">
+<h3>Volcano, MA, and coefficient plots — alternate styling<a class="headerlink" href="#Volcano,-MA,-and-coefficient-plots-—-alternate-styling" title="Link to this heading">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gg</span><span class="o">.</span><span class="n">plot_volcano</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">label_top_n</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">logfc_threshold</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span> <span class="o">+</span> <span class="n">theme_bw</span><span class="p">()</span> <span class="o">+</span> <span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"Stricter |log2FC| &gt; 1.5 threshold"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_specialized-plots_32_0.png" src="../_images/tutorials_specialized-plots_32_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gg</span><span class="o">.</span><span class="n">plot_ma</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">label_top_n</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">logfc_threshold</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">+</span> <span class="n">theme_bw</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_specialized-plots_33_0.png" src="../_images/tutorials_specialized-plots_33_0.png" />
+</div>
+</div>
+</section>
+<section id="Marsilea-backed-heatmap">
+<h3>Marsilea-backed heatmap<a class="headerlink" href="#Marsilea-backed-heatmap" title="Link to this heading">¶</a></h3>
+<p>The transformed expression matrix can also be passed directly to <a class="reference external" href="https://marsilea.readthedocs.io/">Marsilea</a> for a composable heatmap with dendrograms. Marsilea is used alongside ggnomics here rather than wrapped by it.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">marsilea</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ma</span>
+
+<span class="n">sig_top</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">results</span><span class="p">[</span><span class="s2">"padj"</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">"padj"</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span>
+<span class="n">mat</span> <span class="o">=</span> <span class="n">vst</span><span class="p">[</span><span class="n">sig_top</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+<span class="n">z</span> <span class="o">=</span> <span class="p">(</span><span class="n">mat</span> <span class="o">-</span> <span class="n">mat</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span> <span class="o">/</span> <span class="n">mat</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+<span class="n">z</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">gene_names</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">g</span><span class="p">)</span> <span class="ow">or</span> <span class="n">g</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">z</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+
+<span class="n">h</span> <span class="o">=</span> <span class="n">ma</span><span class="o">.</span><span class="n">Heatmap</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"RdBu_r"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"z-score"</span><span class="p">)</span>
+<span class="n">h</span><span class="o">.</span><span class="n">add_dendrogram</span><span class="p">(</span><span class="s2">"right"</span><span class="p">)</span>
+<span class="n">h</span><span class="o">.</span><span class="n">add_dendrogram</span><span class="p">(</span><span class="s2">"top"</span><span class="p">)</span>
+<span class="n">h</span><span class="o">.</span><span class="n">add_left</span><span class="p">(</span><span class="n">ma</span><span class="o">.</span><span class="n">plotter</span><span class="o">.</span><span class="n">Labels</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">()),</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">h</span><span class="o">.</span><span class="n">add_top</span><span class="p">(</span><span class="n">ma</span><span class="o">.</span><span class="n">plotter</span><span class="o">.</span><span class="n">Labels</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()),</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">h</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+<span class="n">h</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s2">"_freeze_assets"</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"marsilea_emtab1625.png"</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;marsilea.heatmap.Heatmap at 0x7b87ba2e3ce0&gt;
+</pre></div></div>
+</div>
+<figure><p><img alt="d9258ac2ee7543a696e6384a6b2eab51" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAIvCAYAAABqceEhAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90" /></p>
+<figcaption aria-hidden="true"><p>Marsilea heatmap of the top 25 significant genes, 24h salt vs. control</p>
+</figcaption></figure></section>
+</section>
+<section id="ECCITE-seq-TCR-repertoire-(EH4616-CTCL,-EH4621-control)">
+<h2>ECCITE-seq TCR repertoire (EH4616 CTCL, EH4621 control)<a class="headerlink" href="#ECCITE-seq-TCR-repertoire-(EH4616-CTCL,-EH4621-control)" title="Link to this heading">¶</a></h2>
+<p>bGliIHZlcnNpb24zLjExLjEsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvctoD+AAAAAlwSFlzAAAO
+xAAADsQBlSsOGwAAi89JREFUeJztnQm4TPX/x7+2LFEIJWWtUCFbIUKWUslSkUi2rMmW0iJS0kKi
+UJRUIlkjUZJdUsnSHkkL2hBZK/7P69PvTHPnLjPXvbr/M+f9ep557r1zznznnJm597zvZ3l/Mh07
+duyYE0IIIYTwEZkz+gCEEEIIIVKLBIwQQgghfIcEjBBCCCF8hwSMEEIIIXyHBIwQQgghfIcEjBBC
+CCF8hwSMEEIIIXyHBIwQQgghfIcEjBBCCCF8hwSMECeI9evXu59++kmvbwDZt2+f27Jli/v7779d
+UPnjjz8Cff7ixCMBI9LM999/7/bu3Rv6ec2aNa5Ro0aufPnyrnPnzm737t2BfJUfeught2LFChcE
+PvroI9ezZ083cOBA+zyE88gjj7hVq1a5eIVpLEOGDHG7du2y77t27epOPfVUd84557gzzzzTLVq0
+yMUznPPQoUPdhRde6Jo2bep+/vlnez14DU455RT3/PPPuyDTv39/984772T0YcQlEjAizfTp08e9
+/fbb9v3WrVtd3bp1XYECBVybNm3cBx984Jo3bx7Xr3KHDh3sfCNv8+bNC23j+3hl8+bNrmbNmm7T
+pk12nhUqVEggWD788EO3Y8cOF69MnDjRbd++3eXPn9+9/PLLbv78+Xb74osvXN++fd1NN92UQODH
+G7Nnz3ZPPvmka9++vQm2Vq1a2euAcHv88cddr169TNwFFf4m7tmzJ6MPIy7JmtEHIOIL/ttq2bKl
+mzRpkv3Mf6MlSpRwX375pStdurSLR7Jly+Zy5crl7rnnHpc7d+7Q/aNHj3bVq1d3VatWtYt6PF/A
+EasTJkywn5955hnXuHFj99Zbb9m5xzvLli1zl19+uX2/fPlyN2DAAItAwl133WWibt26da5OnTou
+HuGfFz77/CMDvOe9e/e214TbK6+84jZu3Bi350/0KaVIK6nkG2+88T89pqAgASPS/b+NK664IvQz
+IWT+oHF/vAqYsWPHumHDhrmRI0e6MWPGuPr169v9c+bMcbVq1XLXX3+9i2d++OGH0Dl7ohUhx0V8
+8eLFLt4566yz3Nq1a127du1c9uzZE9V9/PXXX+7PP/908crhw4dd3rx5Qz/ny5cvgZDPkyePO3To
+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
+V6/u9u7dm9GHIUSGcMopp7j33ntPr774f4sEjBDJgHj59NNP9fqIQHLBBRdk9CEIkSJKIQkhhBDC
+d0jACCGEEMJ3SMAIIYQQwndIwAghhBDCd0jACCGEEMJ3SMAIIYQQwndIwAghhBDCd0jACCGEEMJ3
+SMAIIYQQwndIwAghhBDCd0jACCGEEMJ3SMAIIYQQwndIwAghhBDCd0jACCGEEMJ3SMAIIYQQwndI
+wAghhBDCd0jACCGEEMJ3SMAIIYQQwndIwAghhBDCd0jACCGEEMJ3SMAIIYQQwndkzegDEEKIeKR6
+9epu7969zq8cOnTIXXDBBc6vnHLKKe69997L6MMQJxAJGCGEOAEgXj799FO9thmEn8WXiA2lkIQQ
+QgjhOyRghBBCCOE7JGCEEEII4TskYIQQQgjhOyRghBBCCOE7JGCEEEII4TskYIQQQgjhOyRghBBC
+COE7JGCEEEII4TskYIQQQgjhOyRghBBCCOE7JGCEEEII4Ts0zFGcMDSNN2PRNF4R5N//jJ6mrd+/
+E48EjDhhaBpvxqJpvCIjCfrvv37/TjwSMEKcIPQf6Cnuvffe0+dLCHFCkIAR4gSh/0AzLnwvhIh/
+VMQrhBBCCN8hASOEEEII3yEBI4QQQgjfIQEjhBBCCN8hASOEEEII35Hp2LFjxzL6IMSJYfe4AYF+
+afds+dEFmUxZgv3/yXlvZ3FBZtDwYP/+L9q4wwWZpX1qu3gn2H/hhBBCCBEcH5j9+/e7yZMnuw8/
+/ND9/fffrnz58u6WW25x+fLli3mN5cuXu1dffdX9+eef7pprrnFNmjQJbRszZoxbsWJFyI55/Pjx
+qT7GlNa/8cYbk3wMz8PzRds+evRot3r16gTbunXr5mrX/kfxRtse7fhi2S6EEEIEmVRHYLZs2eLK
+lSvnJk6c6MqUKeMqVqzo5s2bZ99//PHHMa0xa9Ys17BhQ1eoUCFXunRp165dOzd8+PDQ9sqVK7um
+TZu6AgUK2L6pJdr6rB1+27Nnj/vkk09MnMSyHXFy5MiRBPsULVo0tH607dGOL9p2IYQQIuikugam
+Ro0aLk+ePG7+/Pkua9Z/Ajgs0bZtW7dmzRr3+eef2/2bNm1yL7/8stu1a5e75JJLXIcOHVyWLP/k
+pLkot27d2t1///328yuvvGIRip9++snlzJkz9FxEeXr37u1+/fXXBMdw9OhR9/zzz7sPPvjAFStW
+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
+NjUap13EB4MQvflEiCiexxspQOSGYY6syWiBcH799Vfrj8eIjscgLhBgzJcgCgS4/DIP6ccff3S7
+d++2AZEce/HixW37woULTSAhdIi2nH322RbBYcZRUiBYUlqDqEysVB640AWZHV9tdUGmXuNg18D0
+m32vCzLn3dTABZkdy4M9ALfUqFdj3pdrDkEGv/GfRGAwdMO91rvoh1OhQgVLoSxYsMAiHjfffLNF
+TXC5RThwv7cG0ZbIFFEkXOhvvPFG16pVKxMyw4cPTzBcMRJqYyCybgYmTpxoowJI9wCigkgNKSkP
+vkcDEk3xCNeErM+x8+FASCFCop1DSmsIIYQQ4j8SMFz0qUXxrP0j4X4u7IgIZg9Rd0KNDIMVn332
+2dAaXMSTWyMc6kmIrJQtW9aiHZEgCBBLPCc2/oUKFbIoUKSAwN6fOUUY4sG+ffvsa3gUhDocamHY
+RiqLlNRdd93ldu7caSkmL3XFdiI63vkmR7Q1hBBCCPEfCRgu+BTOJmdVzP2ICLqEmAw9a9YsExTN
+mze39Eksa4SDoKC4N7lBiAgC0jlEZkgzMQmampNwOA62hU+19upgwq3+EVUU2LIN0UUKi+gRITkm
+XBMNggIFCriCBQuGzjc5oq0hhBBCiP+ojZqLcoMGDazQtlOnTgm2ffTRR27Tpk2W6gGEy9SpU+37
+Dz74wNWuXdu+cjEnlZPUGqmFIl6vBiY5KDBu1qyZdTt5UJOCkFq7dq1FSbxjJHJUvnx5+5moEfU8
+Hi+++KIJD9JkwHrcN2zYsGSfO9oaQgghREqMGTPG6jVjIbVz9v6/8J+Zmzz++OOuevXqVuNCSzOF
+s6tWrbLuGlqRETjbtm2zbf369bPoCJENUj1eezEih4JZOoNI/RBloXuHiz370CGUHtCdRFSGjqZw
+iBCRUqIAF6FFG3b//v1N6HA+wDamXCNoVqxY4e688067z5ubxIeKGhhEHa8FjyNN9MILL1ihMIXK
+0dYQQgghUqJHjx52i2f+MwFDPQqRi0GDBlm3D/UcJUqUcD179nR9+/a1fYoVK2ZdQ4iEL7/80jqA
+Ro0aFapPQdQQsRkyZIgV6+K/wmP4not8pNjgFgnCwatpSQ7EBFGQunXrJtpGVxRiiW2kjzjep59+
+OrSd4mFEGd4ynB/CjWJiD3xwEC2PPPKIRXmoDaLuhVQVIi6WNYQQQoig85+1UYv/HrVRq406yKiN
+Wm3UQaZUKtqo/YqGOQohhBDCd0jACCGEEMJ3SMAIIYQQwneoBkYIIYQQvkMRGCGEEEL4DgkYIYQQ
+QvgOCRghhBBC+A4JGCGEEEL4DgkYIYQQQvgOCRghhBBC+A4JGCGEEEL4DgkYIYQQQvgOCRghhBBC
++A4JGCGEEEL4DgkYIYQQQvgOCRghhBBC+A4JGCGEEEL4DgkYIYQQQvgOCRghhBBC+A4JGCGEEEL4
+DgkYIYQQQvgOCRghhBBC+A4JGCGEEEL4DgkYIYQQQvgOCRghhBBC+A4JGCGEEEL4DgkYIYQQQvgO
+CRghhBBC+A4JGCGEEEL4DgkYIYQQQvgOCRghhBBC+A4JGCGEEEL4DgkYIYQQQvgOCRghhBBC+A4J
+GCGEEEI4v/F/kHNlIFbxQ7wAAAAASUVORK5CYII=</p>
+<blockquote>
+<div><dl class="field-list simple">
+<dt class="field-odd">alt<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Marsilea heatmap of the top 25 significant genes, 24h salt vs. control</p>
+</dd>
+</dl>
+</div></blockquote>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">data</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_tcr_repertoire</span>
+
+<span class="n">tcr</span> <span class="o">=</span> <span class="n">load_tcr_repertoire</span><span class="p">()</span>
+<span class="n">tcr</span><span class="p">[</span><span class="s2">"chain"</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Package &#39;multiassayexperiment&#39; is not installed.
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+chain
+TRB      8581
+TRA      6243
+Multi    2159
+IGL       399
+IGH       302
+IGK       185
+TRG        56
+TRD        44
+None       16
+Name: count, dtype: int64
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trb</span> <span class="o">=</span> <span class="n">tcr</span><span class="p">[(</span><span class="n">tcr</span><span class="p">[</span><span class="s2">"chain"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"TRB"</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">tcr</span><span class="p">[</span><span class="s2">"raw_clonotype_id"</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">"None"</span><span class="p">)]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s2">"v_gene"</span><span class="p">,</span> <span class="s2">"j_gene"</span><span class="p">])</span>
+<span class="n">cell_level</span> <span class="o">=</span> <span class="n">trb</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s2">"barcode"</span><span class="p">,</span> <span class="s2">"condition"</span><span class="p">])</span>
+<span class="n">cell_level</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(6601, 20)
+</pre></div></div>
+</div>
+<section id="Clonotype-abundance">
+<h3>Clonotype abundance<a class="headerlink" href="#Clonotype-abundance" title="Link to this heading">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gg</span><span class="o">.</span><span class="n">plot_clonotype_abundance</span><span class="p">(</span><span class="n">cell_level</span><span class="p">,</span> <span class="n">clonotype_col</span><span class="o">=</span><span class="s2">"clonotype_id"</span><span class="p">,</span> <span class="n">sample_col</span><span class="o">=</span><span class="s2">"condition"</span><span class="p">,</span> <span class="n">top_n</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span> <span class="o">+</span> <span class="n">theme_bw</span><span class="p">()</span> <span class="o">+</span> <span class="n">theme</span><span class="p">(</span><span class="n">axis_text_x</span><span class="o">=</span><span class="n">element_text</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span> <span class="n">hjust</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_specialized-plots_40_0.png" src="../_images/tutorials_specialized-plots_40_0.png" />
+</div>
+</div>
+</section>
+<section id="Clonotype-overlap">
+<h3>Clonotype overlap<a class="headerlink" href="#Clonotype-overlap" title="Link to this heading">¶</a></h3>
+<p>The loading helper prefixes <code class="docutils literal notranslate"><span class="pre">clonotype_id</span></code> by condition because native 10x clonotype labels are only unique within a run. Cross-condition overlap is therefore calculated from CDR3 amino-acid sequences instead:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">productive_trb</span> <span class="o">=</span> <span class="n">tcr</span><span class="p">[(</span><span class="n">tcr</span><span class="p">[</span><span class="s2">"chain"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"TRB"</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">tcr</span><span class="p">[</span><span class="s2">"productive"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"True"</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">tcr</span><span class="p">[</span><span class="s2">"cdr3"</span><span class="p">]</span><span class="o">.</span><span class="n">notna</span><span class="p">()]</span>
+<span class="n">ctcl_cdr3</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">productive_trb</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">productive_trb</span><span class="p">[</span><span class="s2">"condition"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"CTCL"</span><span class="p">,</span> <span class="s2">"cdr3"</span><span class="p">])</span>
+<span class="n">control_cdr3</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">productive_trb</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">productive_trb</span><span class="p">[</span><span class="s2">"condition"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"control"</span><span class="p">,</span> <span class="s2">"cdr3"</span><span class="p">])</span>
+<span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">ctcl_cdr3</span><span class="p">)</span><span class="si">}</span><span class="s2"> unique productive TRB CDR3s (CTCL), </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">control_cdr3</span><span class="p">)</span><span class="si">}</span><span class="s2"> (control), </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">ctcl_cdr3</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">control_cdr3</span><span class="p">)</span><span class="si">}</span><span class="s2"> shared"</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&#39;1568 unique productive TRB CDR3s (CTCL), 1394 (control), 0 shared&#39;
+</pre></div></div>
+</div>
+<p>No exact CDR3 sequence is shared between the CTCL and control samples in these resources. Exact overlap between unrelated individuals is expected to be sparse because of the diversity of the TCR repertoire. The Jaccard matrix summarizes the comparison. For more than two groups, a set-intersection matrix is often more legible than pairwise Jaccard values — see <a class="reference internal" href="upset.html"><span class="doc">UpSet plots</span></a>, which also covers <code class="docutils literal notranslate"><span class="pre">plot_pseudobulk_de</span></code>’s <code class="docutils literal notranslate"><span class="pre">mode=&quot;upset&quot;</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cdr3_level</span> <span class="o">=</span> <span class="n">productive_trb</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s2">"cdr3"</span><span class="p">,</span> <span class="s2">"condition"</span><span class="p">])[[</span><span class="s2">"cdr3"</span><span class="p">,</span> <span class="s2">"condition"</span><span class="p">]]</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">gg</span><span class="o">.</span><span class="n">plot_clonotype_overlap</span><span class="p">(</span><span class="n">cdr3_level</span><span class="p">,</span> <span class="n">clonotype_col</span><span class="o">=</span><span class="s2">"cdr3"</span><span class="p">,</span> <span class="n">sample_col</span><span class="o">=</span><span class="s2">"condition"</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"jaccard"</span><span class="p">)</span>
+<span class="n">result</span><span class="o">.</span><span class="n">matrix</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+</div></div>
+</div>
+</section>
+<section id="V/J-gene-usage">
+<h3>V/J gene usage<a class="headerlink" href="#V/J-gene-usage" title="Link to this heading">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">v_usage</span> <span class="o">=</span> <span class="n">cell_level</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s2">"condition"</span><span class="p">,</span> <span class="s2">"v_gene"</span><span class="p">])</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"n_cells"</span><span class="p">)</span>
+<span class="n">top_v</span> <span class="o">=</span> <span class="n">v_usage</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"v_gene"</span><span class="p">)[</span><span class="s2">"n_cells"</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">nlargest</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span><span class="o">.</span><span class="n">index</span>
+<span class="n">gg</span><span class="o">.</span><span class="n">plot_coldata</span><span class="p">(</span>
+    <span class="n">v_usage</span><span class="p">[</span><span class="n">v_usage</span><span class="p">[</span><span class="s2">"v_gene"</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">top_v</span><span class="p">)],</span> <span class="n">x</span><span class="o">=</span><span class="s2">"v_gene"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"n_cells"</span><span class="p">,</span> <span class="n">color_by</span><span class="o">=</span><span class="s2">"condition"</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s2">"bar"</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">+</span> <span class="n">theme_bw</span><span class="p">()</span> <span class="o">+</span> <span class="n">theme</span><span class="p">(</span><span class="n">axis_text_x</span><span class="o">=</span><span class="n">element_text</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span> <span class="n">hjust</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span> <span class="o">+</span> <span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"TRB V-gene usage (top 15 by cell count)"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_specialized-plots_46_0.png" src="../_images/tutorials_specialized-plots_46_0.png" />
+</div>
+</div>
+</section>
+<section id="Repertoire-feature-embedding">
+<h3>Repertoire-feature embedding<a class="headerlink" href="#Repertoire-feature-embedding" title="Link to this heading">¶</a></h3>
+<p>These TCR resources do not include matched expression coordinates. We therefore calculate a repertoire-feature PCA from one-hot-encoded V/J gene usage per clonotype. It should be interpreted as an embedding of receptor features, not as a transcriptomic UMAP.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.decomposition</span><span class="w"> </span><span class="kn">import</span> <span class="n">PCA</span>
+
+<span class="n">clonotype_summary</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">trb</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"clonotype_id"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">v_gene</span><span class="o">=</span><span class="p">(</span><span class="s2">"v_gene"</span><span class="p">,</span> <span class="s2">"first"</span><span class="p">),</span> <span class="n">j_gene</span><span class="o">=</span><span class="p">(</span><span class="s2">"j_gene"</span><span class="p">,</span> <span class="s2">"first"</span><span class="p">),</span> <span class="n">condition</span><span class="o">=</span><span class="p">(</span><span class="s2">"condition"</span><span class="p">,</span> <span class="s2">"first"</span><span class="p">),</span> <span class="n">n_cells</span><span class="o">=</span><span class="p">(</span><span class="s2">"barcode"</span><span class="p">,</span> <span class="s2">"nunique"</span><span class="p">))</span>
+    <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+<span class="p">)</span>
+<span class="n">onehot</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">clonotype_summary</span><span class="p">[[</span><span class="s2">"v_gene"</span><span class="p">,</span> <span class="s2">"j_gene"</span><span class="p">]])</span>
+<span class="n">coords</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">onehot</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())</span>
+<span class="n">clonotype_summary</span><span class="p">[</span><span class="s2">"X_pca_1"</span><span class="p">],</span> <span class="n">clonotype_summary</span><span class="p">[</span><span class="s2">"X_pca_2"</span><span class="p">]</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">coords</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+
+<span class="n">gg</span><span class="o">.</span><span class="n">plot_clonotype_embedding</span><span class="p">(</span><span class="n">clonotype_summary</span><span class="p">,</span> <span class="n">clonotype_col</span><span class="o">=</span><span class="s2">"clonotype_id"</span><span class="p">,</span> <span class="n">dimred</span><span class="o">=</span><span class="s2">"X_pca"</span><span class="p">)</span> <span class="o">+</span> <span class="n">theme_bw</span><span class="p">()</span> <span class="o">+</span> <span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"Repertoire-feature embedding (PCA of V/J gene usage), colored by clonal expansion"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_specialized-plots_48_0.png" src="../_images/tutorials_specialized-plots_48_0.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="Composed-multi-panel-figure">
+<h2>Composed multi-panel figure<a class="headerlink" href="#Composed-multi-panel-figure" title="Link to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p1</span> <span class="o">=</span> <span class="n">gg</span><span class="o">.</span><span class="n">plot_abundance</span><span class="p">(</span><span class="n">baron_cd</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="s2">"donor"</span><span class="p">,</span> <span class="n">color_by</span><span class="o">=</span><span class="s2">"label"</span><span class="p">)</span> <span class="o">+</span> <span class="n">theme_bw</span><span class="p">()</span> <span class="o">+</span> <span class="n">theme</span><span class="p">(</span><span class="n">legend_position</span><span class="o">=</span><span class="s2">"none"</span><span class="p">,</span> <span class="n">axis_text_x</span><span class="o">=</span><span class="n">element_text</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span> <span class="n">hjust</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">7</span><span class="p">))</span> <span class="o">+</span> <span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"Baron composition"</span><span class="p">)</span>
+<span class="n">p2</span> <span class="o">=</span> <span class="n">gg</span><span class="o">.</span><span class="n">plot_volcano</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">label_top_n</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span> <span class="o">+</span> <span class="n">theme_bw</span><span class="p">()</span> <span class="o">+</span> <span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"E-MTAB-1625 volcano"</span><span class="p">)</span>
+<span class="n">p3</span> <span class="o">=</span> <span class="n">gg</span><span class="o">.</span><span class="n">plot_clonotype_abundance</span><span class="p">(</span><span class="n">cell_level</span><span class="p">,</span> <span class="n">clonotype_col</span><span class="o">=</span><span class="s2">"clonotype_id"</span><span class="p">,</span> <span class="n">sample_col</span><span class="o">=</span><span class="s2">"condition"</span><span class="p">,</span> <span class="n">top_n</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span> <span class="o">+</span> <span class="n">theme_bw</span><span class="p">()</span> <span class="o">+</span> <span class="n">theme</span><span class="p">(</span><span class="n">legend_position</span><span class="o">=</span><span class="s2">"none"</span><span class="p">,</span> <span class="n">axis_text_x</span><span class="o">=</span><span class="n">element_text</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span> <span class="n">hjust</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span> <span class="o">+</span> <span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"TCR clonotype abundance"</span><span class="p">)</span>
+
+<span class="p">(</span><span class="n">p1</span> <span class="o">|</span> <span class="n">p2</span><span class="p">)</span> <span class="o">/</span> <span class="n">p3</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_specialized-plots_50_0.png" src="../_images/tutorials_specialized-plots_50_0.png" />
+</div>
+</div>
+</section>
+<section id="Next">
+<h2>Next<a class="headerlink" href="#Next" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="upset.html"><span class="doc">UpSet plots</span></a> covers <code class="docutils literal notranslate"><span class="pre">plot_pseudobulk_de(mode=&quot;upset&quot;)</span></code> and the full native set-intersection API in depth.</p></li>
+<li><p>The <a class="reference internal" href="plot-gallery.html"><span class="doc">plot gallery</span></a> provides a function-oriented index to these and the other plotting examples.</p></li>
+</ul>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="plot-gallery.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Plot gallery</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="multimodal.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Multimodal: RNA + protein (CITE-seq)</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, MaximilianNuber
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Specialized plots</a><ul>
+<li><a class="reference internal" href="#Baron-pancreas:-abundance,-composition,-and-pseudobulk">Baron pancreas: abundance, composition, and pseudobulk</a><ul>
+<li><a class="reference internal" href="#Abundance-by-donor-and-cell-type">Abundance by donor and cell type</a></li>
+<li><a class="reference internal" href="#Counts-vs. proportions">Counts vs. proportions</a></li>
+<li><a class="reference internal" href="#Donor-aware-grouping-and-pseudobulk-QC">Donor-aware grouping and pseudobulk QC</a></li>
+<li><a class="reference internal" href="#Grouped,-clustered-heatmap">Grouped, clustered heatmap</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Zeisel:-statistics,-significance-brackets,-dot-plots,-palettes">Zeisel: statistics, significance brackets, dot plots, palettes</a><ul>
+<li><a class="reference internal" href="#Grouped-statistics-with-automatic-significance-brackets">Grouped statistics with automatic significance brackets</a></li>
+<li><a class="reference internal" href="#A-minimal-geometry-example-for-geom_signif">A minimal geometry example for <code class="docutils literal notranslate"><span class="pre">geom_signif</span></code></a></li>
+<li><a class="reference internal" href="#Dot-plot">Dot plot</a></li>
+<li><a class="reference internal" href="#Selected-scatter-plot">Selected scatter plot</a></li>
+<li><a class="reference internal" href="#Custom-palettes-and-the-IGV-palette">Custom palettes and the IGV palette</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#E-MTAB-1625:-differential-expression-results">E-MTAB-1625: differential-expression results</a><ul>
+<li><a class="reference internal" href="#Sample-metadata-plot">Sample metadata plot</a></li>
+<li><a class="reference internal" href="#Volcano,-MA,-and-coefficient-plots-—-alternate-styling">Volcano, MA, and coefficient plots — alternate styling</a></li>
+<li><a class="reference internal" href="#Marsilea-backed-heatmap">Marsilea-backed heatmap</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ECCITE-seq-TCR-repertoire-(EH4616-CTCL,-EH4621-control)">ECCITE-seq TCR repertoire (EH4616 CTCL, EH4621 control)</a><ul>
+<li><a class="reference internal" href="#Clonotype-abundance">Clonotype abundance</a></li>
+<li><a class="reference internal" href="#Clonotype-overlap">Clonotype overlap</a></li>
+<li><a class="reference internal" href="#V/J-gene-usage">V/J gene usage</a></li>
+<li><a class="reference internal" href="#Repertoire-feature-embedding">Repertoire-feature embedding</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Composed-multi-panel-figure">Composed multi-panel figure</a></li>
+<li><a class="reference internal" href="#Next">Next</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    </body>
+</html>

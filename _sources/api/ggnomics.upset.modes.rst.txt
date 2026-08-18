@@ -1,0 +1,7 @@
+ggnomics.upset.modes module
+===========================
+
+.. automodule:: ggnomics.upset.modes
+   :members:
+   :show-inheritance:
+   :undoc-members:

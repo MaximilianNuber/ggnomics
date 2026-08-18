@@ -1,0 +1,7 @@
+ggnomics.bulk.pca module
+========================
+
+.. automodule:: ggnomics.bulk.pca
+   :members:
+   :show-inheritance:
+   :undoc-members:

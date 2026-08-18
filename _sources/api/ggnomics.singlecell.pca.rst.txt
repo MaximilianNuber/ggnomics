@@ -1,0 +1,7 @@
+ggnomics.singlecell.pca module
+==============================
+
+.. automodule:: ggnomics.singlecell.pca
+   :members:
+   :show-inheritance:
+   :undoc-members:

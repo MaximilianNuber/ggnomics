@@ -1,0 +1,7 @@
+ggnomics
+========
+
+.. toctree::
+   :maxdepth: 4
+
+   ggnomics

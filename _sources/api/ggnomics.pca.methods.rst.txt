@@ -1,0 +1,7 @@
+ggnomics.pca.methods module
+===========================
+
+.. automodule:: ggnomics.pca.methods
+   :members:
+   :show-inheritance:
+   :undoc-members:

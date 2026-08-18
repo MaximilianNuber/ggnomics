@@ -1,0 +1,12 @@
+ggnomics.bulk namespace
+=======================
+
+.. py:module:: ggnomics.bulk
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   ggnomics.bulk.pca

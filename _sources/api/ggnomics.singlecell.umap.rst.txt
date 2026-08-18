@@ -1,0 +1,7 @@
+ggnomics.singlecell.umap module
+===============================
+
+.. automodule:: ggnomics.singlecell.umap
+   :members:
+   :show-inheritance:
+   :undoc-members:

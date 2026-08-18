@@ -1,0 +1,7 @@
+ggnomics.upset.annotations module
+=================================
+
+.. automodule:: ggnomics.upset.annotations
+   :members:
+   :show-inheritance:
+   :undoc-members:
