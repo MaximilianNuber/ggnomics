@@ -5,6 +5,7 @@ Run from the repo root:
 """
 
 import matplotlib
+
 matplotlib.use("Agg")
 
 import importlib.util
@@ -16,46 +17,43 @@ _REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_REPO_ROOT))
 
 # Load 00_mock_data.py via importlib (filename starts with a digit).
-_spec = importlib.util.spec_from_file_location(
-    "mock_data", _REPO_ROOT / "examples" / "00_mock_data.py"
-)
+_spec = importlib.util.spec_from_file_location("mock_data", _REPO_ROOT / "examples" / "00_mock_data.py")
 _mock = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_mock)  # type: ignore[union-attr]
 
-make_mock_anndata    = _mock.make_mock_anndata
+make_mock_anndata = _mock.make_mock_anndata
 make_mock_de_results = _mock.make_mock_de_results
-make_mock_coefs      = _mock.make_mock_coefs
-make_mock_mudata     = _mock.make_mock_mudata
+make_mock_coefs = _mock.make_mock_coefs
+make_mock_mudata = _mock.make_mock_mudata
 make_mock_repertoire = _mock.make_mock_repertoire
 
 import numpy as np
-import pandas as pd
 
 from ggnomics import (
-    plot_scatter,
-    plot_umap,
-    plot_pca,
-    plot_expression,
-    plot_dot,
-    plot_heatmap,
-    plot_coldata,
-    plot_highest_exprs,
     plot_abundance,
-    plot_violin_stats,
-    plot_box_stats,
-    plot_scatter_marginal,
-    plot_embedding_panel,
-    plot_volcano,
-    plot_ma,
-    plot_coef_lollipop,
-    plot_coef_expression,
-    plot_pseudobulk_qc,
-    plot_pseudobulk_de,
-    plot_bimodal_scatter,
     plot_adt_qc,
+    plot_bimodal_scatter,
+    plot_box_stats,
     plot_clonotype_abundance,
-    plot_clonotype_overlap,
     plot_clonotype_embedding,
+    plot_clonotype_overlap,
+    plot_coef_expression,
+    plot_coef_lollipop,
+    plot_coldata,
+    plot_dot,
+    plot_embedding_panel,
+    plot_expression,
+    plot_heatmap,
+    plot_highest_exprs,
+    plot_ma,
+    plot_pca,
+    plot_pseudobulk_de,
+    plot_pseudobulk_qc,
+    plot_scatter,
+    plot_scatter_marginal,
+    plot_umap,
+    plot_violin_stats,
+    plot_volcano,
 )
 from ggnomics.heatmap import heatmap_from_matrix
 
@@ -69,18 +67,18 @@ OUT.mkdir(parents=True, exist_ok=True)
 # Build mock data (n_cells = 800)
 # ---------------------------------------------------------------------------
 print("Building mock data (n_cells=800) …")
-adata       = make_mock_anndata(n_cells=800)
-de_df       = make_mock_de_results()
-coefs       = make_mock_coefs()
-mudata      = make_mock_mudata(n_cells=800)
+adata = make_mock_anndata(n_cells=800)
+de_df = make_mock_de_results()
+coefs = make_mock_coefs()
+mudata = make_mock_mudata(n_cells=800)
 
 top20 = list(adata.var_names[:20])
 top10 = list(adata.var_names[:10])
 results_dict = {c: make_mock_de_results() for c in list(adata.obs["cluster"].unique())[:4]}
 
 # First two gene names (stand-ins for "CD3E" / "CD8A" in README examples)
-_g1 = adata.var_names[0]   # Gene0001
-_g2 = adata.var_names[1]   # Gene0002
+_g1 = adata.var_names[0]  # Gene0001
+_g2 = adata.var_names[1]  # Gene0002
 
 # Build adata_prot: combine protein features + isotype controls into one AnnData
 adata_prot = None
@@ -88,19 +86,19 @@ try:
     import anndata as _ad
 
     _prot = mudata["prot"]
-    _iso  = mudata["iso"]
+    _iso = mudata["iso"]
     # Rename IgG2a → IgG2 so the call matches isotype_controls=["IgG1","IgG2"]
     _X = np.concatenate([np.asarray(_prot.X), np.asarray(_iso.X[:, :2])], axis=1)
     adata_prot = _ad.AnnData(X=_X.astype(np.float32))
-    adata_prot.var_names  = list(_prot.var_names) + ["IgG1", "IgG2"]
-    adata_prot.obs_names  = _prot.obs_names.copy()
+    adata_prot.var_names = list(_prot.var_names) + ["IgG1", "IgG2"]
+    adata_prot.obs_names = _prot.obs_names.copy()
     for _col in _prot.obs.columns:
         adata_prot.obs[_col] = _prot.obs[_col].values
 except Exception as _e:
     print(f"  ⚠ Could not build adata_prot: {_e}")
 
 # Simple numpy matrix for the heatmap_matrix demo (20 rows × 10 cols)
-_rng   = np.random.default_rng(42)
+_rng = np.random.default_rng(42)
 matrix = _rng.normal(0, 1, (20, 10))
 
 print("Mock data ready.\n")
@@ -108,6 +106,7 @@ print("Mock data ready.\n")
 # ---------------------------------------------------------------------------
 # Save helpers
 # ---------------------------------------------------------------------------
+
 
 def _save_plot(p, name, width=6, height=4):
     p.save(str(OUT / name), dpi=150, width=width, height=height)
@@ -141,7 +140,9 @@ except Exception as e:
 try:
     _save_plot(
         plot_umap(adata, color="cluster", facet_by="batch"),
-        "reduced_dim_facet.png", width=9, height=4,
+        "reduced_dim_facet.png",
+        width=9,
+        height=4,
     )
 except Exception as e:
     print(f"⚠ reduced_dim_facet.png failed: {e}")
@@ -210,7 +211,9 @@ except Exception as e:
 try:
     _save_compose(
         plot_scatter_marginal(adata, x="n_counts", y="n_genes_detected", color="cluster"),
-        "scatter_marginal.png", width=8, height=6,
+        "scatter_marginal.png",
+        width=8,
+        height=6,
     )
 except Exception as e:
     print(f"⚠ scatter_marginal.png failed: {e}")
@@ -268,8 +271,7 @@ except Exception as e:
 try:
     # Full clustering on rows + cols = clustermap equivalent
     _save_plot(
-        plot_heatmap(adata, features=top20, group_by="cluster",
-                     cluster_rows=True, cluster_cols=True),
+        plot_heatmap(adata, features=top20, group_by="cluster", cluster_rows=True, cluster_cols=True),
         "clustermap.png",
     )
 except Exception as e:
@@ -287,7 +289,9 @@ except Exception as e:
 try:
     _save_plot(
         plot_expression(adata, features=top10[:3], group_by="cluster"),
-        "expression_violin.png", width=8, height=4,
+        "expression_violin.png",
+        width=8,
+        height=4,
     )
 except Exception as e:
     print(f"⚠ expression_violin.png failed: {e}")
@@ -338,7 +342,9 @@ try:
     _pb_adata.obs["condition"] = _pb_adata.obs["sample"].map(_sample_to_condition)
     _save_compose(
         plot_pseudobulk_qc(_pb_adata, sample_by="sample", group_by="cluster", condition_by="condition"),
-        "pseudobulk_qc.png", width=12, height=8,
+        "pseudobulk_qc.png",
+        width=12,
+        height=8,
     )
 except Exception as e:
     print(f"⚠ pseudobulk_qc.png failed: {e}")
@@ -346,7 +352,9 @@ except Exception as e:
 try:
     _save_compose(
         plot_pseudobulk_de(results_dict, mode="volcano", ncol=2),
-        "pseudobulk_de_volcano.png", width=10, height=8,
+        "pseudobulk_de_volcano.png",
+        width=10,
+        height=8,
     )
 except Exception as e:
     print(f"⚠ pseudobulk_de_volcano.png failed: {e}")
@@ -364,11 +372,10 @@ except Exception as e:
 # ===========================================================================
 
 try:
-    _x_feat = mudata["rna"].var_names[0]   # Gene0001
+    _x_feat = mudata["rna"].var_names[0]  # Gene0001
     _y_feat = mudata["prot"].var_names[0]  # Prot01
     _save_plot(
-        plot_bimodal_scatter(mudata, x_feature=_x_feat, y_feature=_y_feat,
-                              x_mod="rna", y_mod="prot"),
+        plot_bimodal_scatter(mudata, x_feature=_x_feat, y_feature=_y_feat, x_mod="rna", y_mod="prot"),
         "bimodal_scatter.png",
     )
 except Exception as e:
@@ -380,7 +387,9 @@ try:
     else:
         _save_plot(
             plot_adt_qc(adata_prot, isotype_controls=["IgG1", "IgG2"]),
-            "adt_qc.png", width=9, height=4,
+            "adt_qc.png",
+            width=9,
+            height=4,
         )
 except Exception as e:
     print(f"⚠ adt_qc.png failed: {e}")

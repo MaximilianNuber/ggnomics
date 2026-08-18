@@ -20,8 +20,9 @@ p + p9.theme_bw() + p9.labs(title="Cell populations")
 ```
 
 Start with [Getting started](getting-started.qmd), follow one of the
-end-to-end workflows, or browse the [plot gallery](plot-gallery.qmd) for a
-particular figure.
+end-to-end workflows, browse the [plot gallery](plot-gallery.qmd) for a
+particular figure, or read about the native
+[UpSet plots](upset.qmd) for set intersections.
 
 ## Examples
 
@@ -82,7 +83,7 @@ docstring shown by `help()` and in Jupyter. Adapters for AnnData, BiocPy, and
 MuData register automatically when their corresponding packages are
 installed.
 
-[Getting started §7](getting-started.qmd#7-how-dispatch-works)
+[Getting started §7](getting-started.qmd#how-dispatch-works)
 explains the design and shows how to inspect the registered implementations.
 
 ## Build on the returned plot

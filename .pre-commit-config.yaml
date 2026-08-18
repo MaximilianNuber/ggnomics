@@ -1,0 +1,44 @@
+# Pre-commit hooks for ggnomics.
+#
+#   pip install pre-commit
+#   pre-commit install
+#   pre-commit run --all-files
+#
+# Generated documentation is excluded on purpose: vignettes/reference/ is
+# written by `quartodoc build`, vignettes/_freeze/ is Quarto's committed
+# execution cache, and vignettes/_site/ is rendered output. Reformatting any
+# of them would create diffs that the next docs build immediately reverts.
+exclude: |
+  (?x)^(
+    vignettes/_freeze/.*|
+    vignettes/_site/.*|
+    vignettes/reference/.*|
+    vignettes/objects\.json|
+    docs/img/.*|
+    .*\.ipynb
+  )$
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: check-ast
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+      - id: check-added-large-files
+        # Rendered vignette figures and the README demonstration plots are
+        # legitimately large and are already excluded above; 512 kB is enough
+        # headroom for source files without letting datasets slip in.
+        args: ["--maxkb=512"]
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.3
+    hooks:
+      - id: ruff-check
+        args: ["--fix"]
+      - id: ruff-format

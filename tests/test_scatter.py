@@ -1,6 +1,7 @@
 """Tests for the scatter and embedding dispatch hierarchy."""
 
 import inspect
+
 import pandas as pd
 import pytest
 from plotnine.ggplot import ggplot as ggplot_class
@@ -15,7 +16,6 @@ from ggnomics import (
     plot_umap,
 )
 from ggnomics._utils import adaptive_size
-
 
 # ---------------------------------------------------------------------------
 # plot_scatter — DataFrame
@@ -106,16 +106,12 @@ def test_scatter_adata_gene_color(mock_adata):
 
 
 def test_scatter_adata_gene_color_layer(mock_adata):
-    p = plot_scatter(
-        mock_adata, x="n_counts", y="n_genes_detected",
-        color="Gene0001", layer="logcounts"
-    )
+    p = plot_scatter(mock_adata, x="n_counts", y="n_genes_detected", color="Gene0001", layer="logcounts")
     assert isinstance(p, ggplot_class)
 
 
 def test_scatter_adata_facet(mock_adata):
-    p = plot_scatter(mock_adata, x="n_counts", y="n_genes_detected",
-                     color="cluster", facet_by="batch")
+    p = plot_scatter(mock_adata, x="n_counts", y="n_genes_detected", color="cluster", facet_by="batch")
     assert isinstance(p, ggplot_class)
     assert p.facet is not None
 

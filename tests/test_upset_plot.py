@@ -4,11 +4,10 @@ from __future__ import annotations
 
 import pandas as pd
 import pytest
-from plotnine import aes, geom_boxplot, geom_point, ggplot, geom_segment
+from plotnine import aes, geom_boxplot, geom_point, geom_segment, ggplot
 from plotnine.composition import Compose
 
 import ggnomics.upset as upset
-
 
 # ---------------------------------------------------------------------------
 # Input handling
@@ -100,9 +99,7 @@ def test_multiple_annotations_draw(abc_example_with_covariates, tmp_path):
     assert output.stat().st_size > 1_000
 
 
-def test_custom_annotation_using_numeric_gene_level_variable_draws(
-    abc_example_with_covariates, tmp_path
-):
+def test_custom_annotation_using_numeric_gene_level_variable_draws(abc_example_with_covariates, tmp_path):
     annotation = upset.upset_annotate("score", geom_boxplot())
     composition = upset.upset(
         abc_example_with_covariates,
@@ -142,11 +139,7 @@ def test_only_components_limits_highlighting_in_full_composition(abc_example, tm
         abc_example,
         ["A", "B", "C"],
         intersections="all",
-        queries=[
-            upset.upset_query(
-                intersect=["A", "B"], color="red", only_components=["intersections_matrix"]
-            )
-        ],
+        queries=[upset.upset_query(intersect=["A", "B"], color="red", only_components=["intersections_matrix"])],
     )
     output = tmp_path / "only_components.png"
     composition.save(output, width=8, height=6, dpi=60, verbose=False)
@@ -154,9 +147,7 @@ def test_only_components_limits_highlighting_in_full_composition(abc_example, tm
 
 
 def test_custom_labeller_is_applied(abc_example, tmp_path):
-    composition = upset.upset(
-        abc_example, ["A", "B", "C"], labeller=lambda name: f"Set {name}"
-    )
+    composition = upset.upset(abc_example, ["A", "B", "C"], labeller=lambda name: f"Set {name}")
     output = tmp_path / "labeller.png"
     composition.save(output, width=8, height=6, dpi=60, verbose=False)
     assert output.exists()

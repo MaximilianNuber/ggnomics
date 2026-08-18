@@ -94,15 +94,11 @@ def test_invalid_radius_raises():
 
 def test_invalid_grid_size_raises():
     with pytest.raises(ValueError):
-        upset.compute_venn_layout(
-            _membership_df(n_sets=2), sets=["A", "B"], starting_grid_size=5
-        )
+        upset.compute_venn_layout(_membership_df(n_sets=2), sets=["A", "B"], starting_grid_size=5)
 
 
 def test_deterministic_circle_count():
-    layout = upset.compute_venn_layout(
-        _membership_df(n_sets=3), sets=["A", "B", "C"], starting_grid_size=60
-    )
+    layout = upset.compute_venn_layout(_membership_df(n_sets=3), sets=["A", "B", "C"], starting_grid_size=60)
     # 240 boundary angles per circle, one circle per set.
     assert len(layout.circles) == 240 * 3
 
@@ -127,9 +123,7 @@ def test_region_counts_agree_with_direct_boolean_tabulation():
 
 
 def test_set_labels_exist_exactly_once_per_set():
-    layout = upset.compute_venn_layout(
-        _membership_df(n_sets=3), sets=["A", "B", "C"], starting_grid_size=60
-    )
+    layout = upset.compute_venn_layout(_membership_df(n_sets=3), sets=["A", "B", "C"], starting_grid_size=60)
     counts = layout.set_labels["set"].value_counts()
     assert counts.to_dict() == {"A": 1, "B": 1, "C": 1}
 

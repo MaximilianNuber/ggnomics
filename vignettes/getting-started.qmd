@@ -125,7 +125,7 @@ gg.plot_expression(adata, features=["Gfap"], group_by="level1class", log1p=True)
 All three calls use the same underlying measurements and produce the same
 plot.
 
-## 7. How dispatch works
+## 7. How dispatch works {#how-dispatch-works}
 
 `plot_expression`, like the other public `plot_*` functions, is a
 `functools.singledispatch` generic. The base DataFrame implementation supplies

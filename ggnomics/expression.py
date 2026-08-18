@@ -8,22 +8,22 @@ from typing import Dict, List, Optional
 import numpy as np
 import pandas as pd
 from plotnine import (
-    ggplot,
     aes,
-    geom_violin,
+    element_blank,
+    element_text,
+    facet_wrap,
     geom_jitter,
     geom_point,
     geom_tile,
-    theme_classic,
-    theme,
-    element_text,
-    element_blank,
+    geom_violin,
+    ggplot,
     ggtitle,
     labs,
-    facet_wrap,
     scale_color_cmap,
     scale_fill_cmap,
     scale_size_continuous,
+    theme,
+    theme_classic,
 )
 
 from ._utils import adaptive_size, color_scale, to_long
@@ -43,10 +43,7 @@ def _validate_features(features: List[str]) -> None:
     seen = set()
     duplicates = sorted({f for f in features if f in seen or seen.add(f)})
     if duplicates:
-        raise ValueError(
-            f"`features` contains duplicate names, which would make the "
-            f"result ambiguous: {duplicates}"
-        )
+        raise ValueError(f"`features` contains duplicate names, which would make the result ambiguous: {duplicates}")
 
 
 def _validate_no_collision(features: List[str], metadata_names: List[str]) -> None:
@@ -62,10 +59,7 @@ def _validate_no_collision(features: List[str], metadata_names: List[str]) -> No
 def _require_columns(data: pd.DataFrame, columns: List[str], *, location: str) -> None:
     missing = [c for c in columns if c not in data.columns]
     if missing:
-        raise KeyError(
-            f"Column(s) {missing} not found in {location}. "
-            f"Available: {list(data.columns)}"
-        )
+        raise KeyError(f"Column(s) {missing} not found in {location}. Available: {list(data.columns)}")
 
 
 # ---------------------------------------------------------------------------
@@ -255,16 +249,21 @@ def _plot_dot_dataframe(
     records = []
     for feat in features:
         tmp = pd.DataFrame({"val": obs_df[feat].to_numpy(), "group": groups.to_numpy()})
-        agg = tmp.groupby("group", observed=True).agg(
-            mean_expr=("val", "mean"),
-            frac_expr=("val", lambda v: float((v > 0).mean())),
-        ).reset_index()
+        agg = (
+            tmp.groupby("group", observed=True)
+            .agg(
+                mean_expr=("val", "mean"),
+                frac_expr=("val", lambda v: float((v > 0).mean())),
+            )
+            .reset_index()
+        )
         agg["feature"] = feat
         records.append(agg)
 
     stats = pd.concat(records, ignore_index=True)
 
     if scale:
+
         def _scale_vals(vals: pd.Series) -> pd.Series:
             mn, mx = vals.min(), vals.max()
             rng = mx - mn
@@ -278,9 +277,7 @@ def _plot_dot_dataframe(
 
     stats["frac_expr"] = stats["frac_expr"].clip(dot_min, dot_max)
     stats["feature"] = pd.Categorical(stats["feature"], categories=features, ordered=True)
-    stats["group"] = pd.Categorical(
-        stats["group"], categories=list(dict.fromkeys(groups)), ordered=True
-    )
+    stats["group"] = pd.Categorical(stats["group"], categories=list(dict.fromkeys(groups)), ordered=True)
 
     p = (
         ggplot(stats)
@@ -439,7 +436,7 @@ def _hclust_order(mat: np.ndarray, labels: list, axis: int):
         ImportError: If SciPy is not installed.
     """
     try:
-        from scipy.cluster.hierarchy import linkage, leaves_list
+        from scipy.cluster.hierarchy import leaves_list, linkage
         from scipy.spatial.distance import pdist
     except ImportError as exc:
         raise ImportError(

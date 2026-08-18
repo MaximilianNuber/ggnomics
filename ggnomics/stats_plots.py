@@ -9,23 +9,23 @@ from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Union
 import numpy as np
 import pandas as pd
 from plotnine import (
-    ggplot,
     aes,
-    geom_violin,
+    element_text,
     geom_boxplot,
     geom_jitter,
-    theme_classic,
-    theme,
-    element_text,
+    geom_violin,
+    ggplot,
     ggtitle,
     labs,
-    scale_fill_manual,
     scale_fill_brewer,
+    scale_fill_manual,
     scale_y_continuous,
+    theme,
+    theme_classic,
 )
 
 from ._utils import adaptive_size
-from .signif._geom import _DeferredSignif, geom_signif
+from .signif._geom import geom_signif
 
 if TYPE_CHECKING:
     from plotnine.composition import Compose
@@ -66,10 +66,12 @@ def _build_violin_data(
 ) -> Tuple[pd.DataFrame, List]:
     """Combine already-resolved feature/group Series into a long DataFrame."""
 
-    df = pd.DataFrame({
-        "__feature__": feature_series.to_numpy(),
-        "__group__": group_series.to_numpy(),
-    })
+    df = pd.DataFrame(
+        {
+            "__feature__": feature_series.to_numpy(),
+            "__group__": group_series.to_numpy(),
+        }
+    )
 
     unique_groups = sorted(df["__group__"].unique().astype(str).tolist())
     if order is not None:
@@ -246,18 +248,25 @@ def _plot_violin_stats_dataframe(
 ) -> ggplot:
     for column in (feature, group_by):
         if column not in data.columns:
-            raise KeyError(
-                f"Column {column!r} not found in the DataFrame. "
-                f"Available: {list(data.columns)[:20]}"
-            )
+            raise KeyError(f"Column {column!r} not found in the DataFrame. Available: {list(data.columns)[:20]}")
 
     df, groups_order = _build_violin_data(data[feature], data[group_by], order)
 
     p = _build_stat_annotated_plot(
-        df, groups_order, group_by, feature,
+        df,
+        groups_order,
+        group_by,
+        feature,
         geom_violin(scale="width", trim=True),
-        comparisons, test, p_adjust, sig_only, annotation, palette,
-        x_label, y_label, title,
+        comparisons,
+        test,
+        p_adjust,
+        sig_only,
+        annotation,
+        palette,
+        x_label,
+        y_label,
+        title,
     )
 
     if add_boxplot:
@@ -354,18 +363,25 @@ def _plot_box_stats_dataframe(
 ) -> ggplot:
     for column in (feature, group_by):
         if column not in data.columns:
-            raise KeyError(
-                f"Column {column!r} not found in the DataFrame. "
-                f"Available: {list(data.columns)[:20]}"
-            )
+            raise KeyError(f"Column {column!r} not found in the DataFrame. Available: {list(data.columns)[:20]}")
 
     df, groups_order = _build_violin_data(data[feature], data[group_by], order)
 
     p = _build_stat_annotated_plot(
-        df, groups_order, group_by, feature,
+        df,
+        groups_order,
+        group_by,
+        feature,
         geom_boxplot(outlier_alpha=0.5),
-        comparisons, test, p_adjust, sig_only, annotation, palette,
-        x_label, y_label, title,
+        comparisons,
+        test,
+        p_adjust,
+        sig_only,
+        annotation,
+        palette,
+        x_label,
+        y_label,
+        title,
     )
 
     if add_points:
@@ -396,7 +412,7 @@ def plot_scatter_marginal(
     title: Optional[str] = None,
     x_label: Optional[str] = None,
     y_label: Optional[str] = None,
-) -> "Compose":
+) -> Compose:
     """Scatter plot with marginal distributions.
 
     Composed from three plotnine panels (scatter, x-marginal, y-marginal)
@@ -450,23 +466,20 @@ def _plot_scatter_marginal_dataframe(
     x_label: Optional[str] = None,
     y_label: Optional[str] = None,
 ):
-    from plotnine import geom_density, geom_histogram, geom_boxplot as _gbp, coord_flip, element_blank
+    from plotnine import coord_flip, element_blank, geom_density, geom_histogram
+    from plotnine import geom_boxplot as _gbp
     from plotnine.composition import plot_spacer
-    from .scatter import plot_scatter
+
     from ._compose import HAS_LAYOUT
+    from .scatter import plot_scatter
 
     if marginal not in _MARGINAL_MODES:
-        raise ValueError(
-            f"marginal must be one of {_MARGINAL_MODES}, got {marginal!r}."
-        )
+        raise ValueError(f"marginal must be one of {_MARGINAL_MODES}, got {marginal!r}.")
 
     required = [x, y] + ([color] if color is not None else [])
     missing = [c for c in required if c not in data.columns]
     if missing:
-        raise KeyError(
-            f"Column(s) {missing} not found in the DataFrame. "
-            f"Available: {list(data.columns)[:20]}"
-        )
+        raise KeyError(f"Column(s) {missing} not found in the DataFrame. Available: {list(data.columns)[:20]}")
 
     color_is_cont = bool(color is not None and pd.api.types.is_numeric_dtype(data[color]))
 
@@ -486,35 +499,51 @@ def _plot_scatter_marginal_dataframe(
 
     if marginal == "density":
         p_top = (
-            ggplot(marg_df) + aes(**aes_x_kwargs) + geom_density(alpha=0.4)
-            + theme_classic() + labs(y="Density") + _strip_top
+            ggplot(marg_df)
+            + aes(**aes_x_kwargs)
+            + geom_density(alpha=0.4)
+            + theme_classic()
+            + labs(y="Density")
+            + _strip_top
         )
         p_right = (
-            ggplot(marg_df) + aes(**aes_y_kwargs) + geom_density(alpha=0.4)
-            + coord_flip() + theme_classic() + labs(x="Density") + _strip_right
+            ggplot(marg_df)
+            + aes(**aes_y_kwargs)
+            + geom_density(alpha=0.4)
+            + coord_flip()
+            + theme_classic()
+            + labs(x="Density")
+            + _strip_right
         )
     elif marginal == "histogram":
         p_top = (
-            ggplot(marg_df) + aes(**aes_x_kwargs) + geom_histogram(bins=30, alpha=0.6)
-            + theme_classic() + _strip_top
+            ggplot(marg_df) + aes(**aes_x_kwargs) + geom_histogram(bins=30, alpha=0.6) + theme_classic() + _strip_top
         )
         p_right = (
-            ggplot(marg_df) + aes(**aes_y_kwargs) + geom_histogram(bins=30, alpha=0.6)
-            + coord_flip() + theme_classic() + _strip_right
+            ggplot(marg_df)
+            + aes(**aes_y_kwargs)
+            + geom_histogram(bins=30, alpha=0.6)
+            + coord_flip()
+            + theme_classic()
+            + _strip_right
         )
     else:  # boxplot
-        p_top = (
-            ggplot(marg_df) + aes(x="_mx_", y="_mx_") + _gbp()
-            + theme_classic() + _strip_top
-        )
-        p_right = (
-            ggplot(marg_df) + aes(x="_my_", y="_my_") + _gbp()
-            + theme_classic() + _strip_right
-        )
+        p_top = ggplot(marg_df) + aes(x="_mx_", y="_mx_") + _gbp() + theme_classic() + _strip_top
+        p_right = ggplot(marg_df) + aes(x="_my_", y="_my_") + _gbp() + theme_classic() + _strip_right
 
     p_scatter = plot_scatter(
-        data, x=x, y=y, color=color, layer=None, size=size, stroke=stroke,
-        alpha=alpha, palette=palette, cmap=cmap, x_label=x_label, y_label=y_label,
+        data,
+        x=x,
+        y=y,
+        color=color,
+        layer=None,
+        size=size,
+        stroke=stroke,
+        alpha=alpha,
+        palette=palette,
+        cmap=cmap,
+        x_label=x_label,
+        y_label=y_label,
         title=title,
     )
 
@@ -524,6 +553,7 @@ def _plot_scatter_marginal_dataframe(
 
     if HAS_LAYOUT:
         from plotnine.composition import plot_layout
+
         composition = composition + plot_layout(widths=[3, 1], heights=[1, 3])
 
     return composition
@@ -549,7 +579,7 @@ def plot_embedding_panel(
     cmap: str = "viridis",
     palette: Optional[Dict] = None,
     title: Optional[str] = None,
-) -> "Union[Compose, ggplot]":
+) -> Union[Compose, ggplot]:
     """Grid of embedding plots, one panel per feature.
 
     Each panel is a :func:`ggnomics.plot_reduced_dim` call. For continuous
@@ -605,8 +635,9 @@ def _plot_embedding_panel_dataframe(
     palette: Optional[Dict] = None,
     title: Optional[str] = None,
 ):
+    from ._compose import annotate_composition
+    from ._compose import grid as _grid
     from .scatter import plot_reduced_dim
-    from ._compose import grid as _grid, annotate_composition
 
     if not features:
         raise ValueError("`features` must be a non-empty list of column names.")

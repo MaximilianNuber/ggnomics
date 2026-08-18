@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 from plotnine.ggplot import ggplot as ggplot_class
 
-from ggnomics import plot_expression, plot_dot, plot_heatmap
+from ggnomics import plot_dot, plot_expression, plot_heatmap
 
 FEATURES = ["Gene0001", "Gene0002", "Gene0003"]
 
@@ -196,9 +196,7 @@ def test_heatmap_empty_features_raises(mock_df):
 def test_expression_layer_ignored_for_dataframe(mock_df):
     p1 = plot_expression(mock_df, features=FEATURES, group_by="cluster")
     p2 = plot_expression(mock_df, features=FEATURES, group_by="cluster", layer="nonexistent")
-    pd.testing.assert_frame_equal(
-        p1.data.reset_index(drop=True), p2.data.reset_index(drop=True)
-    )
+    pd.testing.assert_frame_equal(p1.data.reset_index(drop=True), p2.data.reset_index(drop=True))
 
 
 def test_expression_unsupported_type_raises():
@@ -218,7 +216,7 @@ def test_expression_sparse_dense_equivalence():
     rng = np.random.default_rng(0)
     n_cells, n_genes = 100, 10
     X = rng.negative_binomial(3, 0.5, size=(n_cells, n_genes)).astype(float)
-    gene_names = [f"Gene{i+1:04d}" for i in range(n_genes)]
+    gene_names = [f"Gene{i + 1:04d}" for i in range(n_genes)]
 
     def _make(x):
         ad = anndata.AnnData(X=x.copy())

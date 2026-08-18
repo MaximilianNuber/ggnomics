@@ -1,5 +1,11 @@
-# Reproducible environment for building the ggnomics documentation site
-# (Quarto vignettes + MkDocs API reference) against real public datasets.
+# Reproducible environment for building the ggnomics documentation.
+#
+# Covers both builds:
+#   * the published Sphinx site (BiocPy style: furo, MyST, sphinx-apidoc,
+#     nbsphinx), and
+#   * the Quarto project in vignettes/, which authors the tutorials and
+#     builds its own site,
+# against real public datasets.
 #
 # Usage:
 #   mamba env create -f environment-docs.yml
@@ -14,9 +20,16 @@
 #
 # Render docs (see vignettes/README or the top-level README for the full command,
 # including how QUARTO_PYTHON is resolved from this environment's prefix):
-#   mamba run -n ggnomics-docs env QUARTO_PYTHON="$(mamba run -n ggnomics-docs which python)" \
-#     quarto render vignettes
-#   mamba run -n ggnomics-docs mkdocs build --strict
+#   Quarto site:
+#     cd vignettes && mamba run -n ggnomics-docs quartodoc build
+#     mamba run -n ggnomics-docs env QUARTO_PYTHON="$(mamba run -n ggnomics-docs which python)" \
+#       quarto render vignettes
+#
+#   Tutorial notebooks (executes the vignettes, embeds the figures):
+#     mamba run -n ggnomics-docs python tools/build_tutorial_notebooks.py
+#
+#   Sphinx site (never executes a notebook):
+#     mamba run -n ggnomics-docs sphinx-build -b html docs docs/_build/html
 name: ggnomics-docs
 channels:
   - conda-forge
@@ -41,12 +54,7 @@ dependencies:
   - nbclient>=0.8
   - nbformat>=5.9
   - pyyaml>=6.0
-
-  # MkDocs site (API reference generated from docstrings)
-  - mkdocs>=1.6
-  - mkdocs-material>=9.5
-  - mkdocstrings>=0.26
-  - mkdocstrings-python>=1.10
+  - pandoc>=3
 
   - pip:
       # ggnomics itself is installed editable in a separate step (see Usage above)
@@ -77,3 +85,21 @@ dependencies:
 
       # Composable heatmaps
       - marsilea
+
+      # Sphinx documentation site (BiocPy house style). nbsphinx also needs
+      # pandoc on PATH; install it from conda-forge or your package manager.
+      - sphinx>=7.2
+      - furo
+      - myst-parser[linkify]
+      - nbsphinx
+      - sphinx-autodoc-typehints
+      - sphinx-copybutton
+
+      # quartodoc API reference for the Quarto site.
+      # griffe is capped below 2.0: quartodoc 0.11 calls griffe's numpy
+      # docstring parser with `allow_section_blank_line`, which only exists
+      # in griffe 1.x. Without the cap, `quartodoc build` fails with
+      #   TypeError: parse_numpy() got an unexpected keyword argument
+      #              'allow_section_blank_line'
+      - quartodoc>=0.7
+      - griffe>=1.5,<2

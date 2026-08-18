@@ -5,13 +5,15 @@ from typing import Optional
 import numpy as np
 import pandas as pd
 from plotnine import (
-    ggplot,
     aes,
     geom_ribbon,
-    theme_classic,
+    ggplot,
     ggtitle,
     scale_fill_brewer,
+    theme_classic,
 )
+
+
 def _kde_density(values: np.ndarray, bandwidth: float, grid: np.ndarray) -> np.ndarray:
     from sklearn.neighbors import KernelDensity
 
@@ -59,22 +61,19 @@ def ridge_density(
         dens = _kde_density(v, bandwidth=bandwidth, grid=grid)
         dens_scaled = dens * scale
         base = float(idx)
-        rec = pd.DataFrame({
-            "x": grid,
-            "ymin": base,
-            "ymax": base + dens_scaled,
-            group: g,
-        })
+        rec = pd.DataFrame(
+            {
+                "x": grid,
+                "ymin": base,
+                "ymax": base + dens_scaled,
+                group: g,
+            }
+        )
         records.append(rec)
 
     plot_df = pd.concat(records, ignore_index=True)
 
-    p = (
-        ggplot(plot_df)
-        + aes(x="x", ymin="ymin", ymax="ymax", fill=group)
-        + geom_ribbon(alpha=0.8)
-        + theme_classic()
-    )
+    p = ggplot(plot_df) + aes(x="x", ymin="ymin", ymax="ymax", fill=group) + geom_ribbon(alpha=0.8) + theme_classic()
     if palette:
         p = p + scale_fill_brewer(type="qual", palette=palette)
     if title:

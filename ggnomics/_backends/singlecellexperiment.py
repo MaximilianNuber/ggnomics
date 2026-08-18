@@ -167,10 +167,7 @@ def _embedding_frame(sce: SingleCellExperiment, key: str) -> pd.DataFrame:
             reduced_dimensions = getattr(sce, attribute, None)
             if isinstance(reduced_dimensions, Mapping):
                 available.extend(map(str, reduced_dimensions.keys()))
-        raise KeyError(
-            f"Embedding {key!r} not found in SCE reduced dimensions. "
-            f"Available: {sorted(set(available))}"
-        )
+        raise KeyError(f"Embedding {key!r} not found in SCE reduced dimensions. Available: {sorted(set(available))}")
 
     if values.ndim != 2:
         raise ValueError(f"SCE reduced dimension {key!r} must be two-dimensional.")
@@ -188,9 +185,7 @@ def _resolve_assay(sce: SingleCellExperiment, layer: Optional[str]):
         return sce.assay(assay_name)
     except (KeyError, ValueError, AttributeError) as exc:
         available = list(getattr(sce, "assay_names", []))
-        raise KeyError(
-            f"Assay {assay_name!r} not found in the SCE. Available: {available}"
-        ) from exc
+        raise KeyError(f"Assay {assay_name!r} not found in the SCE. Available: {available}") from exc
 
 
 def _expression_frame(
@@ -204,10 +199,7 @@ def _expression_frame(
     name_to_index = {name: index for index, name in enumerate(row_names)}
     missing = [f for f in features if f not in name_to_index]
     if missing:
-        raise KeyError(
-            f"Feature(s) {missing} not found in sce.row_names. "
-            f"Available (first 20): {row_names[:20]}"
-        )
+        raise KeyError(f"Feature(s) {missing} not found in sce.row_names. Available (first 20): {row_names[:20]}")
 
     indices = [name_to_index[f] for f in features]
     matrix = _resolve_assay(sce, layer)
@@ -233,10 +225,7 @@ def _obs_expression_frame(
     obs = _column_data(sce)
     missing_meta = [c for c in metadata_columns if c not in obs.columns]
     if missing_meta:
-        raise KeyError(
-            f"Column(s) {missing_meta} not found in SCE column_data. "
-            f"Available: {list(obs.columns)[:20]}"
-        )
+        raise KeyError(f"Column(s) {missing_meta} not found in SCE column_data. Available: {list(obs.columns)[:20]}")
 
     frame = _expression_frame(sce, features, layer)
     for column in metadata_columns:
@@ -258,9 +247,7 @@ def _plot_expression_sce(
     fill_col = color_by if color_by is not None else group_by
     metadata_columns = list(dict.fromkeys([group_by, fill_col]))
     frame = _obs_expression_frame(data, features, layer, metadata_columns)
-    return plot_expression(
-        frame, features=features, group_by=group_by, layer=None, color_by=color_by, **kwargs
-    )
+    return plot_expression(frame, features=features, group_by=group_by, layer=None, color_by=color_by, **kwargs)
 
 
 @plot_dot.register(SingleCellExperiment)
@@ -314,8 +301,7 @@ def _plot_highest_exprs_sce(
     obs = _column_data(data)
     if color_cells_by is not None and color_cells_by not in obs.columns:
         raise KeyError(
-            f"color_cells_by {color_cells_by!r} not found in SCE column_data. "
-            f"Available: {list(obs.columns)[:20]}"
+            f"color_cells_by {color_cells_by!r} not found in SCE column_data. Available: {list(obs.columns)[:20]}"
         )
 
     row_names = _row_names(data)
@@ -324,10 +310,7 @@ def _plot_highest_exprs_sce(
         name_to_index = {name: index for index, name in enumerate(row_names)}
         missing = [f for f in features if f not in name_to_index]
         if missing:
-            raise KeyError(
-                f"features not found in sce.row_names: {missing}. "
-                f"Available (first 20): {row_names[:20]}"
-            )
+            raise KeyError(f"features not found in sce.row_names: {missing}. Available (first 20): {row_names[:20]}")
         indices = [name_to_index[f] for f in features]
         matrix = matrix[indices, :]
         candidate_names = list(features)
@@ -357,14 +340,13 @@ def _plot_violin_stats_sce(
     feature_values, _ = _resolve_column(data, feature, layer=layer)
     obs = _column_data(data)
     if group_by not in obs.columns:
-        raise KeyError(
-            f"group_by {group_by!r} not found in SCE column_data. "
-            f"Available: {list(obs.columns)[:20]}"
-        )
-    frame = pd.DataFrame({
-        feature: feature_values.to_numpy(),
-        group_by: obs[group_by].to_numpy(),
-    })
+        raise KeyError(f"group_by {group_by!r} not found in SCE column_data. Available: {list(obs.columns)[:20]}")
+    frame = pd.DataFrame(
+        {
+            feature: feature_values.to_numpy(),
+            group_by: obs[group_by].to_numpy(),
+        }
+    )
     return plot_violin_stats(frame, feature=feature, group_by=group_by, layer=None, **kwargs)
 
 
@@ -381,14 +363,13 @@ def _plot_box_stats_sce(
     feature_values, _ = _resolve_column(data, feature, layer=layer)
     obs = _column_data(data)
     if group_by not in obs.columns:
-        raise KeyError(
-            f"group_by {group_by!r} not found in SCE column_data. "
-            f"Available: {list(obs.columns)[:20]}"
-        )
-    frame = pd.DataFrame({
-        feature: feature_values.to_numpy(),
-        group_by: obs[group_by].to_numpy(),
-    })
+        raise KeyError(f"group_by {group_by!r} not found in SCE column_data. Available: {list(obs.columns)[:20]}")
+    frame = pd.DataFrame(
+        {
+            feature: feature_values.to_numpy(),
+            group_by: obs[group_by].to_numpy(),
+        }
+    )
     return plot_box_stats(frame, feature=feature, group_by=group_by, layer=None, **kwargs)
 
 
@@ -436,10 +417,7 @@ def _plot_embedding_panel_sce(
         frame[feat] = values.to_numpy()
 
     if missing:
-        raise ValueError(
-            f"The following features could not be resolved in SCE column_data "
-            f"or row_names: {missing}"
-        )
+        raise ValueError(f"The following features could not be resolved in SCE column_data or row_names: {missing}")
 
     return plot_embedding_panel(frame, features=features, dimred=dimred, layer=None, **kwargs)
 
@@ -462,15 +440,10 @@ def _plot_pairs_sce(
     color_series = None
     if color_by is not None:
         if color_by not in obs.columns:
-            raise KeyError(
-                f"color_by {color_by!r} not found in SCE column_data. "
-                f"Available: {list(obs.columns)[:20]}"
-            )
+            raise KeyError(f"color_by {color_by!r} not found in SCE column_data. Available: {list(obs.columns)[:20]}")
         color_series = obs[color_by].reset_index(drop=True)
 
-    return _pairs_plot_from_embedding(
-        emb_df, n_components, color_series, color_by, size, alpha, palette, title
-    )
+    return _pairs_plot_from_embedding(emb_df, n_components, color_series, color_by, size, alpha, palette, title)
 
 
 @plot_clonotype_abundance.register(SingleCellExperiment)
@@ -506,13 +479,21 @@ def _plot_clonotype_embedding_sce(
     obs = _column_data(data)
     if clonotype_col not in obs.columns:
         raise KeyError(
-            f"clonotype_col {clonotype_col!r} not found in SCE column_data. "
-            f"Available: {list(obs.columns)[:20]}"
+            f"clonotype_col {clonotype_col!r} not found in SCE column_data. Available: {list(obs.columns)[:20]}"
         )
     emb_df = _embedding_frame(data, dimred)
     return _clonotype_embedding_plot(
-        emb_df, components, obs[clonotype_col], dimred, expansion_thresholds,
-        non_tcell_color, palette, size, stroke, alpha, title,
+        emb_df,
+        components,
+        obs[clonotype_col],
+        dimred,
+        expansion_thresholds,
+        non_tcell_color,
+        palette,
+        size,
+        stroke,
+        alpha,
+        title,
     )
 
 
@@ -537,10 +518,7 @@ def _plot_pseudobulk_qc_sce(
     required = [sample_by, group_by] + ([condition_by] if condition_by is not None else [])
     missing = [c for c in required if c not in obs.columns]
     if missing:
-        raise KeyError(
-            f"Column(s) {missing} not found in SCE column_data. "
-            f"Available: {list(obs.columns)[:20]}"
-        )
+        raise KeyError(f"Column(s) {missing} not found in SCE column_data. Available: {list(obs.columns)[:20]}")
 
     obs_df = obs.reset_index(drop=True)
     counts_df = _counts_panel_data(obs_df, sample_by, group_by)
@@ -558,8 +536,7 @@ def _plot_pseudobulk_qc_sce(
     unique_samples = pd.unique(sample_ids)
     pb_mat = _pseudobulk_aggregate(matrix, sample_ids, unique_samples)
     condition_map = (
-        _sample_condition_map(obs_df, sample_by, condition_by, unique_samples)
-        if condition_by is not None else None
+        _sample_condition_map(obs_df, sample_by, condition_by, unique_samples) if condition_by is not None else None
     )
     pca_df = _pca_panel_data(pb_mat, unique_samples, sample_by, condition_by, condition_map)
     p3 = _pca_panel_plot(pca_df, sample_by, condition_by)
@@ -592,26 +569,29 @@ def _plot_adt_qc_sce(
     missing_features = [f for f in candidate_features if f not in row_names]
     if missing_features:
         raise KeyError(
-            f"features not found in sce.row_names: {missing_features}. "
-            f"Available (first 20): {row_names[:20]}"
+            f"features not found in sce.row_names: {missing_features}. Available (first 20): {row_names[:20]}"
         )
     missing_iso = [f for f in isotype_controls if f not in candidate_features]
     if missing_iso:
         raise KeyError(f"isotype_controls not found among candidate features: {missing_iso}.")
     obs = _column_data(data)
     if group_by is not None and group_by not in obs.columns:
-        raise KeyError(
-            f"group_by {group_by!r} not found in SCE column_data. "
-            f"Available: {list(obs.columns)[:20]}"
-        )
+        raise KeyError(f"group_by {group_by!r} not found in SCE column_data. Available: {list(obs.columns)[:20]}")
 
     frame = _expression_frame(data, candidate_features, layer)
     if group_by is not None:
         frame[group_by] = obs[group_by].to_numpy()
 
     return plot_adt_qc(
-        frame, isotype_controls=isotype_controls, layer=None, group_by=group_by,
-        log1p=log1p, palette=palette, ncol=ncol, title=title, features=candidate_features,
+        frame,
+        isotype_controls=isotype_controls,
+        layer=None,
+        group_by=group_by,
+        log1p=log1p,
+        palette=palette,
+        ncol=ncol,
+        title=title,
+        features=candidate_features,
     )
 
 
@@ -675,10 +655,7 @@ def _plot_scatter_sce(
 
     if facet_by is not None:
         if facet_by not in obs.columns:
-            raise KeyError(
-                f"facet_by {facet_by!r} not found in SCE column_data. "
-                f"Available: {list(obs.columns)[:20]}"
-            )
+            raise KeyError(f"facet_by {facet_by!r} not found in SCE column_data. Available: {list(obs.columns)[:20]}")
         frame[facet_by] = obs[facet_by].to_numpy()
 
     return plot_scatter(frame, x=x, y=y, color=color, layer=None, **kwargs)
@@ -707,9 +684,6 @@ def _plot_embedding_sce(
         frame[color] = color_values.to_numpy()
 
     if facet_by is not None and facet_by not in obs.columns:
-        raise KeyError(
-            f"facet_by {facet_by!r} not found in SCE column_data. "
-            f"Available: {list(obs.columns)[:20]}"
-        )
+        raise KeyError(f"facet_by {facet_by!r} not found in SCE column_data. Available: {list(obs.columns)[:20]}")
 
     return plot_embedding(frame, dimred=dimred, color=color, layer=None, **kwargs)

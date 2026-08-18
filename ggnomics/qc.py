@@ -5,13 +5,13 @@ from typing import Optional
 import numpy as np
 import pandas as pd
 from plotnine import (
-    ggplot,
     aes,
-    geom_point,
     geom_histogram,
-    theme_classic,
+    geom_point,
+    ggplot,
     ggtitle,
     scale_color_gradient,
+    theme_classic,
 )
 
 

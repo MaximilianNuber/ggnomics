@@ -15,23 +15,20 @@ import numpy as np
 import pandas as pd
 from mudata import MuData
 
-from .anndata import _expression_frame as _anndata_expression_frame
 from ..multimodal import plot_adt_qc, plot_bimodal_scatter
+from .anndata import _expression_frame as _anndata_expression_frame
 
 
 def _modality(mdata: MuData, mod: str):
     if mod not in mdata.mod:
-        raise KeyError(
-            f"Modality {mod!r} not found in MuData. Available: {list(mdata.mod.keys())}"
-        )
+        raise KeyError(f"Modality {mod!r} not found in MuData. Available: {list(mdata.mod.keys())}")
     return mdata.mod[mod]
 
 
 def _feature_series(adata, feature: str) -> pd.Series:
     if feature not in adata.var_names:
         raise KeyError(
-            f"Feature {feature!r} not found in modality var_names. "
-            f"Available (first 20): {list(adata.var_names)[:20]}"
+            f"Feature {feature!r} not found in modality var_names. Available (first 20): {list(adata.var_names)[:20]}"
         )
     return _anndata_expression_frame(adata, [feature], None)[feature].set_axis(adata.obs_names)
 
@@ -40,16 +37,14 @@ def _resolve_mudata_color(
     mdata: MuData,
     color: str,
     shared: List[str],
-    mods: "tuple[str, str]",
+    mods: tuple[str, str],
 ) -> np.ndarray:
     if color in mdata.obs.columns:
         return mdata.obs.loc[shared, color].to_numpy()
 
     found = [mod for mod in mods if color in mdata.mod[mod].obs.columns]
     if not found:
-        raise KeyError(
-            f"color {color!r} not found in mdata.obs or in the obs of modalities {list(mods)}."
-        )
+        raise KeyError(f"color {color!r} not found in mdata.obs or in the obs of modalities {list(mods)}.")
     if len(found) > 1:
         raise ValueError(
             f"color {color!r} is ambiguous: present in multiple modalities {found}. "
@@ -66,7 +61,7 @@ def _aligned_bimodal_frame(
     x_mod: str,
     y_mod: str,
     color: Optional[str],
-) -> "tuple[pd.DataFrame, str, str]":
+) -> tuple[pd.DataFrame, str, str]:
     """Build the aligned (x, y[, color]) frame for a cross-modality scatter.
 
     Returns the frame together with the (possibly disambiguated) column keys
@@ -101,9 +96,7 @@ def _aligned_bimodal_frame(
             stacklevel=3,
         )
     if not shared:
-        raise ValueError(
-            f"Modalities {x_mod!r} and {y_mod!r} share no observations."
-        )
+        raise ValueError(f"Modalities {x_mod!r} and {y_mod!r} share no observations.")
 
     x_key, y_key = x_feature, y_feature
     if x_key == y_key:
@@ -198,8 +191,15 @@ def _plot_adt_qc_mudata(
             )
 
     return plot_adt_qc(
-        frame, isotype_controls=isotype_controls, layer=None, group_by=group_by,
-        log1p=log1p, palette=palette, ncol=ncol, title=title, features=candidate_features,
+        frame,
+        isotype_controls=isotype_controls,
+        layer=None,
+        group_by=group_by,
+        log1p=log1p,
+        palette=palette,
+        ncol=ncol,
+        title=title,
+        features=candidate_features,
     )
 
 

@@ -3,10 +3,18 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, List, Optional
 
 import numpy as np
 import pandas as pd
+from plotnine import (
+    scale_color_brewer,
+    scale_color_cmap,
+    scale_color_manual,
+    scale_fill_brewer,
+    scale_fill_cmap,
+    scale_fill_manual,
+)
 
 if TYPE_CHECKING:
     from plotnine import ggplot
@@ -22,7 +30,7 @@ class HeatmapResult:
                 (e.g. an overlap-coefficient matrix or mean-expression matrix).
     """
 
-    plot: "ggplot"
+    plot: ggplot
     matrix: Optional[pd.DataFrame] = field(default=None)
 
     def _repr_html_(self) -> str:
@@ -30,14 +38,6 @@ class HeatmapResult:
 
     def savefig(self, filename: str, **kwargs) -> None:
         self.plot.save(filename, **kwargs)
-from plotnine import (
-    scale_color_manual,
-    scale_fill_manual,
-    scale_color_brewer,
-    scale_fill_brewer,
-    scale_color_cmap,
-    scale_fill_cmap,
-)
 
 
 def adaptive_size(

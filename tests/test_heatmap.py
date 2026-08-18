@@ -1,7 +1,6 @@
 """Tests for plot_heatmap (extended)."""
 
 import numpy as np
-import pytest
 from plotnine.ggplot import ggplot as ggplot_class
 
 from ggnomics import plot_heatmap

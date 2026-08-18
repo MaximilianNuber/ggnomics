@@ -5,39 +5,61 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "ggnomics"
 version = "0.1.0"
-description = "Modular plotnine-based plotting utilities for single-cell and genomics"
-authors = [{ name = "Your Name" }]
+description = "Composable genomics visualization with plotnine"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
-keywords = ["single-cell", "plotnine", "ggplot", "genomics", "biocpy"]
+authors = [{ name = "MaximilianNuber", email = "maximilian.d.nuber@gmail.com" }]
+maintainers = [{ name = "MaximilianNuber", email = "maximilian.d.nuber@gmail.com" }]
+keywords = [
+  "single-cell",
+  "genomics",
+  "bioinformatics",
+  "visualization",
+  "plotnine",
+  "ggplot",
+  "grammar-of-graphics",
+  "biocpy",
+  "scverse",
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+  "Topic :: Scientific/Engineering :: Visualization",
+  "Typing :: Typed",
+]
 dependencies = [
   "numpy>=1.24",
   "pandas>=2.0",
   "plotnine>=0.16.0a11,<0.17",
 ]
 
+# ---------------------------------------------------------------------------
+# Optional extras
+#
+# The core install covers the pandas.DataFrame interface and all native
+# plotting, including ggnomics.upset. Container backends register themselves
+# only when their package is importable (see ggnomics/_backends/__init__.py),
+# so none of the extras below may be promoted into `dependencies`.
+# ---------------------------------------------------------------------------
 [project.optional-dependencies]
-anndata = [
-  "anndata>=0.10",
-]
-sce = [
-  "singlecellexperiment",
-  "biocframe",
-]
-se = [
-  "summarizedexperiment",
-  "biocframe",
-]
+anndata = ["anndata>=0.10"]
+sce = ["singlecellexperiment", "biocframe"]
+se = ["summarizedexperiment", "biocframe"]
 multimodal = ["mudata>=0.2"]
 stats = ["scipy>=1.10", "statsmodels>=0.14"]
 pca = ["scikit-learn>=1.3", "scipy>=1.10"]
 ridge = ["scikit-learn>=1.3"]
 pseudobulk = ["scikit-learn>=1.3", "scipy>=1.10"]
-upset = [
-  "scipy>=1.10",
-  "statsmodels>=0.14",
-]
+upset = ["scipy>=1.10", "statsmodels>=0.14"]
 umap = ["umap-learn>=0.5"]
 repertoire = []
 layout = []
@@ -52,20 +74,164 @@ all = [
   "scikit-learn>=1.3",
   "umap-learn>=0.5",
 ]
-dev = [
-  "pytest",
-  "build",
-  "quarto",
+
+# Development extras.
+test = [
+  "pytest>=7.4",
+  "pytest-cov>=4.1",
+  "matplotlib>=3.8",
 ]
+# Sphinx documentation site (the published one, BiocPy style).
 docs = [
-  "mkdocs",
-  "mkdocs-material",
-  "mkdocstrings[python]",
+  "sphinx>=7.2",
+  "furo",
+  "myst-parser[linkify]",
+  "nbsphinx",
+  "sphinx-autodoc-typehints",
+  "sphinx-copybutton",
+  "ipykernel>=6",
+  "nbformat>=5.9",
+]
+# Quarto vignette sources + the quartodoc API site, kept alongside Sphinx.
+# Also what produces docs/tutorials/*.ipynb via `quarto render --to ipynb`.
+quarto = [
+  "quartodoc>=0.7",
+  # quartodoc 0.11 passes `allow_section_blank_line` to griffe's numpy parser;
+  # that keyword was only added in griffe 1.x and removed again in griffe 2.x,
+  # so the upper bound is load-bearing. See CONTRIBUTING.md.
+  "griffe>=1.5,<2",
+  "jupyter-client>=8",
+  "ipykernel>=6",
+  "nbclient>=0.8",
+  "nbformat>=5.9",
+  "pyyaml>=6.0",
+]
+dev = [
+  "ggnomics[all,test,docs,quarto]",
+  "ruff>=0.14",
+  "pre-commit>=4.0",
+  "tox>=4.11",
+  "build>=1.0",
+  "twine>=5.0",
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourname/ggnomics"
+Homepage = "https://github.com/MaximilianNuber/ggnomics"
+Documentation = "https://maximiliannuber.github.io/ggnomics/"
+Repository = "https://github.com/MaximilianNuber/ggnomics"
+Issues = "https://github.com/MaximilianNuber/ggnomics/issues"
+Changelog = "https://github.com/MaximilianNuber/ggnomics/blob/main/CHANGELOG.md"
 
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["ggnomics*"]
+
+# ---------------------------------------------------------------------------
+# Ruff
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length = 120  # matches the BiocSetup scaffold default
+target-version = "py310"
+extend-exclude = [
+  # Generated documentation. vignettes/reference/ comes from quartodoc,
+  # docs/tutorials/*.ipynb from `quarto render --to ipynb`, and docs/api/ from
+  # sphinx-apidoc; all three are rewritten on every docs build, so linting or
+  # reformatting them just creates churn. Edit the sources instead.
+  "vignettes/_site",
+  "vignettes/_freeze",
+  "vignettes/.quarto",
+  "vignettes/reference",
+  "docs/tutorials/*.ipynb",
+  "docs/api",
+  "docs/_build",
+  "examples/*.ipynb",
+  "build",
+  "dist",
+  ".tox",
+  ".venv",
+]
+
+[tool.ruff.lint]
+select = [
+  "E",   # pycodestyle errors
+  "W",   # pycodestyle warnings
+  "F",   # Pyflakes
+  "I",   # isort
+  "UP",  # pyupgrade
+  "B",   # flake8-bugbear
+  "C4",  # flake8-comprehensions
+]
+ignore = [
+  # ggnomics deliberately keeps typing.Optional / typing.List in public
+  # signatures so that Python 3.10 users see the same annotations quartodoc
+  # renders; these rules would rewrite them to PEP 585/604 syntax.
+  "UP006",
+  "UP007",
+  "UP035",
+  "UP045",
+  # `zip(..., strict=)` is 3.10+, but the codebase supports 3.10 where the
+  # ergonomics differ; enabling this would be a behaviour change.
+  "B905",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Re-exports and the deliberate "import public API, then register backends"
+# ordering in the package roots.
+"ggnomics/__init__.py" = ["E402", "F401"]
+"ggnomics/*/__init__.py" = ["F401"]
+# Tests import fixtures via conftest star-style helpers and use long
+# parametrize tables.
+"tests/*" = ["E501"]
+# Quarto's _includes helpers set cache environment variables before the
+# data-access packages are imported, so imports cannot all sit at the top.
+"vignettes/_includes/*" = ["E402"]
+# matplotlib.use("Agg") must run before anything imports pyplot, and the repo
+# root has to be on sys.path before `ggnomics` is importable from this script.
+"docs/generate_readme_plots.py" = ["E402"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["ggnomics"]
+
+[tool.ruff.format]
+docstring-code-format = true
+
+# ---------------------------------------------------------------------------
+# pytest
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+minversion = "7.4"
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+norecursedirs = ["build", "dist", ".tox", "vignettes", "examples", ".venv"]
+filterwarnings = [
+  "default",
+]
+
+# ---------------------------------------------------------------------------
+# Coverage
+#
+# The threshold is set from the measured baseline of the full suite rather
+# than an aspirational number; see CONTRIBUTING.md before lowering it.
+# ---------------------------------------------------------------------------
+[tool.coverage.run]
+branch = true
+# source_pkgs (not source) so coverage follows the package wherever it is
+# imported from. Under tox the package is installed into the env's
+# site-packages, and a plain `source = ["ggnomics"]` would measure the
+# uninstalled working copy instead and report 0%.
+source_pkgs = ["ggnomics"]
+omit = ["ggnomics/*/__init__.py"]
+
+[tool.coverage.paths]
+# Report installed and in-tree paths as the same files.
+source = ["ggnomics/", "*/site-packages/ggnomics/"]
+
+[tool.coverage.report]
+show_missing = true
+exclude_lines = [
+  "pragma: no cover",
+  "if TYPE_CHECKING:",
+  "raise NotImplementedError",
+  "def __repr__",
+  "if __name__ == .__main__.:",
+]

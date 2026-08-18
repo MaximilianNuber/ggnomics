@@ -2,13 +2,13 @@ from typing import Optional
 
 import pandas as pd
 from plotnine import (
-    ggplot,
     aes,
     geom_bar,
-    position_stack,
-    theme_classic,
+    ggplot,
     ggtitle,
     labs,
+    position_stack,
+    theme_classic,
 )
 
 

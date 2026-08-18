@@ -1,15 +1,17 @@
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Optional
+
 import numpy as np
 import pandas as pd
 
 if TYPE_CHECKING:
     from sklearn.decomposition import PCA
 
+
 @dataclass
 class PcaResult:
-    scores: np.ndarray                 # samples × components
-    loadings: np.ndarray               # features × components
+    scores: np.ndarray  # samples × components
+    loadings: np.ndarray  # features × components
     explained_variance_ratio: np.ndarray
     feature_names: Optional[np.ndarray] = None
     sample_names: Optional[np.ndarray] = None
@@ -17,7 +19,7 @@ class PcaResult:
 
     def scores_to_pandas(self):
         scores_df = pd.DataFrame(self.scores)
-        scores_df.columns = ["pc_"+str(i+1) for i in range(scores_df.shape[1])]
+        scores_df.columns = ["pc_" + str(i + 1) for i in range(scores_df.shape[1])]
         if self.sample_names is not None:
             scores_df.index = self.sample_names
         return scores_df
@@ -27,6 +29,6 @@ class PcaResult:
 
     def get_loadings(self) -> np.ndarray:
         return self.loadings
-    
+
     def get_explained_variance(self) -> np.ndarray:
         return self.explained_variance_ratio

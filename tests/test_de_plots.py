@@ -1,13 +1,10 @@
 """Tests for de_plots.py."""
 
-import numpy as np
-import pandas as pd
 import pytest
 from plotnine.ggplot import ggplot as ggplot_class
 
-from ggnomics import plot_volcano, plot_ma, plot_coef_lollipop, plot_coef_expression
+from ggnomics import plot_coef_expression, plot_coef_lollipop, plot_ma, plot_volcano
 from ggnomics._utils import HeatmapResult
-
 
 # ---------------------------------------------------------------------------
 # plot_volcano
@@ -28,7 +25,7 @@ def test_volcano_label_genes(mock_de_results):
     """Requesting label_genes should add a geom_text layer."""
     p = plot_volcano(mock_de_results, gene_col="gene", label_genes=["Gene0001"])
     assert isinstance(p, ggplot_class)
-    text_layers = [l for l in p.layers if "text" in type(l.geom).__name__.lower()]
+    text_layers = [layer for layer in p.layers if "text" in type(layer.geom).__name__.lower()]
     assert len(text_layers) > 0
 
 
@@ -92,7 +89,7 @@ def test_coef_lollipop_top_n(mock_coefs):
     p = plot_coef_lollipop(mock_coefs, top_n=5)
     assert isinstance(p, ggplot_class)
     # Only top-5 features should be in the data layer
-    point_layers = [l for l in p.layers if "point" in type(l.geom).__name__.lower()]
+    point_layers = [layer for layer in p.layers if "point" in type(layer.geom).__name__.lower()]
     assert len(point_layers) > 0
 
 

@@ -17,6 +17,8 @@ def _new_upset_themes() -> dict[str, tuple[Any, ...]]:
             theme(
                 axis_text_x=element_blank(),
                 axis_ticks_major_x=element_blank(),
+                axis_text_y=element_blank(),
+                axis_ticks_major_y=element_blank(),
                 axis_title_y=element_blank(),
                 panel_grid=element_blank(),
             ),
@@ -34,8 +36,6 @@ def _new_upset_themes() -> dict[str, tuple[Any, ...]]:
             theme_minimal(),
             theme(
                 axis_title_y=element_blank(),
-                axis_text_y=element_blank(),
-                axis_ticks_major_y=element_blank(),
                 panel_grid_major_y=element_blank(),
                 panel_grid_minor_y=element_blank(),
             ),
@@ -59,9 +59,7 @@ def upset_default_themes(**theme_kwargs: Any) -> ThemeCollection:
     """Return fresh defaults with one theme modification applied everywhere."""
 
     addition = theme(**theme_kwargs)
-    return MappingProxyType(
-        {name: (*components, addition) for name, components in _new_upset_themes().items()}
-    )
+    return MappingProxyType({name: (*components, addition) for name, components in _new_upset_themes().items()})
 
 
 def upset_modify_themes(
@@ -74,9 +72,7 @@ def upset_modify_themes(
     result = _new_upset_themes()
     for name, additions in to_update.items():
         if name not in result:
-            raise KeyError(
-                f"unknown theme component {name!r}; expected one of {sorted(result)}"
-            )
+            raise KeyError(f"unknown theme component {name!r}; expected one of {sorted(result)}")
         if isinstance(additions, (list, tuple)):
             result[name] = (*result[name], *additions)
         else:

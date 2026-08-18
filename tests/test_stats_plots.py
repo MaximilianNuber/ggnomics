@@ -3,11 +3,10 @@
 import numpy as np
 import pandas as pd
 import pytest
-from plotnine.ggplot import ggplot as ggplot_class
 from plotnine.composition import Compose
+from plotnine.ggplot import ggplot as ggplot_class
 
-from ggnomics import plot_violin_stats, plot_box_stats, plot_scatter_marginal, plot_embedding_panel
-
+from ggnomics import plot_box_stats, plot_embedding_panel, plot_scatter_marginal, plot_violin_stats
 
 FEATURES = ["Gene0001", "Gene0002"]
 
@@ -34,7 +33,9 @@ def test_violin_stats_df_add_points(mock_df):
 
 def test_violin_stats_df_single_comparison(mock_df):
     p = plot_violin_stats(
-        mock_df, feature="Gene0001", group_by="cluster",
+        mock_df,
+        feature="Gene0001",
+        group_by="cluster",
         comparisons=[("C0", "C1")],
     )
     assert isinstance(p, ggplot_class)
@@ -43,29 +44,32 @@ def test_violin_stats_df_single_comparison(mock_df):
 def test_violin_stats_df_sig_only_no_bars(mock_df):
     """With sig_only=True and a single non-significant pair, no bar layers added."""
     n = 100
-    df = pd.DataFrame({
-        "feat": np.ones(n),
-        "group": ["A"] * 50 + ["B"] * 50,
-    })
-    p = plot_violin_stats(df, feature="feat", group_by="group",
-                          comparisons=[("A", "B")], sig_only=True)
+    df = pd.DataFrame(
+        {
+            "feat": np.ones(n),
+            "group": ["A"] * 50 + ["B"] * 50,
+        }
+    )
+    p = plot_violin_stats(df, feature="feat", group_by="group", comparisons=[("A", "B")], sig_only=True)
     assert isinstance(p, ggplot_class)
-    seg_layers = [l for l in p.layers if "segment" in type(l.geom).__name__.lower()]
+    seg_layers = [layer for layer in p.layers if "segment" in type(layer.geom).__name__.lower()]
     assert len(seg_layers) == 0
 
 
 def test_violin_stats_annotation_pvalue(mock_df):
     p = plot_violin_stats(
-        mock_df, feature="Gene0001", group_by="cluster",
+        mock_df,
+        feature="Gene0001",
+        group_by="cluster",
         comparisons=[("C0", "C1")],
         sig_only=False,
         annotation="pvalue",
     )
     assert isinstance(p, ggplot_class)
-    text_layers = [l for l in p.layers if "text" in type(l.geom).__name__.lower()]
+    text_layers = [layer for layer in p.layers if "text" in type(layer.geom).__name__.lower()]
     if text_layers:
-        for l in text_layers:
-            layer_data = getattr(l, "_data", getattr(l, "data", None))
+        for layer in text_layers:
+            layer_data = getattr(layer, "_data", getattr(layer, "data", None))
             if layer_data is not None and hasattr(layer_data, "columns") and "label" in layer_data.columns:
                 labels = layer_data["label"].values
                 assert any("p=" in str(lbl) for lbl in labels)
@@ -73,7 +77,9 @@ def test_violin_stats_annotation_pvalue(mock_df):
 
 def test_violin_stats_annotation_stars(mock_df):
     p = plot_violin_stats(
-        mock_df, feature="Gene0001", group_by="cluster",
+        mock_df,
+        feature="Gene0001",
+        group_by="cluster",
         comparisons=[("C0", "C1")],
         sig_only=False,
         annotation="stars",
@@ -83,7 +89,9 @@ def test_violin_stats_annotation_stars(mock_df):
 
 def test_violin_stats_annotation_padj(mock_df):
     p = plot_violin_stats(
-        mock_df, feature="Gene0001", group_by="cluster",
+        mock_df,
+        feature="Gene0001",
+        group_by="cluster",
         comparisons=[("C0", "C1")],
         sig_only=False,
         annotation="padj",
@@ -98,7 +106,9 @@ def test_violin_stats_adata_gene(mock_adata):
 
 def test_violin_stats_order(mock_df):
     p = plot_violin_stats(
-        mock_df, feature="Gene0001", group_by="cluster",
+        mock_df,
+        feature="Gene0001",
+        group_by="cluster",
         order=["C4", "C3", "C2", "C1", "C0"],
     )
     assert isinstance(p, ggplot_class)
@@ -116,7 +126,7 @@ def test_box_stats_df_returns_ggplot(mock_df):
 
 def test_box_stats_has_boxplot_layer(mock_df):
     p = plot_box_stats(mock_df, feature="Gene0001", group_by="cluster")
-    geom_names = [type(l.geom).__name__.lower() for l in p.layers]
+    geom_names = [type(layer.geom).__name__.lower() for layer in p.layers]
     assert any("boxplot" in g for g in geom_names)
 
 
@@ -219,24 +229,30 @@ def test_embedding_panel_basic(mock_adata):
 
 def test_embedding_panel_shared_scale(mock_adata):
     result = plot_embedding_panel(
-        mock_adata, features=["Gene0001", "Gene0002"],
-        ncol=2, shared_scale=True,
+        mock_adata,
+        features=["Gene0001", "Gene0002"],
+        ncol=2,
+        shared_scale=True,
     )
     assert isinstance(result, Compose)
 
 
 def test_embedding_panel_no_shared_scale(mock_adata):
     result = plot_embedding_panel(
-        mock_adata, features=["Gene0001", "Gene0002"],
-        ncol=2, shared_scale=False,
+        mock_adata,
+        features=["Gene0001", "Gene0002"],
+        ncol=2,
+        shared_scale=False,
     )
     assert isinstance(result, Compose)
 
 
 def test_embedding_panel_with_title(mock_adata):
     result = plot_embedding_panel(
-        mock_adata, features=["Gene0001", "Gene0002"],
-        ncol=2, title="Expression Panel",
+        mock_adata,
+        features=["Gene0001", "Gene0002"],
+        ncol=2,
+        title="Expression Panel",
     )
     assert isinstance(result, Compose)
 
@@ -250,6 +266,7 @@ def test_embedding_panel_categorical_feature(mock_adata):
     """Categorical obs column as feature uses discrete palette, not cmap.
     Single feature → grid returns the bare ggplot (not a Compose)."""
     from plotnine.ggplot import ggplot as ggplot_class
+
     result = plot_embedding_panel(mock_adata, features=["cluster"], ncol=1)
     assert isinstance(result, (ggplot_class, Compose))
 
@@ -257,9 +274,7 @@ def test_embedding_panel_categorical_feature(mock_adata):
 def test_embedding_panel_missing_features_reports_full_list(mock_adata):
     """All missing features must be reported together, not silently skipped."""
     with pytest.raises(ValueError) as exc_info:
-        plot_embedding_panel(
-            mock_adata, features=["Gene0001", "nonexistent1", "nonexistent2"], ncol=2
-        )
+        plot_embedding_panel(mock_adata, features=["Gene0001", "nonexistent1", "nonexistent2"], ncol=2)
     message = str(exc_info.value)
     assert "nonexistent1" in message
     assert "nonexistent2" in message

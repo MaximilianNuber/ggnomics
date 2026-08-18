@@ -6,11 +6,14 @@ relevant, their effect once composed into a real plot via ``upset.upset()``.
 
 from __future__ import annotations
 
+import dataclasses
+
 import pandas as pd
 import pytest
-from plotnine import aes, geom_col, geom_point, geom_segment, geom_text, theme
+from plotnine import aes, geom_col, geom_point, geom_segment, theme
 
 import ggnomics.upset as upset
+from ggnomics.upset._utils_query import query_applies
 
 # ---------------------------------------------------------------------------
 # Queries
@@ -43,9 +46,10 @@ def test_query_only_components_is_preserved():
 
 def test_query_objects_are_immutable():
     query = upset.upset_query(set="A", color="red")
-    with pytest.raises(Exception):
+    with pytest.raises(dataclasses.FrozenInstanceError):
         query.set = "B"
-    with pytest.raises(Exception):
+    # aesthetics is exposed as a mappingproxy, so item assignment is a TypeError.
+    with pytest.raises(TypeError):
         query.aesthetics["color"] = "blue"
 
 
@@ -63,9 +67,7 @@ def test_query_unknown_set_rejected_during_composition(abc_example):
 def test_query_unknown_intersection_rejected_during_composition(abc_example):
     prepared = upset.upset_data(abc_example, ["A", "B", "C"])
     with pytest.raises(KeyError):
-        upset.compose_upset(
-            prepared, queries=[upset.upset_query(intersect=["Z"], color="red")]
-        )
+        upset.compose_upset(prepared, queries=[upset.upset_query(intersect=["Z"], color="red")])
 
 
 def test_group_query_raises_not_implemented_rather_than_silently_ignored(abc_example):
@@ -75,16 +77,12 @@ def test_group_query_raises_not_implemented_rather_than_silently_ignored(abc_exa
     silently do nothing."""
     prepared = upset.upset_data(abc_example, ["A", "B", "C"])
     with pytest.raises(NotImplementedError):
-        upset.compose_upset(
-            prepared, queries=[upset.upset_query(group="somegroup", color="red")]
-        )
+        upset.compose_upset(prepared, queries=[upset.upset_query(group="somegroup", color="red")])
 
 
 def test_set_query_highlights_matrix_and_set_size(abc_example, tmp_path):
     prepared = upset.upset_data(abc_example, ["A", "B", "C"], intersections="all")
-    composition = upset.compose_upset(
-        prepared, queries=[upset.upset_query(set="A", color="red")]
-    )
+    composition = upset.compose_upset(prepared, queries=[upset.upset_query(set="A", color="red")])
     output = tmp_path / "set_query.png"
     composition.save(output, width=8, height=6, dpi=60, verbose=False)
     assert output.stat().st_size > 1_000
@@ -92,9 +90,7 @@ def test_set_query_highlights_matrix_and_set_size(abc_example, tmp_path):
 
 def test_intersection_query_highlights_selected_intersection(abc_example, tmp_path):
     prepared = upset.upset_data(abc_example, ["A", "B", "C"], intersections="all")
-    composition = upset.compose_upset(
-        prepared, queries=[upset.upset_query(intersect=["A", "B"], color="red")]
-    )
+    composition = upset.compose_upset(prepared, queries=[upset.upset_query(intersect=["A", "B"], color="red")])
     output = tmp_path / "intersect_query.png"
     composition.save(output, width=8, height=6, dpi=60, verbose=False)
     assert output.stat().st_size > 1_000
@@ -102,12 +98,10 @@ def test_intersection_query_highlights_selected_intersection(abc_example, tmp_pa
 
 def test_query_only_components_limits_highlighting(abc_example, tmp_path):
     prepared = upset.upset_data(abc_example, ["A", "B", "C"], intersections="all")
-    query = upset.upset_query(
-        intersect=["A", "B"], color="red", only_components=["intersections_matrix"]
-    )
+    query = upset.upset_query(intersect=["A", "B"], color="red", only_components=["intersections_matrix"])
     # Not applied to the "Intersection size" annotation panel.
-    assert not upset.plot._query_applies(query, "Intersection size")
-    assert upset.plot._query_applies(query, "intersections_matrix")
+    assert not query_applies(query, "Intersection size")
+    assert query_applies(query, "intersections_matrix")
     composition = upset.compose_upset(prepared, queries=[query])
     output = tmp_path / "only_components.png"
     composition.save(output, width=8, height=6, dpi=60, verbose=False)
@@ -281,9 +275,7 @@ def test_upset_set_size_invalid_position_raises():
 
 
 def test_upset_set_size_custom_mapping_and_geom(abc_example, tmp_path):
-    spec = upset.upset_set_size(
-        mapping=aes(fill="group"), geom=geom_col(width=0.4)
-    )
+    spec = upset.upset_set_size(mapping=aes(fill="group"), geom=geom_col(width=0.4))
     composition = upset.upset(abc_example, ["A", "B", "C"], set_sizes=spec)
     output = tmp_path / "custom_set_size.png"
     composition.save(output, width=8, height=6, dpi=60, verbose=False)
@@ -299,11 +291,19 @@ def test_upset_set_size_filter_intersections_true_vs_false(abc_example):
     )
     filtered_spec = upset.upset_set_size(filter_intersections=True)
     unfiltered_spec = upset.upset_set_size(filter_intersections=False)
-    filtered_plot = upset.plot._build_set_sizes(
-        prepared, spec=filtered_spec, queries=(), themes=upset.upset_themes
+    filtered_plot = upset.set_size.build_set_sizes(
+        prepared,
+        spec=filtered_spec,
+        queries=(),
+        themes=upset.upset_themes,
+        labeller=str,
     )
-    unfiltered_plot = upset.plot._build_set_sizes(
-        prepared, spec=unfiltered_spec, queries=(), themes=upset.upset_themes
+    unfiltered_plot = upset.set_size.build_set_sizes(
+        prepared,
+        spec=unfiltered_spec,
+        queries=(),
+        themes=upset.upset_themes,
+        labeller=str,
     )
     # Filtered sizes only count rows whose intersection was kept; unfiltered
     # uses the full per-set membership totals (>= filtered, since "C" rows
@@ -398,17 +398,13 @@ def test_upset_default_themes_applies_globally():
 
 
 def test_upset_modify_themes_is_component_specific():
-    modified = upset.upset_modify_themes(
-        {"overall_sizes": theme(axis_text_x=None)}
-    )
+    modified = upset.upset_modify_themes({"overall_sizes": theme(axis_text_x=None)})
     assert modified["overall_sizes"][-1] == theme(axis_text_x=None)
     assert modified["intersections_matrix"] == upset.upset_themes["intersections_matrix"]
 
 
 def test_upset_modify_themes_accepts_a_sequence_of_additions():
-    modified = upset.upset_modify_themes(
-        {"default": [theme(legend_position="none"), theme(axis_text_x=None)]}
-    )
+    modified = upset.upset_modify_themes({"default": [theme(legend_position="none"), theme(axis_text_x=None)]})
     assert len(modified["default"]) == len(upset.upset_themes["default"]) + 2
 
 

@@ -1,17 +1,15 @@
-from typing import Optional, Union, Dict
-import pandas as pd
+from typing import Optional
+
 import numpy as np
+import pandas as pd
+
 from ..pca.methods import run_pca_sklearn, run_pca_svd
 from ..pca.result import PcaResult
 from ..scatter import plot_embedding as _plot_reduced_dim
 
+
 def run_pca(
-    sce,
-    assay_name: str = "logcounts",
-    n_components: int = 50,
-    method: str = "sklearn",
-    dest_key: str = "PCA",
-    **kwargs
+    sce, assay_name: str = "logcounts", n_components: int = 50, method: str = "sklearn", dest_key: str = "PCA", **kwargs
 ) -> PcaResult:
     """
     Run PCA for single-cell data (SingleCellExperiment).
@@ -20,7 +18,7 @@ def run_pca(
     mat = sce.assay(assay_name)
     # Transpose to (samples x features)
     data = mat.T
-    
+
     if method == "sklearn":
         res = run_pca_sklearn(data, n_components=n_components, **kwargs)
     elif method == "svd":
@@ -30,7 +28,7 @@ def run_pca(
 
     res.sample_names = sce.column_names
     res.feature_names = sce.row_names
-    
+
     # Store in reduced_dims
     if not hasattr(sce, "reduced_dims"):
         # If naive object, skip
@@ -38,8 +36,9 @@ def run_pca(
     else:
         # Assuming dict-like access for reduced_dims
         sce.reduced_dims[dest_key] = res.scores
-        
+
     return res
+
 
 def build_plot_df_from_sce(
     sce,
@@ -59,7 +58,7 @@ def build_plot_df_from_sce(
     if prefix is None:
         prefix = dim_name.lower()
 
-    dim_cols = [f"{prefix}_{i+1}" for i in range(n_comps)]
+    dim_cols = [f"{prefix}_{i + 1}" for i in range(n_comps)]
     plot_df = pd.DataFrame(emb, columns=dim_cols)
 
     if hasattr(sce.col_data, "to_pandas"):
@@ -73,6 +72,7 @@ def build_plot_df_from_sce(
     plot_df = pd.concat([plot_df, meta], axis=1)
     return plot_df
 
+
 def plot_pca(
     sce,
     dim_name: str = "PCA",
@@ -82,7 +82,7 @@ def plot_pca(
     size: Optional[float] = None,
     run_if_missing: bool = True,
     return_result: bool = False,
-    **kwargs
+    **kwargs,
 ):
     """
     Plot PCA for SingleCellExperiment.
@@ -93,22 +93,20 @@ def plot_pca(
         try:
             sce.reduced_dim(dim_name)
             has_dim = True
-        except:
+        except Exception:
             pass
     elif hasattr(sce, "reduced_dims") and dim_name in sce.reduced_dims:
         has_dim = True
-        
+
     pca_res = None
     if not has_dim and run_if_missing:
         pca_res = run_pca(sce, dest_key=dim_name)
-        
+
     plot_df = build_plot_df_from_sce(sce, dim_name=dim_name, prefix="pca")
 
     # Delegate to the canonical DataFrame plot_embedding/plot_reduced_dim
     # generic; plot_df's "pca_<n>" columns match its naming convention.
-    p = _plot_reduced_dim(
-        plot_df, dimred="pca", components=(x_comp, y_comp), color=color, size=size, **kwargs
-    )
+    p = _plot_reduced_dim(plot_df, dimred="pca", components=(x_comp, y_comp), color=color, size=size, **kwargs)
 
     if return_result:
         return p, pca_res

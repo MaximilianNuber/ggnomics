@@ -1,16 +1,16 @@
-from typing import Optional, Sequence, Tuple
+from typing import Optional, Sequence
 
 import numpy as np
 import pandas as pd
 from plotnine import (
-    ggplot,
     aes,
+    element_text,
     geom_tile,
-    theme_classic,
+    ggplot,
     ggtitle,
     scale_fill_gradient,
     theme,
-    element_text,
+    theme_classic,
 )
 
 

@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from plotnine.composition import Compose
 
 
-def hstack(*plots, spacer: bool = False) -> "Compose":
+def hstack(*plots, spacer: bool = False) -> Compose:
     """Place plots side by side (``|`` operator).
 
     Parameters
@@ -46,7 +46,7 @@ def hstack(*plots, spacer: bool = False) -> "Compose":
     return result
 
 
-def vstack(*plots) -> "Compose":
+def vstack(*plots) -> Compose:
     """Stack plots vertically (``/`` operator)."""
     result = plots[0]
     for p in plots[1:]:
@@ -59,7 +59,7 @@ def grid(
     ncol: int = 2,
     widths: Optional[List] = None,
     heights: Optional[List] = None,
-) -> "Compose":
+) -> Compose:
     """Arrange *plots* in a grid.
 
     On plotnine ≥ 0.16 uses ``plot_layout(ncol=…)`` (``Wrap`` composition).
@@ -111,11 +111,11 @@ def grid(
 
 
 def annotate_composition(
-    composition: "Compose",
+    composition: Compose,
     title: Optional[str] = None,
     subtitle: Optional[str] = None,
     caption: Optional[str] = None,
-) -> "Compose":
+) -> Compose:
     """Add title / subtitle / caption to an entire composition.
 
     Uses ``plot_annotation`` on plotnine ≥ 0.16.  On 0.15 falls back to
@@ -148,6 +148,6 @@ def annotate_composition(
     return composition
 
 
-def save_composition(composition: "Compose", path: str, dpi: int = 150, **kwargs) -> None:
+def save_composition(composition: Compose, path: str, dpi: int = 150, **kwargs) -> None:
     """Save a composition to *path*.  Same API as ``ggplot.save()``."""
     composition.save(path, dpi=dpi, **kwargs)

@@ -43,7 +43,7 @@ each of the three E-MTAB-1625 salt-stress timepoints — a natural
 three-to-many-set overlap question that a Venn diagram handles poorly once
 more timepoints or contrasts are added.
 
-## 2. Data source and selection rule
+## 2. Data source and selection rule {#data-source-and-selection-rule}
 
 We reuse the three matched salt-vs-control PyDESeq2 fits already computed
 for [Bulk RNA-seq](bulk-rnaseq.qmd) and
@@ -58,7 +58,7 @@ fits = {timepoint: run_deseq2_on_emtab1625(timepoint) for timepoint in timepoint
 ```
 
 The package's documented significance rule for `mode="upset"` (see
-[Section 13](#13-native-plot_pseudobulk_demode-upset)) is `padj < 0.05` and
+[Section 13](#native-plot_pseudobulk_demodeupset)) is `padj < 0.05` and
 `abs(log2FoldChange) >= 1`. Applying it here, before assuming any overlap is
 interesting:
 
@@ -83,7 +83,7 @@ This is a real and biologically sensible result, not an artifact: the salt
 response strengthens substantially between 1 hour and 24 hours, so 1-hour
 (10 genes) and 5-hour (4 genes) contribute too few significant genes at this
 threshold to show an informative *intersection* structure — the overlaps
-above are 0-2 genes. [Section 13](#13-native-plot_pseudobulk_demode-upset)
+above are 0-2 genes. [Section 13](#native-plot_pseudobulk_demodeupset)
 shows this exact, honest result via `plot_pseudobulk_de`.
 
 To demonstrate the rest of the API's features on a richer, still-real
@@ -91,7 +91,7 @@ overlap, Sections 4-12 and 14 instead use a clearly labeled **descriptive,
 top-ranked** rule: the 300 genes with the largest `abs(log2FoldChange)` at
 each timepoint, regardless of `padj`. This is descriptive (a ranking), not a
 significance claim — it deliberately is not read as "these genes are DE";
-see the callout in [Section 15](#15-statistical-helper-caution).
+see the callout in [Section 15](#statistical-helper-caution).
 
 ```{python}
 TOP_N = 300
@@ -315,14 +315,14 @@ combined = (upset.upset(membership, timepoint_columns) | bar) + plot_annotation(
 combined
 ```
 
-## 13. Native `plot_pseudobulk_de(mode="upset")`
+## 13. Native `plot_pseudobulk_de(mode="upset")` {#native-plot_pseudobulk_demodeupset}
 
 `plot_pseudobulk_de` accepts a `dict[str, DataFrame]` of DE result tables
 directly (no pre-built membership table needed) and returns a native
 `Compose` object — the same underlying `ggnomics.upset.upset()` backend used
 throughout this vignette, with the default `padj < 0.05` /
 `abs(log2FoldChange) >= 1` significance rule from
-[Section 2](#2-data-source-and-selection-rule):
+[Section 2](#data-source-and-selection-rule):
 
 ```{python}
 per_timepoint_results = {
@@ -369,7 +369,7 @@ venn_layout_3 = upset.arrange_venn(membership, sets=timepoint_columns)
 )
 ```
 
-## 15. Statistical-helper caution
+## 15. Statistical-helper caution {#statistical-helper-caution}
 
 `compare_between_intersections()` / `upset_test()` compare a covariate
 across intersections (Kruskal-Wallis for numeric, chi-square for
@@ -397,7 +397,7 @@ you care about; `upset_data()` also raises before materializing an
 
 ## 17. See also
 
-* [API reference](../api/upset/) — full signatures for every function used
+* [API reference](reference/index.qmd) — full signatures for every function used
   above.
 * [Bulk RNA-seq](bulk-rnaseq.qmd) — the PyDESeq2 fits reused here.
 * [Plot gallery](plot-gallery.qmd#native-upset-plots) — a compact function

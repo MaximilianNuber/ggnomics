@@ -1,40 +1,42 @@
 # ggnomics
 
-Composable, ggplot2-style genomics visualization for Python. Every public
-`plot_*` function returns a real [plotnine](https://plotnine.org) object —
-inspect it, extend it with ordinary plotnine layers, theme it, facet it, or
-compose it with other panels.
+**Composable genomics visualization with plotnine.**
 
-This site has two parts:
+`ggnomics` provides plotting functions for bulk, single-cell, and multimodal
+genomics in Python. It covers familiar visualizations from tools such as
+scater, Seurat, and scanpy while returning ordinary
+[plotnine](https://plotnine.org) objects that can be extended with the grammar
+of graphics.
 
-* **[API reference](api/reduced-dimensions.md)** — every public function,
-  organized by family, generated from its docstring.
-* **[Vignettes](vignettes.md)** — the full, real-dataset Quarto workflows
-  (getting started, single-cell analysis with scranpy, bulk RNA-seq with
-  PyDESeq2, native UpSet plots, multimodal CITE-seq, specialized plots, and a
-  comprehensive plot gallery).
+The package works with tidy `pandas` data and common genomics containers,
+including AnnData, BiocPy `SingleCellExperiment` and `SummarizedExperiment`,
+and MuData. The public `plot_*` functions use Python's `singledispatch`, so the
+function name and principal arguments stay the same across containers, and
+container support is registered only when the corresponding optional package is
+installed.
 
-See the [project README](https://github.com/MaximilianNuber/ggnomics#readme)
-for installation and a quick overview.
+## Contents
 
-## Design in one sentence
+```{toctree}
+:maxdepth: 2
 
-Every public `plot_*` function is a single `functools.singledispatch`
-generic. The base registration is `pd.DataFrame` (its docstring is the
-canonical documentation); optional adapters for `AnnData`,
-`SingleCellExperiment`, `SummarizedExperiment`, and `MuData` build an
-equivalent DataFrame internally and delegate to that same implementation,
-registering themselves automatically the moment the corresponding package is
-importable.
+Overview <readme>
+Tutorials <tutorials/index>
+Module Reference <api/modules>
+Contributing <contributing>
+Code of Conduct <code_of_conduct>
+License <license>
+Authors <authors>
+Changelog <changelog>
+```
 
-## Unsupported combinations
+## Indices and tables
 
-A plain `SummarizedExperiment` has no stored reduced dimensions —
-embedding-dependent functions (`plot_umap`, `plot_pca`, `plot_reduced_dim`,
-`plot_pairs`, `plot_embedding_panel`, `plot_clonotype_embedding`) correctly
-raise the ordinary singledispatch `TypeError` for it. Bulk PCA is instead an
-explicit analysis step, `ggnomics.bulk_pca`, that computes and plots PCA
-scores from an assay rather than reading a stored embedding. `MuData` is
-registered only for genuinely cross-modality functions
-(`plot_bimodal_scatter`, `plot_adt_qc`) — every other function operates on
-one modality's `AnnData` directly.
+* {ref}`genindex`
+* {ref}`modindex`
+* {ref}`search`
+
+[Sphinx]: http://www.sphinx-doc.org/
+[Markdown]: https://daringfireball.net/projects/markdown/
+[reStructuredText]: http://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html
+[MyST]: https://myst-parser.readthedocs.io/en/latest/

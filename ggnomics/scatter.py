@@ -5,20 +5,19 @@ from __future__ import annotations
 from functools import singledispatch
 from typing import Dict, List, Optional, Tuple
 
-import numpy as np
 import pandas as pd
 from plotnine import (
-    ggplot,
     aes,
+    coord_fixed,
+    facet_wrap,
     geom_point,
-    theme_classic,
+    ggplot,
     ggtitle,
     labs,
-    facet_wrap,
-    scale_color_manual,
     scale_color_brewer,
     scale_color_cmap,
-    coord_fixed,
+    scale_color_manual,
+    theme_classic,
 )
 
 from ._utils import adaptive_size, adaptive_stroke
@@ -59,25 +58,14 @@ def _embedding_frame_from_dataframe(data: pd.DataFrame, key: str) -> pd.DataFram
         return (
             lowered.startswith(f"{stripped}_")
             or lowered.startswith(f"x_{stripped}_")
-            or (
-                lowered.startswith(stripped)
-                and len(lowered) > len(stripped)
-                and lowered[len(stripped)].isdigit()
-            )
+            or (lowered.startswith(stripped) and len(lowered) > len(stripped) and lowered[len(stripped)].isdigit())
         )
 
     matched = sorted(column for column in columns if matches(column))
     if not matched:
-        matched = [
-            column
-            for column in columns
-            if str(column).lower() in {stripped, key.lower()}
-        ]
+        matched = [column for column in columns if str(column).lower() in {stripped, key.lower()}]
     if not matched:
-        raise KeyError(
-            f"Embedding {key!r} not found in DataFrame columns. "
-            f"Available columns: {columns[:20]}"
-        )
+        raise KeyError(f"Embedding {key!r} not found in DataFrame columns. Available columns: {columns[:20]}")
 
     frame = data[matched].copy().reset_index(drop=True)
     frame.columns = [f"{stripped}_{index + 1}" for index in range(len(matched))]
@@ -128,12 +116,7 @@ def _scatter_ggplot(
     if color is not None:
         aes_kwargs["color"] = color
 
-    p = (
-        ggplot(df)
-        + aes(**aes_kwargs)
-        + geom_point(size=size, stroke=stroke, alpha=alpha)
-        + theme_classic()
-    )
+    p = ggplot(df) + aes(**aes_kwargs) + geom_point(size=size, stroke=stroke, alpha=alpha) + theme_classic()
 
     # Color scale
     if color is not None:
@@ -252,30 +235,17 @@ def _plot_scatter_dataframe(
 
     for column in (x, y):
         if column not in data.columns:
-            raise KeyError(
-                f"Column {column!r} not found in DataFrame. "
-                f"Available: {list(data.columns)[:20]}"
-            )
+            raise KeyError(f"Column {column!r} not found in DataFrame. Available: {list(data.columns)[:20]}")
 
     if color is not None and color not in data.columns:
-        raise KeyError(
-            f"Color column {color!r} not found in DataFrame. "
-            f"Available: {list(data.columns)[:20]}"
-        )
+        raise KeyError(f"Color column {color!r} not found in DataFrame. Available: {list(data.columns)[:20]}")
     if facet_by is not None and facet_by not in data.columns:
-        raise KeyError(
-            f"facet_by {facet_by!r} not found in DataFrame. "
-            f"Available: {list(data.columns)[:20]}"
-        )
+        raise KeyError(f"facet_by {facet_by!r} not found in DataFrame. Available: {list(data.columns)[:20]}")
 
     n = len(data)
-    color_is_continuous = bool(
-        color is not None and pd.api.types.is_numeric_dtype(data[color])
-    )
+    color_is_continuous = bool(color is not None and pd.api.types.is_numeric_dtype(data[color]))
 
-    frame = pd.DataFrame(
-        {"_gg_x_": data[x].to_numpy(), "_gg_y_": data[y].to_numpy()}
-    )
+    frame = pd.DataFrame({"_gg_x_": data[x].to_numpy(), "_gg_y_": data[y].to_numpy()})
     if color is not None:
         frame["_gg_color_"] = data[color].to_numpy()
     if facet_by is not None:
@@ -374,10 +344,7 @@ def _plot_embedding_dataframe(
     comp_cols = list(emb_df.columns)
     ci, cj = components[0] - 1, components[1] - 1
     if ci < 0 or cj < 0 or ci >= len(comp_cols) or cj >= len(comp_cols):
-        raise IndexError(
-            f"components={components} out of range for embedding with "
-            f"{len(comp_cols)} dimensions."
-        )
+        raise IndexError(f"components={components} out of range for embedding with {len(comp_cols)} dimensions.")
     x_col = comp_cols[ci]
     y_col = comp_cols[cj]
 
@@ -392,15 +359,9 @@ def _plot_embedding_dataframe(
     )
 
     if color is not None and color not in data.columns:
-        raise KeyError(
-            f"Color column {color!r} not found in DataFrame. "
-            f"Available: {list(data.columns)[:20]}"
-        )
+        raise KeyError(f"Color column {color!r} not found in DataFrame. Available: {list(data.columns)[:20]}")
     if facet_by is not None and facet_by not in data.columns:
-        raise KeyError(
-            f"facet_by {facet_by!r} not found in DataFrame. "
-            f"Available: {list(data.columns)[:20]}"
-        )
+        raise KeyError(f"facet_by {facet_by!r} not found in DataFrame. Available: {list(data.columns)[:20]}")
 
     base_name = _strip_x_prefix(dimred).upper()
     x_label = f"{base_name} {components[0]}"

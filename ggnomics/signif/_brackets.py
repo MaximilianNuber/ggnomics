@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import numpy as np
 from dataclasses import dataclass
 
 
@@ -29,7 +28,8 @@ def map_pvalue_to_stars(
 ) -> str:
     """Convert a p-value to a significance label.
 
-    Default thresholds match ggsignif:
+    Default thresholds match ggsignif::
+
         p <= 0.0001 → "****"
         p <= 0.001  → "***"
         p <= 0.01   → "**"
@@ -103,9 +103,7 @@ def compute_brackets(
         tip_l, tip_r = float(tip_length[0]), float(tip_length[1])
 
     def _span(comp: tuple[str, str]) -> float:
-        return abs(
-            group_positions.get(comp[1], 0.0) - group_positions.get(comp[0], 0.0)
-        )
+        return abs(group_positions.get(comp[1], 0.0) - group_positions.get(comp[0], 0.0))
 
     # Sort narrowest → widest so wider brackets get higher i and thus higher y
     indexed = sorted(zip(comparisons, labels), key=lambda x: _span(x[0]))
@@ -120,11 +118,7 @@ def compute_brackets(
             group_maxima.get(g1, 0.0),
             group_maxima.get(g2, 0.0),
         )
-        y_bracket = (
-            y_data_max
-            + y_scale_range * margin_top
-            + y_scale_range * step_increase * i
-        )
+        y_bracket = y_data_max + y_scale_range * margin_top + y_scale_range * step_increase * i
         y_tip_left = y_bracket - y_scale_range * tip_l
         y_tip_right = y_bracket - y_scale_range * tip_r
 

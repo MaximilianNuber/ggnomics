@@ -3,15 +3,15 @@ import pandas as pd
 from plotnine.ggplot import ggplot as ggplot_class
 
 from ggnomics import (
-    plot_reduced_dim,
+    cluster_composition_barplot,
     expression_violin,
-    volcano_plot,
     heatmap_from_matrix,
     marker_dotplot_from_matrix,
-    qc_scatter,
+    plot_reduced_dim,
     qc_histogram,
-    cluster_composition_barplot,
+    qc_scatter,
     ridge_density,
+    volcano_plot,
 )
 
 
@@ -48,13 +48,15 @@ def test_marker_dotplot_from_matrix():
 
 
 def test_qc_plots():
-    df = pd.DataFrame({
-        "n_counts": np.random.gamma(2, 100, size=100),
-        "n_genes": np.random.gamma(2, 50, size=100),
-        "mito_frac": np.random.rand(100),
-        "cluster": np.random.choice(list("ABC"), 100),
-        "condition": np.random.choice(["ctrl", "stim"], 100),
-    })
+    df = pd.DataFrame(
+        {
+            "n_counts": np.random.gamma(2, 100, size=100),
+            "n_genes": np.random.gamma(2, 50, size=100),
+            "mito_frac": np.random.rand(100),
+            "cluster": np.random.choice(list("ABC"), 100),
+            "condition": np.random.choice(["ctrl", "stim"], 100),
+        }
+    )
     p1 = qc_scatter(df, x="n_counts", y="n_genes", color="mito_frac")
     p2 = qc_histogram(df, value="mito_frac")
     p3 = cluster_composition_barplot(df, cluster_col="cluster", group_col="condition")
@@ -62,9 +64,11 @@ def test_qc_plots():
 
 
 def test_ridge_density():
-    df = pd.DataFrame({
-        "expr": np.random.randn(200),
-        "cluster": np.random.choice(list("ABC"), 200),
-    })
+    df = pd.DataFrame(
+        {
+            "expr": np.random.randn(200),
+            "cluster": np.random.choice(list("ABC"), 200),
+        }
+    )
     p = ridge_density(df, value="expr", group="cluster")
     assert isinstance(p, ggplot_class)

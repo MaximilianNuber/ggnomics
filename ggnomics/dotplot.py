@@ -1,39 +1,39 @@
 from __future__ import annotations
 
 from functools import singledispatch
-from typing import Optional, Sequence, Any
+from typing import Any, Optional, Sequence
 
 import numpy as np
 import pandas as pd
 from plotnine import (
-    ggplot,
     aes,
     geom_point,
-    theme_classic,
+    ggplot,
     ggtitle,
-    scale_size_continuous,
     scale_color_gradient,
+    scale_size_continuous,
+    theme_classic,
 )
 
 
 @singledispatch
 def marker_dotplot(data: Any, *args, **kwargs):  # pragma: no cover
-    raise TypeError(
-        "Unsupported input for marker_dotplot. Pass a tidy DataFrame or use the matrix+groups helper."
-    )
+    raise TypeError("Unsupported input for marker_dotplot. Pass a tidy DataFrame or use the matrix+groups helper.")
 
 
 @marker_dotplot.register(pd.DataFrame)
-def _(df: pd.DataFrame,
-      gene: str = "gene",
-      group: str = "group",
-      mean_col: str = "mean",
-      pct_col: str = "pct",
-      *,
-      size_range: tuple[float, float] = (0.5, 4.0),
-      color_low: str = "#f0f0f0",
-      color_high: str = "#67000d",
-      title: Optional[str] = None):
+def _(
+    df: pd.DataFrame,
+    gene: str = "gene",
+    group: str = "group",
+    mean_col: str = "mean",
+    pct_col: str = "pct",
+    *,
+    size_range: tuple[float, float] = (0.5, 4.0),
+    color_low: str = "#f0f0f0",
+    color_high: str = "#67000d",
+    title: Optional[str] = None,
+):
     p = (
         ggplot(df)
         + aes(x=group, y=gene, size=pct_col, color=mean_col)
@@ -67,7 +67,6 @@ def marker_dotplot_from_matrix(
         all_genes = [f"g{i}" for i in range(X.shape[1])]
 
     groups = pd.Series(np.asarray(groups), name="group")
-    cells = X.shape[0]
 
     # Indices for selected genes
     gene_to_idx = {g: i for i, g in enumerate(all_genes)}
@@ -103,7 +102,7 @@ def marker_dotplot_sce(
     expr_threshold: float = 0.0,
     title: Optional[str] = None,
 ):
-    from .violin import _get_assay_matrix, _get_row_names, _get_col_data
+    from .violin import _get_assay_matrix, _get_col_data, _get_row_names
 
     mat = _get_assay_matrix(sce, assay)
     if hasattr(mat, "toarray"):

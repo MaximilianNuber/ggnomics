@@ -2,6 +2,7 @@
 
 import subprocess
 import sys
+from importlib.util import find_spec
 
 import pandas as pd
 import pytest
@@ -35,14 +36,16 @@ def test_only_discovered_backend_is_imported(monkeypatch):
     assert imported == ["ggnomics._backends.anndata"]
 
 
+@pytest.mark.skipif(find_spec("anndata") is None, reason="anndata not installed")
 def test_registration_is_idempotent():
     """Calling register_installed_backends() twice must not raise or double-register."""
 
     _backends.register_installed_backends()
     _backends.register_installed_backends()
 
-    import ggnomics
     import anndata
+
+    import ggnomics
 
     df_impl = ggnomics.plot_scatter.dispatch(pd.DataFrame)
     anndata_impl = ggnomics.plot_scatter.dispatch(anndata.AnnData)
@@ -59,9 +62,7 @@ def test_broken_installed_backend_propagates_import_error(monkeypatch):
             raise RuntimeError("simulated broken backend module")
         raise AssertionError(f"unexpected import: {name}")
 
-    monkeypatch.setattr(
-        _backends, "find_spec", lambda dependency: object() if dependency == "anndata" else None
-    )
+    monkeypatch.setattr(_backends, "find_spec", lambda dependency: object() if dependency == "anndata" else None)
     monkeypatch.setattr(_backends, "import_module", _broken_import)
 
     with pytest.raises(RuntimeError, match="simulated broken backend"):
@@ -113,6 +114,7 @@ print("OK")
     assert "OK" in result.stdout
 
 
+@pytest.mark.skipif(find_spec("anndata") is None, reason="anndata not installed")
 def test_anndata_only_registers_only_anndata_backend():
     result = _run_snippet(f"""
 import sys
@@ -129,6 +131,7 @@ print("OK")
     assert "OK" in result.stdout
 
 
+@pytest.mark.skipif(find_spec("summarizedexperiment") is None, reason="summarizedexperiment not installed")
 def test_se_only_installation_loads_se_registration():
     result = _run_snippet(f"""
 import sys
@@ -144,6 +147,7 @@ print("OK")
     assert "OK" in result.stdout
 
 
+@pytest.mark.skipif(find_spec("singlecellexperiment") is None, reason="singlecellexperiment not installed")
 def test_sce_backend_module_does_not_import_se_backend_module():
     """SCE and SE are registered by two independent backend modules, both
     gated by the same central `_BACKENDS` loader — `_backends/singlecellexperiment.py`
@@ -182,6 +186,7 @@ def test_sce_only_registers_sce_but_not_ggnomics_se_backend_when_se_package_abse
     assert "ggnomics._backends.summarizedexperiment" not in imported
 
 
+@pytest.mark.skipif(find_spec("mudata") is None, reason="mudata not installed")
 def test_mudata_only_registers_mudata_backend():
     result = _run_snippet(f"""
 import sys
@@ -195,6 +200,10 @@ print("OK")
     assert "OK" in result.stdout
 
 
+@pytest.mark.skipif(find_spec("anndata") is None, reason="anndata not installed")
+@pytest.mark.skipif(find_spec("singlecellexperiment") is None, reason="singlecellexperiment not installed")
+@pytest.mark.skipif(find_spec("summarizedexperiment") is None, reason="summarizedexperiment not installed")
+@pytest.mark.skipif(find_spec("mudata") is None, reason="mudata not installed")
 def test_all_backends_installed_registers_every_concrete_class():
     result = _run_snippet("""
 import ggnomics

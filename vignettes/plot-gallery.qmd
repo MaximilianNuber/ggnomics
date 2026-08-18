@@ -78,7 +78,7 @@ p_umap = gg.sc_umap.plot_umap(sub2, color="level1class") + theme_bw() + labs(tit
 p_pca | p_umap
 ```
 
-`bulk_pca.plot_pca` is demonstrated in full in [Bulk RNA-seq §7](bulk-rnaseq.qmd#7-pca-on-the-vst-transformed-expression).
+`bulk_pca.plot_pca` is demonstrated in full in [Bulk RNA-seq §7](bulk-rnaseq.qmd#pca-on-the-vst-transformed-expression).
 
 ## Expression distributions
 
@@ -167,7 +167,7 @@ gg.cluster_composition_barplot(baron_cd, cluster_col="label", group_col="donor")
 `plot_pseudobulk_qc` is demonstrated with the four Baron donors in
 [Specialized plots](specialized-plots.qmd#donor-aware-grouping-and-pseudobulk-qc).
 RNA and ADT quality-control plots are covered separately in
-[Multimodal](multimodal.qmd#5-rna-qc-and-adt-qc).
+[Multimodal](multimodal.qmd#rna-qc-and-adt-qc).
 
 ## Dot plots
 
@@ -202,8 +202,8 @@ gg.plot_highest_exprs(zeisel_final, n=15, layer="counts") + theme_bw() + labs(ti
 | Marsilea (`ma.Heatmap`) | Composable clustered heatmap (interop, not wrapped by ggnomics) | `np.ndarray` | E-MTAB-1625 |
 
 For grouped, bulk, and Marsilea heatmaps, see:
-[Single-cell analysis §11](single-cell-scranpy.qmd#11-heatmap),
-[Bulk RNA-seq §10](bulk-rnaseq.qmd#10-heatmap-of-top-differentially-expressed-genes),
+[Single-cell analysis §11](single-cell-scranpy.qmd#heatmap),
+[Bulk RNA-seq §10](bulk-rnaseq.qmd#heatmap-of-top-differentially-expressed-genes),
 [Specialized plots](specialized-plots.qmd#marsilea-backed-heatmap).
 
 ```{python}
@@ -385,7 +385,7 @@ save_composition(annotated, str(pathlib.Path("_freeze_assets") / "composed_figur
 ## Additional API notes
 
 * `plot_adt_qc` requires annotated isotype controls. The CITE-seq panel used
-  here does not contain them; [Multimodal §5](multimodal.qmd#5-rna-qc-and-adt-qc)
+  here does not contain them; [Multimodal §5](multimodal.qmd#rna-qc-and-adt-qc)
   shows the validation behaviour and a control-free ADT QC plot.
 * The generic `ggnomics.pca` layer (`run_pca_sklearn`, `run_pca_svd`, and
   `PcaResult`) is used internally by `bulk_pca.run_pca` and

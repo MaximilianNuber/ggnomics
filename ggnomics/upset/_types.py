@@ -81,9 +81,7 @@ class UpSetQuery:
     intersect: tuple[str, ...] | None = None
     group: str | None = None
     only_components: tuple[str, ...] | None = None
-    aesthetics: Mapping[str, Any] = field(
-        default_factory=lambda: MappingProxyType({})
-    )
+    aesthetics: Mapping[str, Any] = field(default_factory=lambda: MappingProxyType({}))
 
 
 @dataclass(frozen=True)
@@ -93,12 +91,10 @@ class UpSetAnnotation:
     plot: Any
     kind: str
     mode: str
-    options: Mapping[str, Any] = field(
-        default_factory=lambda: MappingProxyType({})
-    )
+    options: Mapping[str, Any] = field(default_factory=lambda: MappingProxyType({}))
     default_y: str | None = None
 
-    def __add__(self, component: Any) -> "UpSetAnnotation":
+    def __add__(self, component: Any) -> UpSetAnnotation:
         """Return a copy with a Plotnine component added to its plot."""
 
         if isinstance(component, ModeSpec):
@@ -133,6 +129,27 @@ class UpSetStripes:
     geom: Any
     colors: tuple[str, ...] | Mapping[Any, str] | None
     data: pd.DataFrame | None
+
+
+@dataclass(frozen=True)
+class PanelEdges:
+    """Measured left/right figure-fraction positions of tagged composition panels."""
+
+    by_role: Mapping[str, tuple[float, float]]
+
+
+@dataclass(frozen=True)
+class MarginSensitivity:
+    """Measured figure-fraction left-shift per unit of ``plot_margin_left``, by role."""
+
+    slope_by_role: Mapping[str, float]
+
+
+@dataclass(frozen=True)
+class MarginCorrections:
+    """Extra ``plot_margin_left`` to add to each role, in that panel's own theme units."""
+
+    plot_margin_left: Mapping[str, float]
 
 
 @dataclass(frozen=True)

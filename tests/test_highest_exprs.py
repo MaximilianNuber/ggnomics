@@ -87,7 +87,7 @@ def test_highest_exprs_sparse_dense_equivalence():
     rng = np.random.default_rng(1)
     n_cells, n_genes = 150, 20
     X = rng.negative_binomial(2, 0.4, size=(n_cells, n_genes)).astype(float)
-    gene_names = [f"Gene{i+1:04d}" for i in range(n_genes)]
+    gene_names = [f"Gene{i + 1:04d}" for i in range(n_genes)]
 
     def _make(x):
         ad = anndata.AnnData(X=x.copy())
@@ -100,9 +100,7 @@ def test_highest_exprs_sparse_dense_equivalence():
     p_dense = plot_highest_exprs(ad_dense, n=5)
     p_sparse = plot_highest_exprs(ad_sparse, n=5)
 
-    assert list(p_dense.data["feature"].cat.categories) == list(
-        p_sparse.data["feature"].cat.categories
-    )
+    assert list(p_dense.data["feature"].cat.categories) == list(p_sparse.data["feature"].cat.categories)
     d1 = p_dense.data.sort_values("feature").reset_index(drop=True)
     d2 = p_sparse.data.sort_values("feature").reset_index(drop=True)
     np.testing.assert_allclose(d1["fraction"].to_numpy(), d2["fraction"].to_numpy())

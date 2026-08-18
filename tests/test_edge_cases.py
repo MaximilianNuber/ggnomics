@@ -13,7 +13,6 @@ from ggnomics import (
     plot_scatter,
 )
 
-
 # ---------------------------------------------------------------------------
 # Non-default / shuffled indexes
 # ---------------------------------------------------------------------------
@@ -70,16 +69,12 @@ def test_heatmap_rejects_duplicate_features():
 
 def test_expression_missing_layer_raises_informative_error(mock_adata):
     with pytest.raises(KeyError, match="Layer"):
-        plot_expression(
-            mock_adata, features=["Gene0001"], group_by="cluster", layer="nonexistent_layer"
-        )
+        plot_expression(mock_adata, features=["Gene0001"], group_by="cluster", layer="nonexistent_layer")
 
 
 def test_expression_missing_assay_raises_informative_error(mock_sce):
     with pytest.raises(KeyError):
-        plot_expression(
-            mock_sce, features=["Gene0001"], group_by="cluster", layer="nonexistent_assay"
-        )
+        plot_expression(mock_sce, features=["Gene0001"], group_by="cluster", layer="nonexistent_assay")
 
 
 # ---------------------------------------------------------------------------

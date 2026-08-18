@@ -1,17 +1,14 @@
 """Tests for repertoire.py."""
 
-import numpy as np
-import pandas as pd
 import pytest
 from plotnine.ggplot import ggplot as ggplot_class
 
 from ggnomics import (
     plot_clonotype_abundance,
-    plot_clonotype_overlap,
     plot_clonotype_embedding,
+    plot_clonotype_overlap,
 )
 from ggnomics._utils import HeatmapResult
-
 
 # ---------------------------------------------------------------------------
 # plot_clonotype_abundance
@@ -37,18 +34,13 @@ def test_clonotype_abundance_expansion_computed(mock_repertoire_df):
     """Expansion categories should be computed from clone sizes when expansion_col is None."""
     p = plot_clonotype_abundance(mock_repertoire_df, clonotype_col="clonotype_id", top_n=5)
     assert isinstance(p, ggplot_class)
-    # The fill layer should be present
-    fill_mapped = any(
-        "fill" in (l.mapping or {}) or (hasattr(l.mapping, "keys") and "fill" in l.mapping)
-        for l in p.layers
-    )
-    # Just check it returned ggplot without error
+    # Expansion categories are derived internally; the contract checked here is
+    # that the call succeeds and returns a plottable ggplot.
+    p.draw()
 
 
 def test_clonotype_abundance_title(mock_repertoire_df):
-    p = plot_clonotype_abundance(
-        mock_repertoire_df, clonotype_col="clonotype_id", title="Clonotypes"
-    )
+    p = plot_clonotype_abundance(mock_repertoire_df, clonotype_col="clonotype_id", title="Clonotypes")
     assert isinstance(p, ggplot_class)
 
 
@@ -66,9 +58,7 @@ def test_clonotype_abundance_facet_ranks_within_sample(mock_repertoire_df):
     """Regression test: facet column must be computed per-sample, not attached
     to one global top-n table (each sample's ranks are independent 1..top_n,
     not derived from a global ranking)."""
-    p = plot_clonotype_abundance(
-        mock_repertoire_df, clonotype_col="clonotype_id", sample_col="sample", top_n=5
-    )
+    p = plot_clonotype_abundance(mock_repertoire_df, clonotype_col="clonotype_id", sample_col="sample", top_n=5)
     assert "sample" in p.data.columns
     max_ranks = p.data.groupby("sample", observed=True)["rank"].max()
     assert (max_ranks <= 5).all()
@@ -201,8 +191,5 @@ def test_clonotype_embedding_missing_col_raises(mock_adata):
 def test_clonotype_embedding_title(mock_adata):
     if "clonotype_id" not in mock_adata.obs.columns:
         pytest.skip("clonotype_id not in adata.obs")
-    p = plot_clonotype_embedding(
-        mock_adata, clonotype_col="clonotype_id", dimred="X_umap",
-        title="Clonotype Embedding"
-    )
+    p = plot_clonotype_embedding(mock_adata, clonotype_col="clonotype_id", dimred="X_umap", title="Clonotype Embedding")
     assert isinstance(p, ggplot_class)

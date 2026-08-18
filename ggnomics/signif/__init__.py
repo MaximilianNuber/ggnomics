@@ -1,6 +1,6 @@
-from ._geom import geom_signif, _DeferredSignif
-from ._stats import run_comparisons, TESTS
-from ._brackets import compute_brackets, map_pvalue_to_stars, BracketSpec
+from ._brackets import BracketSpec, compute_brackets, map_pvalue_to_stars
+from ._geom import _DeferredSignif, geom_signif
+from ._stats import TESTS, run_comparisons
 
 __all__ = [
     "geom_signif",

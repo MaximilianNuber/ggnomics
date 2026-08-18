@@ -40,10 +40,7 @@ def _require_columns(
 ) -> None:
     missing = [column for column in columns if column not in data.columns]
     if missing:
-        raise KeyError(
-            f"Column(s) {missing} not found in {location}. "
-            f"Available: {list(data.columns)}"
-        )
+        raise KeyError(f"Column(s) {missing} not found in {location}. Available: {list(data.columns)}")
 
 
 @singledispatch
@@ -100,7 +97,7 @@ def _plot_coldata_dataframe(
 ) -> ggplot:
     obs_df = data.copy().reset_index(drop=True)
     requested = (x, y) + ((color_by,) if color_by is not None else ())
-    requested += ((facet_by,) if facet_by is not None else ())
+    requested += (facet_by,) if facet_by is not None else ()
     _require_columns(obs_df, requested, location="the metadata DataFrame")
 
     x_numeric = pd.api.types.is_numeric_dtype(obs_df[x])
@@ -113,26 +110,17 @@ def _plot_coldata_dataframe(
     if x_numeric and y_numeric:
         if size is None:
             size = adaptive_size(len(obs_df))
-        plot = (
-            ggplot(obs_df)
-            + aes(**aes_kwargs)
-            + geom_point(size=size, alpha=0.7)
-            + theme_classic()
-        )
+        plot = ggplot(obs_df) + aes(**aes_kwargs) + geom_point(size=size, alpha=0.7) + theme_classic()
         if color_by is not None:
             plot += color_scale(obs_df[color_by], palette=palette, type_="color")
     else:
         shape = shape.lower()
         if shape not in {"point", "violin", "box", "bar"}:
-            raise ValueError(
-                "shape must be one of 'point', 'violin', 'box', or 'bar'."
-            )
+            raise ValueError("shape must be one of 'point', 'violin', 'box', or 'bar'.")
 
         fill_column = color_by if color_by is not None else x
         fill_aes = {"x": x, "y": y, "fill": fill_column}
-        rotated_labels = theme(
-            axis_text_x=element_text(rotation=45, ha="right")
-        )
+        rotated_labels = theme(axis_text_x=element_text(rotation=45, ha="right"))
 
         if shape == "violin":
             plot = (
@@ -143,21 +131,12 @@ def _plot_coldata_dataframe(
                 + rotated_labels
             )
         elif shape == "box":
-            plot = (
-                ggplot(obs_df)
-                + aes(**fill_aes)
-                + geom_boxplot(outlier_alpha=0.5)
-                + theme_classic()
-                + rotated_labels
-            )
+            plot = ggplot(obs_df) + aes(**fill_aes) + geom_boxplot(outlier_alpha=0.5) + theme_classic() + rotated_labels
         elif shape == "bar":
             group_columns = [x]
             if color_by is not None and color_by != x:
                 group_columns.append(color_by)
-            means = (
-                obs_df.groupby(group_columns, observed=True, as_index=False)[y]
-                .mean()
-            )
+            means = obs_df.groupby(group_columns, observed=True, as_index=False)[y].mean()
             bar_aes = {"x": x, "y": y, "fill": fill_column}
             plot = (
                 ggplot(means)
@@ -235,12 +214,7 @@ def _plot_rowdata_dataframe(
     if color_by is not None:
         aes_kwargs["color"] = color_by
 
-    plot = (
-        ggplot(var_df)
-        + aes(**aes_kwargs)
-        + geom_point(size=size, alpha=0.7)
-        + theme_classic()
-    )
+    plot = ggplot(var_df) + aes(**aes_kwargs) + geom_point(size=size, alpha=0.7) + theme_classic()
     if color_by is not None:
         plot += color_scale(var_df[color_by], palette=None, type_="color")
     if title is not None:

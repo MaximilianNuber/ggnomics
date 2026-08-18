@@ -15,11 +15,7 @@ import ggnomics.upset as upset
 
 
 def _id_for(prepared, members):
-    return next(
-        identifier
-        for identifier, value in prepared.intersection_members.items()
-        if value == members
-    )
+    return next(identifier for identifier, value in prepared.intersection_members.items() if value == members)
 
 
 # ---------------------------------------------------------------------------
@@ -28,9 +24,7 @@ def _id_for(prepared, members):
 
 
 def test_exclusive_intersection_counts_match_known_values(abc_example):
-    statistics = upset.compute_intersections(
-        abc_example, intersect=["A", "B", "C"], intersections="all"
-    )
+    statistics = upset.compute_intersections(abc_example, intersect=["A", "B", "C"], intersections="all")
     expected = {
         (): 2,
         ("A",): 50,
@@ -43,16 +37,13 @@ def test_exclusive_intersection_counts_match_known_values(abc_example):
     }
     by_members = {members: identifier for identifier, members in statistics.intersection_members.items()}
     observed = {
-        members: int(statistics.sizes.loc[by_members[members], "exclusive_intersection"])
-        for members in expected
+        members: int(statistics.sizes.loc[by_members[members], "exclusive_intersection"]) for members in expected
     }
     assert observed == expected
 
 
 def test_four_modes_for_target_a_b(abc_example):
-    statistics = upset.compute_intersections(
-        abc_example, intersect=["A", "B", "C"], intersections="all"
-    )
+    statistics = upset.compute_intersections(abc_example, intersect=["A", "B", "C"], intersections="all")
     by_members = {members: identifier for identifier, members in statistics.intersection_members.items()}
     identifier = by_members[("A", "B")]
     assert statistics.sizes.loc[identifier].to_dict() == {
@@ -64,21 +55,23 @@ def test_four_modes_for_target_a_b(abc_example):
 
 
 def test_empty_intersection_count_is_2(abc_example):
-    statistics = upset.compute_intersections(
-        abc_example, intersect=["A", "B", "C"], intersections="all"
-    )
+    statistics = upset.compute_intersections(abc_example, intersect=["A", "B", "C"], intersections="all")
     by_members = {members: identifier for identifier, members in statistics.intersection_members.items()}
     assert int(statistics.sizes.loc[by_members[()], "exclusive_intersection"]) == 2
 
 
 def test_intersections_all_includes_every_combination(abc_example):
-    statistics = upset.compute_intersections(
-        abc_example, intersect=["A", "B", "C"], intersections="all"
-    )
+    statistics = upset.compute_intersections(abc_example, intersect=["A", "B", "C"], intersections="all")
     observed = set(statistics.intersection_members.values())
     expected = {
-        (), ("A",), ("B",), ("C",),
-        ("A", "B"), ("A", "C"), ("B", "C"), ("A", "B", "C"),
+        (),
+        ("A",),
+        ("B",),
+        ("C",),
+        ("A", "B"),
+        ("A", "C"),
+        ("B", "C"),
+        ("A", "B", "C"),
     }
     assert observed == expected
 
@@ -92,9 +85,7 @@ def test_intersections_observed_excludes_absent_combinations():
             "C": [False, False, False, False],
         }
     )
-    statistics = upset.compute_intersections(
-        data, intersect=["A", "B", "C"], intersections="observed"
-    )
+    statistics = upset.compute_intersections(data, intersect=["A", "B", "C"], intersections="observed")
     observed = set(statistics.intersection_members.values())
     assert observed == {("A",), ("B",)}
     assert ("A", "B") not in observed
@@ -123,9 +114,7 @@ def test_duplicate_requested_intersections_are_deduplicated_deterministically(ab
 
 def test_invalid_set_name_in_intersections_raises_keyerror(abc_example):
     with pytest.raises(KeyError):
-        upset.compute_intersections(
-            abc_example, intersect=["A", "B", "C"], intersections=[["Z"]]
-        )
+        upset.compute_intersections(abc_example, intersect=["A", "B", "C"], intersections=[["Z"]])
 
 
 def test_fewer_than_two_intersect_columns_raises_valueerror(abc_example):
@@ -164,9 +153,7 @@ def test_zero_one_columns_converted_to_boolean_and_reported():
 
 def test_zero_one_columns_can_convert_silently():
     data = pd.DataFrame({"A": [1, 0, 1, 0], "B": [0, 1, 1, 0]})
-    statistics = upset.compute_intersections(
-        data, intersect=["A", "B"], warn_when_converting=False
-    )
+    statistics = upset.compute_intersections(data, intersect=["A", "B"], warn_when_converting=False)
     assert statistics.converted_columns == ("A", "B")
 
 
@@ -190,9 +177,7 @@ def test_duplicate_dataframe_columns_raise_valueerror():
 
 def test_compute_select_apply_does_not_mutate_caller_input(abc_example):
     original = abc_example.copy(deep=True)
-    statistics = upset.compute_intersections(
-        abc_example, intersect=["A", "B", "C"], intersections="all"
-    )
+    statistics = upset.compute_intersections(abc_example, intersect=["A", "B", "C"], intersections="all")
     selection = upset.select_intersections(statistics, min_size=10, min_degree=1, sort_sets=False)
     prepared = upset.apply_intersection_selection(statistics, selection=selection)
     pd.testing.assert_frame_equal(abc_example, original)
@@ -206,12 +191,8 @@ def test_custom_index_remains_aligned():
         index=["gene_x", "gene_y", "gene_z"],
     )
     statistics = upset.compute_intersections(data, intersect=["A", "B"])
-    prepared = upset.apply_intersection_selection(
-        statistics, selection=upset.select_intersections(statistics)
-    )
-    assert list(prepared.with_sizes.index) == list(
-        data.index[data[["A", "B"]].any(axis=1)]
-    )
+    prepared = upset.apply_intersection_selection(statistics, selection=upset.select_intersections(statistics))
+    assert list(prepared.with_sizes.index) == list(data.index[data[["A", "B"]].any(axis=1)])
 
 
 def test_combination_growth_limit_raises_before_materializing():
@@ -234,9 +215,7 @@ def test_empty_input_raises_informative_error():
 
 
 def test_size_columns_suffix_controls_output_column_names(abc_example):
-    prepared = upset.upset_data(
-        abc_example, ["A", "B", "C"], size_columns_suffix="_n"
-    )
+    prepared = upset.upset_data(abc_example, ["A", "B", "C"], size_columns_suffix="_n")
     assert "exclusive_intersection_n" in prepared.with_sizes.columns
     assert "exclusive_intersection_size" not in prepared.with_sizes.columns
     for canonical in (
@@ -255,9 +234,7 @@ def test_size_columns_suffix_default_matches_get_size_mode(abc_example):
 
 
 def test_generated_categorical_axes_contain_only_selected_intersections(abc_example):
-    prepared = upset.upset_data(
-        abc_example, ["A", "B", "C"], intersections="all", min_size=10
-    )
+    prepared = upset.upset_data(abc_example, ["A", "B", "C"], intersections="all", min_size=10)
     axis_values = set(prepared.matrix_frame["intersection"].cat.categories)
     assert axis_values == set(prepared.sorted_intersections)
     assert set(prepared.sizes.index.astype(str)) == set(prepared.sorted_intersections)
@@ -361,7 +338,9 @@ def test_select_sort_intersections_by_ratio(abc_example):
     numerator = statistics.sizes.loc[list(selection.intersections), "exclusive_intersection"]
     denominator = statistics.sizes.loc[list(selection.intersections), "inclusive_union"].replace(0, np.nan)
     ratios = (numerator / denominator).tolist()
-    assert ratios == sorted(ratios, reverse=True, key=lambda v: (v is not None and not np.isnan(v), v if not np.isnan(v) else -np.inf))
+    assert ratios == sorted(
+        ratios, reverse=True, key=lambda v: (v is not None and not np.isnan(v), v if not np.isnan(v) else -np.inf)
+    )
 
 
 def test_select_sort_intersections_false_preserves_input_order(abc_example):
@@ -396,26 +375,20 @@ def test_select_group_by_sets_orders_by_set_rank(abc_example):
     # First set in `sets` order should lead the grouped intersections.
     lead_members = [statistics.intersection_members[i] for i in selection.intersections]
     first_set = selection.sets[0]
-    leading_positions = [
-        i for i, members in enumerate(lead_members) if first_set in members
-    ]
+    leading_positions = [i for i, members in enumerate(lead_members) if first_set in members]
     if leading_positions:
         assert leading_positions == list(range(min(leading_positions), min(leading_positions) + len(leading_positions)))
 
 
 def test_select_dropped_set_reporting(abc_example):
-    statistics = upset.compute_intersections(
-        abc_example, intersect=["A", "B", "C"], intersections=[["A"], ["B"]]
-    )
+    statistics = upset.compute_intersections(abc_example, intersect=["A", "B", "C"], intersections=[["A"], ["B"]])
     selection = upset.select_intersections(statistics, keep_empty_groups=False)
     assert selection.dropped_sets == ("C",)
 
 
 def test_report_dropped_sets_emits_message(abc_example):
     messages: list[str] = []
-    statistics = upset.compute_intersections(
-        abc_example, intersect=["A", "B", "C"], intersections=[["A"], ["B"]]
-    )
+    statistics = upset.compute_intersections(abc_example, intersect=["A", "B", "C"], intersections=[["A"], ["B"]])
     selection = upset.select_intersections(statistics, keep_empty_groups=False)
     result = upset.report_dropped_sets(selection, emit=messages.append)
     assert any("C" in message for message in messages)

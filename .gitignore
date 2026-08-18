@@ -1,15 +1,42 @@
+# --- Python ---------------------------------------------------------------
 __pycache__/
 *.py[cod]
-*.egg-info/
+*$py.class
+*.so
+
+# --- Packaging / build ----------------------------------------------------
 build/
 dist/
+sdist/
+wheels/
+*.egg-info/
+*.egg
+*.whl
+*.tar.gz
+MANIFEST
+
+# --- Testing / coverage ---------------------------------------------------
 .pytest_cache/
+.cache/
 .coverage
+.coverage.*
+coverage.xml
 htmlcov/
+nosetests.xml
 
-# MkDocs build output
-/site/
+# --- Linting / type checking ----------------------------------------------
+.ruff_cache/
+.mypy_cache/
 
+# --- tox / virtual environments -------------------------------------------
+.tox/
+.nox/
+.venv/
+venv/
+env/
+ENV/
+
+# --- Documentation --------------------------------------------------------
 # Quarto build output (rendered HTML; regenerate with `quarto render vignettes`).
 # vignettes/_freeze/ is intentionally NOT ignored - Quarto's freeze cache is
 # committed so the docs site can be rebuilt/deployed without re-fetching every
@@ -18,3 +45,25 @@ vignettes/_site/
 vignettes/.quarto/
 vignettes/_freeze_assets/
 vignettes/*.quarto_ipynb
+
+# quartodoc output. Generated from docstrings by `quartodoc build`; regenerate
+# rather than editing by hand.
+vignettes/reference/
+vignettes/objects.json
+
+# Sphinx build output and the sphinx-apidoc pages, which docs/conf.py
+# regenerates from the package on every build.
+docs/_build/
+docs/api/
+
+# Legacy MkDocs output (MkDocs is no longer the site renderer).
+/site/
+
+# --- Editors and OS -------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db

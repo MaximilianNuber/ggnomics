@@ -1,2 +1,2 @@
-from .pca import run_pca, plot_pca
+from .pca import plot_pca, run_pca
 from .umap import plot_umap

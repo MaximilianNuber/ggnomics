@@ -26,14 +26,13 @@ def _membership_frame(
 ) -> tuple[pd.DataFrame, tuple[str, ...]]:
     if not isinstance(data, pd.DataFrame):
         raise TypeError("data must be a pandas.DataFrame")
-    selected = tuple(sets) if sets is not None else tuple(
-        column for column in data.columns if pd.api.types.is_bool_dtype(data[column])
+    selected = (
+        tuple(sets)
+        if sets is not None
+        else tuple(column for column in data.columns if pd.api.types.is_bool_dtype(data[column]))
     )
     if len(selected) not in {2, 3, 4}:
-        raise ValueError(
-            "Venn geometry supports exactly two, three, or four sets; "
-            f"selected {len(selected)}"
-        )
+        raise ValueError(f"Venn geometry supports exactly two, three, or four sets; selected {len(selected)}")
     missing = [name for name in selected if name not in data.columns]
     if missing:
         raise KeyError(f"sets missing from data: {missing}")
@@ -43,7 +42,7 @@ def _membership_frame(
         if values.isna().any():
             raise ValueError(f"data[{name!r}] contains missing memberships")
         unique = set(pd.unique(values))
-        if not unique.issubset({False, True, 0, 1, 0.0, 1.0}):
+        if not unique.issubset({False, True}):
             raise TypeError(f"data[{name!r}] must be Boolean or 0/1")
         frame[name] = values.astype(bool)
     return frame, selected
@@ -107,16 +106,10 @@ def compute_venn_layout(
     extent = radius * 1.65
     axis = np.linspace(-extent, extent, resolution)
     xx, yy = np.meshgrid(axis, axis)
-    membership_grid = np.column_stack(
-        [
-            ((xx - x0) ** 2 + (yy - y0) ** 2 <= radius**2).ravel()
-            for x0, y0 in centers
-        ]
-    )
+    membership_grid = np.column_stack([((xx - x0) ** 2 + (yy - y0) ** 2 <= radius**2).ravel() for x0, y0 in centers])
     inside = membership_grid.any(axis=1)
     grid_members = [
-        tuple(name for name, present in zip(selected, row, strict=True) if present)
-        for row in membership_grid[inside]
+        tuple(name for name, present in zip(selected, row, strict=True) if present) for row in membership_grid[inside]
     ]
     regions = pd.DataFrame(
         {
@@ -133,14 +126,8 @@ def compute_venn_layout(
         tuple(name for name, present in zip(selected, row, strict=True) if present)
         for row in memberships.to_numpy(dtype=bool, copy=False)
     ]
-    counts = pd.Series(
-        [_region_name(members) for members in observed_members]
-    ).value_counts()
-    labels = (
-        regions.groupby("region", observed=True)[["x", "y"]]
-        .mean()
-        .reset_index()
-    )
+    counts = pd.Series([_region_name(members) for members in observed_members]).value_counts()
+    labels = regions.groupby("region", observed=True)[["x", "y"]].mean().reset_index()
     labels["count"] = labels["region"].map(counts).fillna(0).astype(int)
 
     center_x = np.mean([center[0] for center in centers])
@@ -319,10 +306,11 @@ def _mixed_region_colors(
         if len(palette) < len(prepared.sets):
             raise ValueError("colors must contain at least one color per set")
         set_colors = dict(zip(prepared.sets, palette, strict=False))
-    highlighted = None if highlight is None else {
-        tuple(name for name in prepared.sets if name in set(members))
-        for members in highlight
-    }
+    highlighted = (
+        None
+        if highlight is None
+        else {tuple(name for name in prepared.sets if name in set(members)) for members in highlight}
+    )
     values: dict[str, str | None] = {}
     for members in dict.fromkeys(prepared.regions["members"]):
         name = _region_name(members)

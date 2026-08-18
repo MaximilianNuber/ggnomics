@@ -4,8 +4,39 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  MPLBACKEND: Agg
 
 jobs:
+  lint:
+    name: Lint and format (Ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install Ruff
+        run: pip install ruff
+
+      - name: ruff check
+        run: ruff check . --output-format=github
+
+      - name: ruff format --check
+        run: ruff format --check --diff .
+
   core-only:
     name: Core-only (numpy, pandas, plotnine)
     runs-on: ubuntu-latest
@@ -18,7 +49,7 @@ jobs:
           cache: pip
 
       - name: Install core package only
-        run: pip install -e .
+        run: pip install -e ".[test]"
 
       - name: Import ggnomics and run a core-only smoke test
         run: |
@@ -37,17 +68,29 @@ jobs:
           print('core-only import + plot OK (including ggnomics.upset, without scipy/statsmodels/upsetplot)')
           "
 
+      - name: Assert no optional container package was imported
+        run: |
+          python -c "
+          import sys
+          import ggnomics  # noqa: F401
+          leaked = [m for m in ('anndata', 'mudata', 'singlecellexperiment', 'summarizedexperiment')
+                    if m in sys.modules]
+          assert not leaked, f'optional backends imported eagerly: {leaked}'
+          print('no optional container package was imported by `import ggnomics`')
+          "
+
       - name: Run tests that don't require optional dependencies
-        run: pytest tests/test_backends.py tests/test_palettes.py -v --tb=short
-        env:
-          MPLBACKEND: Agg
+        run: pytest tests/test_backends.py tests/test_palettes.py tests/test_upset_api.py -v --tb=short
 
   full:
-    name: Full (all extras)
+    name: Full (all extras), Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["3.10", "3.12"]
+        # 3.10 is the declared minimum, 3.12 is the development version, 3.13
+        # is the newest release the dependency stack supports.
+        python-version: ["3.10", "3.12", "3.13"]
 
     steps:
       - uses: actions/checkout@v4
@@ -63,17 +106,24 @@ jobs:
           sudo apt-get install -y libgl1 libglib2.0-0
 
       - name: Install
-        run: pip install -e ".[all,dev]"
+        run: pip install -e ".[all,test]"
 
-      - name: Run full test suite
-        run: pytest tests/ -v --tb=short
-        env:
-          MPLBACKEND: Agg
+      - name: Run full test suite with coverage
+        run: pytest tests/ -v --tb=short --cov --cov-report=xml --cov-report=term-missing --cov-fail-under=80
+
+      - name: Upload coverage artifact
+        if: matrix.python-version == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-xml
+          path: coverage.xml
+          if-no-files-found: error
 
   optional-backend:
     name: Isolated backend (${{ matrix.extra }})
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         extra: [anndata, sce, se, multimodal]
 
@@ -86,7 +136,7 @@ jobs:
           cache: pip
 
       - name: Install core + one optional extra
-        run: pip install -e ".[${{ matrix.extra }},dev]"
+        run: pip install -e ".[${{ matrix.extra }},test]"
 
       - name: Import ggnomics with only this backend installed
         run: |
@@ -97,8 +147,6 @@ jobs:
 
       - name: Run backend registration tests
         run: pytest tests/test_backends.py -v --tb=short
-        env:
-          MPLBACKEND: Agg
 
   upset-focused:
     name: UpSet plots (targeted)
@@ -112,7 +160,7 @@ jobs:
           cache: pip
 
       - name: Install ggnomics with the upset extra
-        run: pip install -e ".[upset,dev]"
+        run: pip install -e ".[upset,test]"
 
       - name: Run focused ggnomics.upset tests
         run: |
@@ -124,38 +172,9 @@ jobs:
             tests/test_upset_statistics.py \
             tests/test_upset_venn.py \
             -v --tb=short
-        env:
-          MPLBACKEND: Agg
 
       - name: Run pseudobulk DE tests relevant to mode="upset"
         run: pytest -q tests/test_pseudobulk.py -k pseudobulk_de -v --tb=short
-        env:
-          MPLBACKEND: Agg
-
-  docs:
-    name: Documentation build validation
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: pip
-
-      - name: Install ggnomics with docs and full-plotting extras
-        run: pip install -e ".[all,docs]"
-
-      - name: mkdocs build --strict
-        run: mkdocs build --strict
-
-      - uses: quarto-dev/quarto-actions/setup@v2
-
-      - name: quarto render vignettes --no-execute
-        # Uses the committed vignettes/_freeze results; does not execute
-        # code cells or download any datasets, so no docs environment
-        # (pydeseq2, BiocPy data-access packages, ...) is needed here.
-        run: quarto render vignettes --no-execute
 
   build:
     name: Build + wheel install smoke test
@@ -169,10 +188,13 @@ jobs:
           cache: pip
 
       - name: Install build tooling
-        run: pip install build
+        run: pip install build twine
 
       - name: Build sdist and wheel
         run: python -m build
+
+      - name: Validate distribution metadata
+        run: python -m twine check dist/*
 
       - name: Install the built wheel into a clean environment
         run: |
@@ -187,3 +209,10 @@ jobs:
           assert type(p).__name__ == 'ggplot'
           print('wheel install + smoke test OK')
           "
+
+      - name: Upload distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          if-no-files-found: error

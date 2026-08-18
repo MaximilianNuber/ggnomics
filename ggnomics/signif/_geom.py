@@ -3,7 +3,6 @@ from __future__ import annotations
 import pandas as pd
 from plotnine import aes, geom_segment, geom_text
 
-
 # ---------------------------------------------------------------------------
 # Private helpers
 # ---------------------------------------------------------------------------
@@ -49,17 +48,11 @@ def _brackets_to_layers(brackets: list, params) -> list:
 
     for b in brackets:
         # left vertical tip
-        seg_rows.append(
-            {"x": b.xmin, "xend": b.xmin, "y": b.y_tip_left, "yend": b.y_bracket}
-        )
+        seg_rows.append({"x": b.xmin, "xend": b.xmin, "y": b.y_tip_left, "yend": b.y_bracket})
         # horizontal bar
-        seg_rows.append(
-            {"x": b.xmin, "xend": b.xmax, "y": b.y_bracket, "yend": b.y_bracket}
-        )
+        seg_rows.append({"x": b.xmin, "xend": b.xmax, "y": b.y_bracket, "yend": b.y_bracket})
         # right vertical tip
-        seg_rows.append(
-            {"x": b.xmax, "xend": b.xmax, "y": b.y_bracket, "yend": b.y_tip_right}
-        )
+        seg_rows.append({"x": b.xmax, "xend": b.xmax, "y": b.y_bracket, "yend": b.y_tip_right})
         # label centered above bar
         txt_rows.append(
             {
@@ -164,9 +157,7 @@ class _DeferredSignif:
 
         group_maxima = df.groupby(x_col, observed=True)[y_col].max().to_dict()
 
-        stats_df = run_comparisons(
-            df[y_col], df[x_col], self.comparisons, self.test, self.p_adjust
-        )
+        stats_df = run_comparisons(df[y_col], df[x_col], self.comparisons, self.test, self.p_adjust)
 
         if stats_df.empty:
             self._last_brackets = []
@@ -237,21 +228,19 @@ def geom_signif(
     Returns a list of plotnine layers (manual mode) or a _DeferredSignif
     object (automatic mode) that can be resolved with .resolve(df, x_col, y_col).
 
-    MANUAL MODE
-    -----------
-    When annotations + y_position + xmin + xmax are all provided, draws
-    brackets at the exact positions given without running any statistics.
+    **Manual mode.** When annotations + y_position + xmin + xmax are all
+    provided, draws brackets at the exact positions given without running any
+    statistics::
 
         geom_signif(
             annotations=["p = 0.003"],
             y_position=[8.5],
-            xmin=[1], xmax=[3],
+            xmin=[1],
+            xmax=[3],
         )
 
-    AUTOMATIC MODE
-    --------------
-    When only comparisons are given, returns a _DeferredSignif that runs
-    statistical tests at resolve time.
+    **Automatic mode.** When only comparisons are given, returns a
+    ``_DeferredSignif`` that runs statistical tests at resolve time::
 
         deferred = geom_signif(comparisons=[("A", "B"), ("A", "C")])
         layers = deferred.resolve(df, x_col="group", y_col="value")
@@ -266,10 +255,12 @@ def geom_signif(
     xmin, xmax  : list of float — bracket x spans, numeric (manual mode)
     test : "mannwhitney" | "wilcoxon" | "ttest" | "kruskal"
     map_signif_level : True | False | dict | callable
-        True  → default star mapping
-        False → "p={value:.3f}"
-        dict  → {threshold: label}
-        callable → f(p) → str
+        How p-values become labels::
+
+            True     → default star mapping
+            False    → "p={value:.3f}"
+            dict     → {threshold: label}
+            callable → f(p) → str
     p_adjust : "bonferroni" | "fdr_bh" | "none"
     margin_top : fraction of y range above data max before first bracket
     step_increase : fraction of y range added per stacked bracket
@@ -280,12 +271,7 @@ def geom_signif(
     # ------------------------------------------------------------------
     # Manual mode: all four manual parameters provided
     # ------------------------------------------------------------------
-    if (
-        annotations is not None
-        and y_position is not None
-        and xmin is not None
-        and xmax is not None
-    ):
+    if annotations is not None and y_position is not None and xmin is not None and xmax is not None:
         from ._brackets import BracketSpec
 
         if isinstance(tip_length, (int, float)):

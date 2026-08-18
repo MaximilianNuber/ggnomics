@@ -1,16 +1,16 @@
-from typing import Optional, Dict
+from typing import Dict, Optional
 
 import numpy as np
 import pandas as pd
 from plotnine import (
-    ggplot,
     aes,
+    geom_hline,
     geom_point,
     geom_vline,
-    geom_hline,
-    theme_classic,
+    ggplot,
     ggtitle,
     scale_color_manual,
+    theme_classic,
 )
 
 

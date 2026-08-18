@@ -56,19 +56,14 @@ def upset_mode(mode: Mode) -> ModeSpec:
     return ModeSpec(normalize_mode(mode))
 
 
-def upset_text_percentage(
-    *, digits: int = 0, sep: str = "", mode: Mode = "distinct"
-):
+def upset_text_percentage(*, digits: int = 0, sep: str = "", mode: Mode = "distinct"):
     """Return an after-stat expression for an intersection-to-union percentage."""
 
     if digits < 0:
         raise ValueError(f"digits must be non-negative; got {digits}")
     numerator = get_size_mode(mode)
     denominator = get_size_mode("inclusive_union")
-    expression = (
-        f"round(100 * {numerator} / {denominator}, {digits})"
-        f".astype(str) + {('%' if not sep else sep + '%')!r}"
-    )
+    expression = f"round(100 * {numerator} / {denominator}, {digits}).astype(str) + {('%' if not sep else sep + '%')!r}"
     return after_stat(expression)
 
 
@@ -100,10 +95,7 @@ def aes_percentage(
     """
 
     if relative_to not in {"intersection", "group", "all"}:
-        raise ValueError(
-            "relative_to must be 'intersection', 'group', or 'all'; "
-            f"got {relative_to!r}"
-        )
+        raise ValueError(f"relative_to must be 'intersection', 'group', or 'all'; got {relative_to!r}")
     if digits < 0:
         raise ValueError(f"digits must be non-negative; got {digits}")
     denominator = {
@@ -111,10 +103,7 @@ def aes_percentage(
         "group": "count.groupby(fill).transform('sum')",
         "all": "count.sum()",
     }[relative_to]
-    expression = (
-        f"round(100 * count / ({denominator}), {digits}).astype(str)"
-        f" + {('%' if not sep else sep + '%')!r}"
-    )
+    expression = f"round(100 * count / ({denominator}), {digits}).astype(str) + {('%' if not sep else sep + '%')!r}"
     return after_stat(expression)
 
 

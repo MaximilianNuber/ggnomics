@@ -11,10 +11,7 @@ def _scipy_stats():
     try:
         from scipy import stats
     except ImportError as exc:  # pragma: no cover - depends on installation
-        raise ImportError(
-            "Statistical comparisons require scipy. "
-            "Install ggnomics with the 'stats' extra."
-        ) from exc
+        raise ImportError("Statistical comparisons require scipy. Install ggnomics with the 'stats' extra.") from exc
     return stats
 
 
@@ -84,7 +81,8 @@ def run_comparisons(
             warnings.warn(
                 f"Auto-computing all pairwise comparisons for {n} groups "
                 f"({n * (n - 1) // 2} comparisons). "
-                "Consider passing explicit comparisons."
+                "Consider passing explicit comparisons.",
+                stacklevel=2,
             )
         comparisons = list(combinations(unique_groups, 2))
 
@@ -111,9 +109,7 @@ def run_comparisons(
             }
         )
 
-    empty = pd.DataFrame(
-        columns=["group1", "group2", "statistic", "pvalue", "padj", "n1", "n2"]
-    )
+    empty = pd.DataFrame(columns=["group1", "group2", "statistic", "pvalue", "padj", "n1", "n2"])
     if not rows:
         return empty
 

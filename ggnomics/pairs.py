@@ -7,15 +7,15 @@ from typing import Dict, Optional
 
 import pandas as pd
 from plotnine import (
-    ggplot,
     aes,
-    geom_point,
-    facet_grid,
-    theme_classic,
-    theme,
-    element_text,
     element_blank,
+    element_text,
+    facet_grid,
+    geom_point,
+    ggplot,
     ggtitle,
+    theme,
+    theme_classic,
 )
 
 from ._utils import adaptive_size, color_scale
@@ -45,9 +45,7 @@ def _pairs_plot_from_embedding(
     max_comps = emb_df.shape[1]
     k = min(n_components, max_comps)
     if k < 2:
-        raise ValueError(
-            f"Need at least 2 components for a pairs plot; embedding has {max_comps}."
-        )
+        raise ValueError(f"Need at least 2 components for a pairs plot; embedding has {max_comps}.")
 
     comp_cols = list(emb_df.columns[:k])
     emb_k = emb_df[comp_cols].reset_index(drop=True)
@@ -161,15 +159,10 @@ def _plot_pairs_dataframe(
     emb_df = _embedding_frame_from_dataframe(data, dimred)
 
     if color_by is not None and color_by not in data.columns:
-        raise KeyError(
-            f"color_by {color_by!r} not found in the DataFrame. "
-            f"Available: {list(data.columns)[:20]}"
-        )
+        raise KeyError(f"color_by {color_by!r} not found in the DataFrame. Available: {list(data.columns)[:20]}")
     color_series = data[color_by].reset_index(drop=True) if color_by is not None else None
 
-    return _pairs_plot_from_embedding(
-        emb_df, n_components, color_series, color_by, size, alpha, palette, title
-    )
+    return _pairs_plot_from_embedding(emb_df, n_components, color_series, color_by, size, alpha, palette, title)
 
 
 __all__ = ["plot_pairs"]

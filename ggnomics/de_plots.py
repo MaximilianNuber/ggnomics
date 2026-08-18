@@ -2,30 +2,26 @@
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Union
+from typing import List, Optional, Union
 
 import numpy as np
 import pandas as pd
 from plotnine import (
-    ggplot,
     aes,
+    coord_flip,
+    geom_hline,
     geom_point,
     geom_segment,
     geom_text,
-    geom_hline,
     geom_vline,
-    theme_classic,
-    theme,
-    element_text,
+    ggplot,
     ggtitle,
     labs,
     scale_color_manual,
-    scale_y_continuous,
-    coord_flip,
+    theme_classic,
 )
 
 from ._utils import HeatmapResult
-
 
 # ---------------------------------------------------------------------------
 # Helpers shared by volcano/MA
@@ -123,9 +119,7 @@ def plot_volcano(
 
     color_pal = {"ns": ns_color, "up": up_color, "down": down_color}
 
-    df["__label__"] = _get_gene_labels(
-        df, gene_col, pval_col, "__status__", label_top_n, label_genes
-    )
+    df["__label__"] = _get_gene_labels(df, gene_col, pval_col, "__status__", label_top_n, label_genes)
 
     p = (
         ggplot(df)
@@ -157,9 +151,11 @@ def plot_volcano(
 
     if xlim is not None:
         from plotnine import xlim as _xlim
+
         p = p + _xlim(*xlim)
     if ylim is not None:
         from plotnine import ylim as _ylim
+
         p = p + _ylim(*ylim)
 
     if title is not None:
@@ -204,9 +200,7 @@ def plot_ma(
 
     color_pal = {"ns": ns_color, "up": up_color, "down": down_color}
 
-    df["__label__"] = _get_gene_labels(
-        df, gene_col, pval_col, "__status__", label_top_n, label_genes
-    )
+    df["__label__"] = _get_gene_labels(df, gene_col, pval_col, "__status__", label_top_n, label_genes)
 
     p = (
         ggplot(df)
@@ -290,6 +284,7 @@ def plot_coef_lollipop(
 
     if se_col is not None and se_col in df.columns:
         from plotnine import geom_errorbarh
+
         p = p + geom_errorbarh(
             aes(xmin=coef_col + " - " + se_col, xmax=coef_col + " + " + se_col),
             height=0.3,
@@ -328,10 +323,7 @@ def plot_coef_expression(
         coef_series = coefs.rename("coefficient")
     else:
         coef_series = coefs[coef_col].copy()
-        coef_series.index = (
-            coefs.index if not isinstance(coefs.index, pd.RangeIndex)
-            else coefs.iloc[:, 0]
-        )
+        coef_series.index = coefs.index if not isinstance(coefs.index, pd.RangeIndex) else coefs.iloc[:, 0]
 
     coef_abs = coef_series.abs().nlargest(top_n)
     if order_by_coef:
@@ -343,14 +335,17 @@ def plot_coef_expression(
 
     if plot_type == "dot":
         from .expression import plot_dot
+
         return plot_dot(data, features=features, group_by=group_by, layer=layer, title=title)
 
     if plot_type == "violin":
         from .expression import plot_expression
+
         return plot_expression(data, features=features, group_by=group_by, layer=layer, title=title)
 
     if plot_type == "heatmap":
         from .expression import plot_heatmap
+
         p = plot_heatmap(data, features=features, group_by=group_by, layer=layer, title=title)
         return HeatmapResult(plot=p)
 

@@ -1,24 +1,24 @@
 """Tests for ggnomics._compose helpers."""
 
 import pytest
-from plotnine import ggplot, aes, geom_point
-from plotnine.data import mtcars
+from plotnine import aes, geom_point, ggplot
 from plotnine.composition import Compose
+from plotnine.data import mtcars
 
 from ggnomics._compose import (
-    hstack,
-    vstack,
-    grid,
-    annotate_composition,
-    save_composition,
-    HAS_LAYOUT,
     _PLOTNINE_VERSION,
+    HAS_LAYOUT,
+    annotate_composition,
+    grid,
+    hstack,
+    save_composition,
+    vstack,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture(scope="module")
 def p1():

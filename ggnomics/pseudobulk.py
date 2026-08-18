@@ -8,20 +8,20 @@ from typing import TYPE_CHECKING, Dict, List, Optional, Union
 import numpy as np
 import pandas as pd
 from plotnine import (
-    ggplot,
     aes,
+    element_text,
     geom_bar,
+    geom_boxplot,
     geom_hline,
     geom_violin,
-    geom_boxplot,
-    theme_classic,
-    theme,
-    element_text,
+    ggplot,
     ggtitle,
     labs,
     position_stack,
     scale_fill_brewer,
     scale_fill_manual,
+    theme,
+    theme_classic,
 )
 
 from ._compose import annotate_composition
@@ -75,9 +75,7 @@ def _pseudobulk_aggregate(
     if hasattr(matrix, "tocsr"):
         from scipy import sparse
 
-        indicator = sparse.csr_matrix(
-            (np.ones(n_obs), (rows, cols)), shape=(n_samples, n_obs)
-        )
+        indicator = sparse.csr_matrix((np.ones(n_obs), (rows, cols)), shape=(n_samples, n_obs))
         summed = indicator @ matrix
         summed = np.asarray(summed.todense()) if hasattr(summed, "todense") else np.asarray(summed)
     else:
@@ -114,12 +112,7 @@ def _sample_condition_map(
 
 
 def _counts_panel_data(obs_df: pd.DataFrame, sample_by: str, group_by: str) -> pd.DataFrame:
-    return (
-        obs_df.groupby([sample_by, group_by], observed=True)
-        .size()
-        .rename("n_cells")
-        .reset_index()
-    )
+    return obs_df.groupby([sample_by, group_by], observed=True).size().rename("n_cells").reset_index()
 
 
 def _counts_panel_plot(
@@ -152,10 +145,12 @@ def _libsize_panel_data(
     condition_by: Optional[str],
     condition_values: Optional[np.ndarray],
 ) -> pd.DataFrame:
-    df = pd.DataFrame({
-        sample_by: sample_ids,
-        "__log_lib__": np.log10(np.maximum(library_sizes, 1)),
-    })
+    df = pd.DataFrame(
+        {
+            sample_by: sample_ids,
+            "__log_lib__": np.log10(np.maximum(library_sizes, 1)),
+        }
+    )
     if condition_by is not None:
         df[condition_by] = condition_values
     return df
@@ -193,16 +188,13 @@ def _pca_panel_data(
 ) -> pd.DataFrame:
     n_samples = pb_mat.shape[0]
     if n_samples < 2:
-        raise ValueError(
-            f"Pseudobulk PCA requires at least 2 samples; got {n_samples}."
-        )
+        raise ValueError(f"Pseudobulk PCA requires at least 2 samples; got {n_samples}.")
 
     try:
         from sklearn.decomposition import PCA as SkPCA
     except ImportError as exc:
         raise ImportError(
-            "Pseudobulk PCA requires scikit-learn. "
-            "Install with: pip install 'ggnomics[pseudobulk]'"
+            "Pseudobulk PCA requires scikit-learn. Install with: pip install 'ggnomics[pseudobulk]'"
         ) from exc
 
     n_components = min(2, n_samples - 1, pb_mat.shape[1])
@@ -210,11 +202,13 @@ def _pca_panel_data(
     coords = pca.fit_transform(pb_mat)
     pc2 = coords[:, 1] if coords.shape[1] > 1 else np.zeros(n_samples)
 
-    df = pd.DataFrame({
-        "__pc1__": coords[:, 0],
-        "__pc2__": pc2,
-        sample_by: unique_samples,
-    })
+    df = pd.DataFrame(
+        {
+            "__pc1__": coords[:, 0],
+            "__pc2__": pc2,
+            sample_by: unique_samples,
+        }
+    )
     if condition_by is not None and condition_map is not None:
         df[condition_by] = [condition_map[s] for s in unique_samples]
     return df
@@ -229,8 +223,13 @@ def _pca_panel_plot(
 
     color_col = condition_by if condition_by is not None else sample_by
     return plot_scatter(
-        pca_df, x="__pc1__", y="__pc2__", color=color_col,
-        x_label="PC1", y_label="PC2", title="Pseudobulk PCA",
+        pca_df,
+        x="__pc1__",
+        y="__pc2__",
+        color=color_col,
+        x_label="PC1",
+        y_label="PC2",
+        title="Pseudobulk PCA",
     )
 
 
@@ -249,7 +248,7 @@ def plot_pseudobulk_qc(
     min_cells: int = 10,
     palette: Optional[Dict] = None,
     ncol: int = 2,
-) -> "Compose":
+) -> Compose:
     """Three-panel QC figure for pseudobulk analysis setup.
 
     Panel 1 -- Cells per sample-group combination (barplot, fill = ``group_by``).
@@ -305,16 +304,12 @@ def _plot_pseudobulk_qc_dataframe(
     required = [sample_by, group_by] + ([condition_by] if condition_by is not None else [])
     missing = [c for c in required if c not in data.columns]
     if missing:
-        raise KeyError(
-            f"Column(s) {missing} not found in the DataFrame. "
-            f"Available: {list(data.columns)[:20]}"
-        )
+        raise KeyError(f"Column(s) {missing} not found in the DataFrame. Available: {list(data.columns)[:20]}")
     if features is not None:
         missing_f = [f for f in features if f not in data.columns]
         if missing_f:
             raise KeyError(
-                f"features not found in the DataFrame: {missing_f}. "
-                f"Available (first 20): {list(data.columns)[:20]}"
+                f"features not found in the DataFrame: {missing_f}. Available (first 20): {list(data.columns)[:20]}"
             )
 
     obs_df = data.reset_index(drop=True)
@@ -348,8 +343,7 @@ def _plot_pseudobulk_qc_dataframe(
     unique_samples = pd.unique(sample_ids)
     pb_mat = _pseudobulk_aggregate(obs_df[features].to_numpy(dtype=float), sample_ids, unique_samples)
     condition_map = (
-        _sample_condition_map(obs_df, sample_by, condition_by, unique_samples)
-        if condition_by is not None else None
+        _sample_condition_map(obs_df, sample_by, condition_by, unique_samples) if condition_by is not None else None
     )
     pca_df = _pca_panel_data(pb_mat, unique_samples, sample_by, condition_by, condition_map)
     p3 = _pca_panel_plot(pca_df, sample_by, condition_by)
@@ -373,7 +367,7 @@ def plot_pseudobulk_de(
     mode: str = "volcano",
     ncol: int = 3,
     title: Optional[str] = None,
-) -> "Union[Compose, ggplot]":
+) -> Union[Compose, ggplot]:
     """Visualise DE results across multiple clusters or contrasts.
 
     Args:
@@ -405,8 +399,8 @@ def plot_pseudobulk_de(
             thresholds (``mode="upset"``).
     """
     if mode == "volcano":
-        from .de_plots import plot_volcano
         from ._compose import grid as _grid
+        from .de_plots import plot_volcano
 
         plots = []
         for name, df in results.items():
@@ -437,10 +431,12 @@ def plot_pseudobulk_de(
             sig = df2[pval_col] < pval_threshold
             up = int((sig & (df2[logfc_col] >= logfc_threshold)).sum())
             down = int((sig & (df2[logfc_col] <= -logfc_threshold)).sum())
-            rows.extend([
-                {"cluster": name, "direction": "up", "n": up},
-                {"cluster": name, "direction": "down", "n": -down},
-            ])
+            rows.extend(
+                [
+                    {"cluster": name, "direction": "up", "n": up},
+                    {"cluster": name, "direction": "down", "n": -down},
+                ]
+            )
         bar_df = pd.DataFrame(rows)
 
         p = (

@@ -254,7 +254,7 @@ gg.plot_expression(final, features=markers, group_by="level1class", layer="logco
 gg.plot_dot(final, features=markers, group_by="level1class", layer="logcounts") + theme_bw() + theme(axis_text_x=element_text(rotation=45, hjust=1))
 ```
 
-## 11. Heatmap
+## 11. Heatmap {#heatmap}
 
 ```{python}
 gg.plot_heatmap(final, features=markers, group_by="clusters", layer="logcounts", cluster_rows=True, cluster_cols=True)

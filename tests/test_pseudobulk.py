@@ -2,10 +2,10 @@
 
 import pandas as pd
 import pytest
-from plotnine.ggplot import ggplot as ggplot_class
 from plotnine.composition import Compose
+from plotnine.ggplot import ggplot as ggplot_class
 
-from ggnomics import plot_pseudobulk_qc, plot_pseudobulk_de
+from ggnomics import plot_pseudobulk_de, plot_pseudobulk_qc
 
 
 def _make_results(mock_de_results, clusters=("C0", "C1", "C2")):
@@ -30,9 +30,7 @@ def test_pseudobulk_qc_with_condition(mock_adata):
     sample_to_condition = {"S1": "ctrl", "S2": "ctrl", "S3": "treated", "S4": "treated"}
     adata.obs["condition"] = adata.obs["sample"].map(sample_to_condition)
 
-    result = plot_pseudobulk_qc(
-        adata, sample_by="sample", group_by="cluster", condition_by="condition"
-    )
+    result = plot_pseudobulk_qc(adata, sample_by="sample", group_by="cluster", condition_by="condition")
     assert isinstance(result, Compose)
 
 
@@ -40,9 +38,7 @@ def test_pseudobulk_qc_conflicting_condition_raises(mock_adata):
     """A condition column that varies within a sample must raise, not silently
     pick a majority vote."""
     with pytest.raises(ValueError, match="multiple"):
-        plot_pseudobulk_qc(
-            mock_adata, sample_by="sample", group_by="cluster", condition_by="batch"
-        )
+        plot_pseudobulk_qc(mock_adata, sample_by="sample", group_by="cluster", condition_by="batch")
 
 
 def test_pseudobulk_qc_missing_col_raises(mock_adata):
@@ -52,10 +48,7 @@ def test_pseudobulk_qc_missing_col_raises(mock_adata):
 
 def test_pseudobulk_qc_missing_condition_raises(mock_adata):
     with pytest.raises(KeyError):
-        plot_pseudobulk_qc(
-            mock_adata, sample_by="sample", group_by="cluster",
-            condition_by="nonexistent_col"
-        )
+        plot_pseudobulk_qc(mock_adata, sample_by="sample", group_by="cluster", condition_by="nonexistent_col")
 
 
 def test_pseudobulk_qc_sce(mock_sce):
@@ -74,20 +67,16 @@ def test_pseudobulk_qc_dataframe_requires_features(mock_df):
 
 
 def test_pseudobulk_qc_dataframe_with_features(mock_df):
-    features = [f"Gene{i+1:04d}" for i in range(10)]
-    result = plot_pseudobulk_qc(
-        mock_df, sample_by="sample", group_by="cluster", features=features
-    )
+    features = [f"Gene{i + 1:04d}" for i in range(10)]
+    result = plot_pseudobulk_qc(mock_df, sample_by="sample", group_by="cluster", features=features)
     assert isinstance(result, Compose)
 
 
 def test_pseudobulk_qc_dataframe_prefers_n_counts_for_libsize(mock_df):
     # n_counts is present, so features is only required for the PCA panel,
     # not for library size.
-    features = [f"Gene{i+1:04d}" for i in range(10)]
-    result = plot_pseudobulk_qc(
-        mock_df, sample_by="sample", group_by="cluster", features=features
-    )
+    features = [f"Gene{i + 1:04d}" for i in range(10)]
+    result = plot_pseudobulk_qc(mock_df, sample_by="sample", group_by="cluster", features=features)
     assert isinstance(result, Compose)
 
 
@@ -104,12 +93,13 @@ def test_pseudobulk_qc_sparse_dense_equivalence():
     anndata = pytest.importorskip("anndata")
     import numpy as np
     from scipy import sparse
+
     from ggnomics.pseudobulk import _pseudobulk_aggregate, _sparse_row_sums
 
     rng = np.random.default_rng(3)
     n_cells, n_genes = 120, 15
     X = rng.negative_binomial(3, 0.4, size=(n_cells, n_genes)).astype(float)
-    gene_names = [f"Gene{i+1:04d}" for i in range(n_genes)]
+    gene_names = [f"Gene{i + 1:04d}" for i in range(n_genes)]
     samples = rng.choice(["S1", "S2", "S3"], n_cells)
     clusters = rng.choice(["C0", "C1"], n_cells)
 
@@ -237,9 +227,7 @@ def test_pseudobulk_de_upset_gene_col_and_index_agree():
     indexed = _de_table(["g1", "g2"], [])
     named = _de_table(["g1", "g2"], [], gene_col="gene")
     comp_index = plot_pseudobulk_de({"A": indexed, "B": indexed}, mode="upset")
-    comp_named = plot_pseudobulk_de(
-        {"A": named, "B": named}, mode="upset", gene_col="gene"
-    )
+    comp_named = plot_pseudobulk_de({"A": named, "B": named}, mode="upset", gene_col="gene")
     assert isinstance(comp_index, Compose)
     assert isinstance(comp_named, Compose)
 

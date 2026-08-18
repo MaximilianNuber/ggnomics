@@ -57,9 +57,7 @@ def _resolve_assay(se: SummarizedExperiment, layer: Optional[str]):
         return se.assay(assay_name)
     except (KeyError, ValueError, AttributeError) as exc:
         available = list(getattr(se, "assay_names", []))
-        raise KeyError(
-            f"Assay {assay_name!r} not found in the SE. Available: {available}"
-        ) from exc
+        raise KeyError(f"Assay {assay_name!r} not found in the SE. Available: {available}") from exc
 
 
 def _expression_frame(
@@ -73,10 +71,7 @@ def _expression_frame(
     name_to_index = {name: index for index, name in enumerate(row_names)}
     missing = [f for f in features if f not in name_to_index]
     if missing:
-        raise KeyError(
-            f"Feature(s) {missing} not found in se.row_names. "
-            f"Available (first 20): {row_names[:20]}"
-        )
+        raise KeyError(f"Feature(s) {missing} not found in se.row_names. Available (first 20): {row_names[:20]}")
 
     indices = [name_to_index[f] for f in features]
     matrix = _resolve_assay(se, layer)
@@ -109,7 +104,7 @@ def _resolve_column(
     se: SummarizedExperiment,
     key: str,
     layer: Optional[str] = None,
-) -> "tuple[pd.Series, bool]":
+) -> tuple[pd.Series, bool]:
     obs = column_data_frame(se)
     if key in obs.columns:
         series = obs[key].reset_index(drop=True)
@@ -141,10 +136,7 @@ def _obs_expression_frame(
     obs = column_data_frame(se)
     missing_meta = [c for c in metadata_columns if c not in obs.columns]
     if missing_meta:
-        raise KeyError(
-            f"Column(s) {missing_meta} not found in SE column_data. "
-            f"Available: {list(obs.columns)[:20]}"
-        )
+        raise KeyError(f"Column(s) {missing_meta} not found in SE column_data. Available: {list(obs.columns)[:20]}")
 
     frame = _expression_frame(se, features, layer)
     for column in metadata_columns:
@@ -166,9 +158,7 @@ def _plot_expression_se(
     fill_col = color_by if color_by is not None else group_by
     metadata_columns = list(dict.fromkeys([group_by, fill_col]))
     frame = _obs_expression_frame(data, features, layer, metadata_columns)
-    return plot_expression(
-        frame, features=features, group_by=group_by, layer=None, color_by=color_by, **kwargs
-    )
+    return plot_expression(frame, features=features, group_by=group_by, layer=None, color_by=color_by, **kwargs)
 
 
 @plot_dot.register(SummarizedExperiment)
@@ -222,8 +212,7 @@ def _plot_highest_exprs_se(
     obs = column_data_frame(data)
     if color_cells_by is not None and color_cells_by not in obs.columns:
         raise KeyError(
-            f"color_cells_by {color_cells_by!r} not found in SE column_data. "
-            f"Available: {list(obs.columns)[:20]}"
+            f"color_cells_by {color_cells_by!r} not found in SE column_data. Available: {list(obs.columns)[:20]}"
         )
 
     row_names = _row_names(data)
@@ -232,10 +221,7 @@ def _plot_highest_exprs_se(
         name_to_index = {name: index for index, name in enumerate(row_names)}
         missing = [f for f in features if f not in name_to_index]
         if missing:
-            raise KeyError(
-                f"features not found in se.row_names: {missing}. "
-                f"Available (first 20): {row_names[:20]}"
-            )
+            raise KeyError(f"features not found in se.row_names: {missing}. Available (first 20): {row_names[:20]}")
         indices = [name_to_index[f] for f in features]
         matrix = matrix[indices, :]
         candidate_names = list(features)
@@ -264,14 +250,13 @@ def _plot_violin_stats_se(
     feature_values, _ = _resolve_column(data, feature, layer=layer)
     obs = column_data_frame(data)
     if group_by not in obs.columns:
-        raise KeyError(
-            f"group_by {group_by!r} not found in SE column_data. "
-            f"Available: {list(obs.columns)[:20]}"
-        )
-    frame = pd.DataFrame({
-        feature: feature_values.to_numpy(),
-        group_by: obs[group_by].to_numpy(),
-    })
+        raise KeyError(f"group_by {group_by!r} not found in SE column_data. Available: {list(obs.columns)[:20]}")
+    frame = pd.DataFrame(
+        {
+            feature: feature_values.to_numpy(),
+            group_by: obs[group_by].to_numpy(),
+        }
+    )
     return plot_violin_stats(frame, feature=feature, group_by=group_by, layer=None, **kwargs)
 
 
@@ -288,14 +273,13 @@ def _plot_box_stats_se(
     feature_values, _ = _resolve_column(data, feature, layer=layer)
     obs = column_data_frame(data)
     if group_by not in obs.columns:
-        raise KeyError(
-            f"group_by {group_by!r} not found in SE column_data. "
-            f"Available: {list(obs.columns)[:20]}"
-        )
-    frame = pd.DataFrame({
-        feature: feature_values.to_numpy(),
-        group_by: obs[group_by].to_numpy(),
-    })
+        raise KeyError(f"group_by {group_by!r} not found in SE column_data. Available: {list(obs.columns)[:20]}")
+    frame = pd.DataFrame(
+        {
+            feature: feature_values.to_numpy(),
+            group_by: obs[group_by].to_numpy(),
+        }
+    )
     return plot_box_stats(frame, feature=feature, group_by=group_by, layer=None, **kwargs)
 
 
@@ -354,10 +338,7 @@ def _plot_pseudobulk_qc_se(
     required = [sample_by, group_by] + ([condition_by] if condition_by is not None else [])
     missing = [c for c in required if c not in obs.columns]
     if missing:
-        raise KeyError(
-            f"Column(s) {missing} not found in SE column_data. "
-            f"Available: {list(obs.columns)[:20]}"
-        )
+        raise KeyError(f"Column(s) {missing} not found in SE column_data. Available: {list(obs.columns)[:20]}")
 
     obs_df = obs.reset_index(drop=True)
     counts_df = _counts_panel_data(obs_df, sample_by, group_by)
@@ -375,8 +356,7 @@ def _plot_pseudobulk_qc_se(
     unique_samples = pd.unique(sample_ids)
     pb_mat = _pseudobulk_aggregate(matrix, sample_ids, unique_samples)
     condition_map = (
-        _sample_condition_map(obs_df, sample_by, condition_by, unique_samples)
-        if condition_by is not None else None
+        _sample_condition_map(obs_df, sample_by, condition_by, unique_samples) if condition_by is not None else None
     )
     pca_df = _pca_panel_data(pb_mat, unique_samples, sample_by, condition_by, condition_map)
     p3 = _pca_panel_plot(pca_df, sample_by, condition_by)
@@ -409,26 +389,29 @@ def _plot_adt_qc_se(
     missing_features = [f for f in candidate_features if f not in row_names]
     if missing_features:
         raise KeyError(
-            f"features not found in se.row_names: {missing_features}. "
-            f"Available (first 20): {row_names[:20]}"
+            f"features not found in se.row_names: {missing_features}. Available (first 20): {row_names[:20]}"
         )
     missing_iso = [f for f in isotype_controls if f not in candidate_features]
     if missing_iso:
         raise KeyError(f"isotype_controls not found among candidate features: {missing_iso}.")
     obs = column_data_frame(data)
     if group_by is not None and group_by not in obs.columns:
-        raise KeyError(
-            f"group_by {group_by!r} not found in SE column_data. "
-            f"Available: {list(obs.columns)[:20]}"
-        )
+        raise KeyError(f"group_by {group_by!r} not found in SE column_data. Available: {list(obs.columns)[:20]}")
 
     frame = _expression_frame(data, candidate_features, layer)
     if group_by is not None:
         frame[group_by] = obs[group_by].to_numpy()
 
     return plot_adt_qc(
-        frame, isotype_controls=isotype_controls, layer=None, group_by=group_by,
-        log1p=log1p, palette=palette, ncol=ncol, title=title, features=candidate_features,
+        frame,
+        isotype_controls=isotype_controls,
+        layer=None,
+        group_by=group_by,
+        log1p=log1p,
+        palette=palette,
+        ncol=ncol,
+        title=title,
+        features=candidate_features,
     )
 
 

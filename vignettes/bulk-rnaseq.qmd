@@ -148,7 +148,7 @@ fit = run_deseq2_on_emtab1625()
 results, vst, metadata = fit["results"], fit["vst"], fit["metadata"]
 ```
 
-## 7. PCA on the VST-transformed expression
+## 7. PCA on the VST-transformed expression {#pca-on-the-vst-transformed-expression}
 
 `ggnomics.bulk_pca` computes PCA from an assay in a
 `SummarizedExperiment`. In contrast, the top-level `ggnomics.plot_pca`
@@ -189,7 +189,7 @@ coefs.index = [gene_label_map.get(g) or g for g in coefs.index]
 gg.plot_coef_lollipop(coefs, top_n=20) + theme_bw() + labs(title="Top 20 genes by |log2FoldChange|, 24h salt vs. control")
 ```
 
-## 10. Heatmap of top differentially expressed genes
+## 10. Heatmap of top differentially expressed genes {#heatmap-of-top-differentially-expressed-genes}
 
 ```{python}
 sig_top = results.loc[results["padj"] < 0.05].sort_values("padj").head(30)

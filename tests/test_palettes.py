@@ -6,13 +6,10 @@ import pytest
 from ggnomics.palettes import (
     BIOC_COLORS,
     IGV_ALTERNATING,
-    IGV_DEFAULT,
     TABLEAU_10,
-    TABLEAU_20,
     get_palette,
     resolve_palette,
 )
-
 
 # ---------------------------------------------------------------------------
 # get_palette
@@ -151,6 +148,7 @@ def test_resolve_palette_non_string_color_raises():
 
 def test_resolve_palette_ignores_nan():
     import numpy as np
+
     resolved = resolve_palette(["A", np.nan, "B", None])
     assert list(resolved.keys()) == ["A", "B"]
 

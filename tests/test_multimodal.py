@@ -3,11 +3,10 @@
 import numpy as np
 import pandas as pd
 import pytest
-from plotnine.ggplot import ggplot as ggplot_class
 from plotnine.composition import Compose
+from plotnine.ggplot import ggplot as ggplot_class
 
-from ggnomics import plot_bimodal_scatter, plot_adt_qc
-
+from ggnomics import plot_adt_qc, plot_bimodal_scatter
 
 # ---------------------------------------------------------------------------
 # plot_bimodal_scatter — MuData
@@ -17,8 +16,11 @@ from ggnomics import plot_bimodal_scatter, plot_adt_qc
 def test_bimodal_scatter_mudata(mock_mudata):
     pytest.importorskip("mudata", reason="mudata not installed")
     p = plot_bimodal_scatter(
-        mock_mudata, x_feature="Gene0001", y_feature="Prot01",
-        x_mod="rna", y_mod="prot",
+        mock_mudata,
+        x_feature="Gene0001",
+        y_feature="Prot01",
+        x_mod="rna",
+        y_mod="prot",
     )
     assert isinstance(p, ggplot_class)
 
@@ -26,8 +28,12 @@ def test_bimodal_scatter_mudata(mock_mudata):
 def test_bimodal_scatter_mudata_color(mock_mudata):
     pytest.importorskip("mudata", reason="mudata not installed")
     p = plot_bimodal_scatter(
-        mock_mudata, x_feature="Gene0001", y_feature="Prot01",
-        x_mod="rna", y_mod="prot", color="cluster",
+        mock_mudata,
+        x_feature="Gene0001",
+        y_feature="Prot01",
+        x_mod="rna",
+        y_mod="prot",
+        color="cluster",
     )
     assert isinstance(p, ggplot_class)
 
@@ -35,8 +41,11 @@ def test_bimodal_scatter_mudata_color(mock_mudata):
 def test_bimodal_scatter_mudata_title(mock_mudata):
     pytest.importorskip("mudata", reason="mudata not installed")
     p = plot_bimodal_scatter(
-        mock_mudata, x_feature="Gene0001", y_feature="Prot01",
-        x_mod="rna", y_mod="prot",
+        mock_mudata,
+        x_feature="Gene0001",
+        y_feature="Prot01",
+        x_mod="rna",
+        y_mod="prot",
         title="RNA vs Protein",
     )
     assert isinstance(p, ggplot_class)
@@ -78,8 +87,11 @@ def test_bimodal_scatter_add_marginal_returns_compose(mock_mudata):
     """add_marginal=True → delegates to plot_scatter_marginal → returns Compose."""
     pytest.importorskip("mudata", reason="mudata not installed")
     result = plot_bimodal_scatter(
-        mock_mudata, x_feature="Gene0001", y_feature="Prot01",
-        x_mod="rna", y_mod="prot",
+        mock_mudata,
+        x_feature="Gene0001",
+        y_feature="Prot01",
+        x_mod="rna",
+        y_mod="prot",
         add_marginal=True,
     )
     assert isinstance(result, Compose)
@@ -89,8 +101,11 @@ def test_bimodal_scatter_missing_modality_raises(mock_mudata):
     pytest.importorskip("mudata", reason="mudata not installed")
     with pytest.raises(KeyError):
         plot_bimodal_scatter(
-            mock_mudata, x_feature="Gene0001", y_feature="Prot01",
-            x_mod="nonexistent", y_mod="prot",
+            mock_mudata,
+            x_feature="Gene0001",
+            y_feature="Prot01",
+            x_mod="nonexistent",
+            y_mod="prot",
         )
 
 
@@ -98,8 +113,11 @@ def test_bimodal_scatter_missing_feature_raises(mock_mudata):
     pytest.importorskip("mudata", reason="mudata not installed")
     with pytest.raises(KeyError):
         plot_bimodal_scatter(
-            mock_mudata, x_feature="NonexistentGene", y_feature="Prot01",
-            x_mod="rna", y_mod="prot",
+            mock_mudata,
+            x_feature="NonexistentGene",
+            y_feature="Prot01",
+            x_mod="rna",
+            y_mod="prot",
         )
 
 
@@ -153,8 +171,9 @@ def test_bimodal_scatter_unsupported_type_raises():
 
 def _make_protein_adata(n_cells=200, n_prot=10, seed=42):
     import anndata
+
     rng = np.random.default_rng(seed)
-    prot_names = [f"Prot{i+1:02d}" for i in range(n_prot)]
+    prot_names = [f"Prot{i + 1:02d}" for i in range(n_prot)]
     iso_names = ["IgG1", "IgG2a"]
     all_names = prot_names + iso_names
     X = np.abs(rng.normal(3, 1, (n_cells, len(all_names)))).astype(np.float32)
@@ -218,15 +237,17 @@ def test_adt_qc_dataframe_requires_features():
 
 
 def test_adt_qc_dataframe_with_features():
-    df = pd.DataFrame({
-        "Ab1": [1.0, 2.0, 3.0], "Ab2": [2.0, 1.0, 0.5], "IgG1": [0.5, 0.5, 0.4],
-        "sample": ["S1", "S1", "S2"],
-    })
+    df = pd.DataFrame(
+        {
+            "Ab1": [1.0, 2.0, 3.0],
+            "Ab2": [2.0, 1.0, 0.5],
+            "IgG1": [0.5, 0.5, 0.4],
+            "sample": ["S1", "S1", "S2"],
+        }
+    )
     p = plot_adt_qc(df, isotype_controls=["IgG1"], features=["Ab1", "Ab2", "IgG1"])
     assert isinstance(p, ggplot_class)
-    p2 = plot_adt_qc(
-        df, isotype_controls=["IgG1"], features=["Ab1", "Ab2", "IgG1"], group_by="sample"
-    )
+    p2 = plot_adt_qc(df, isotype_controls=["IgG1"], features=["Ab1", "Ab2", "IgG1"], group_by="sample")
     assert p2.facet is not None
 
 
@@ -252,7 +273,6 @@ def test_adt_qc_sce():
 
 def test_adt_qc_se():
     pytest.importorskip("summarizedexperiment")
-    import biocframe
     from summarizedexperiment import SummarizedExperiment
 
     rng = np.random.default_rng(0)

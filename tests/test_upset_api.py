@@ -94,8 +94,9 @@ def test_upset_all_contains_expected_public_name(name):
 
 
 def test_no_reference_to_upsetplot_in_native_module_files():
-    import ggnomics.upset as upset
     import pathlib
+
+    import ggnomics.upset as upset
 
     package_dir = pathlib.Path(upset.__file__).parent
     offenders = []

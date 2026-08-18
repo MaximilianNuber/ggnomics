@@ -11,13 +11,10 @@ ggnomics calls being demonstrated.
 from __future__ import annotations
 
 import pickle
-from pathlib import Path
-from typing import Literal
 
 import numpy as np
 import pandas as pd
-
-from setup import EXPERIMENTHUB_CACHE, EXPRESSIONATLAS_CACHE, PROCESSED_CACHE, SCRNASEQ_CACHE
+from setup import EXPERIMENTHUB_CACHE, EXPRESSIONATLAS_CACHE, PROCESSED_CACHE
 
 ZEISEL_LEVEL1_CLASSES = [
     "pyramidal CA1",
@@ -216,7 +213,9 @@ def run_deseq2_on_emtab1625(timepoint: str = "24 hour"):
         metadata = sub_cd[["growth_condition"]].copy()
         metadata["growth_condition"] = pd.Categorical(metadata["growth_condition"], categories=["control", "salt"])
 
-        dds = DeseqDataSet(counts=counts_df, metadata=metadata, design="~growth_condition", refit_cooks=True, quiet=True)
+        dds = DeseqDataSet(
+            counts=counts_df, metadata=metadata, design="~growth_condition", refit_cooks=True, quiet=True
+        )
         dds.deseq2()
         ds = DeseqStats(dds, contrast=["growth_condition", "salt", "control"], alpha=0.05, quiet=True)
         ds.summary()
@@ -253,8 +252,8 @@ def load_pbmc_cite_seq() -> tuple[dict, str]:
     et al. BD Rhapsody PBMC CITE-seq: 499 RNA features, 42 ADT features,
     29,033 cells across 3 main donors), not synthetic.
     """
-    from experimenthub import ExperimentHubRegistry
     import anndata as ad
+    from experimenthub import ExperimentHubRegistry
 
     hub = ExperimentHubRegistry(cache_dir=str(EXPERIMENTHUB_CACHE))
 
@@ -285,9 +284,9 @@ def load_pbmc_cite_seq() -> tuple[dict, str]:
     # Keep the original cell_meta.index (barcode + cartridge suffix) as the cell
     # identifier - the bare numeric barcode alone is reused across cartridges
     # (confirmed live: 271 collisions out of 29,033) so it is not unique on its own.
-    obs = cell_meta.rename(
-        columns={"Sample_Tag": "sample_tag", "Sample_Name": "donor", "Cartridge": "cartridge"}
-    ).drop(columns=["rownames"], errors="ignore")
+    obs = cell_meta.rename(columns={"Sample_Tag": "sample_tag", "Sample_Name": "donor", "Cartridge": "cartridge"}).drop(
+        columns=["rownames"], errors="ignore"
+    )
     # Drop multiplets/undetermined droplets - not real single cells.
     keep = ~obs["donor"].isin(["Multiplet", "Undetermined"])
     keep_np = keep.to_numpy()

@@ -8,19 +8,17 @@ from typing import TYPE_CHECKING, Dict, List, Optional, Union
 import numpy as np
 import pandas as pd
 from plotnine import (
-    ggplot,
     aes,
-    geom_density,
-    theme_classic,
-    theme,
     element_text,
+    facet_wrap,
+    geom_density,
+    ggplot,
     ggtitle,
     labs,
-    facet_wrap,
     scale_color_brewer,
-    scale_fill_brewer,
     scale_color_manual,
-    scale_fill_manual,
+    theme,
+    theme_classic,
 )
 
 if TYPE_CHECKING:
@@ -59,7 +57,7 @@ def plot_bimodal_scatter(
     title: Optional[str] = None,
     x_label: Optional[str] = None,
     y_label: Optional[str] = None,
-) -> "Union[ggplot, Compose]":
+) -> Union[ggplot, Compose]:
     """Scatter plot of two features, typically from different modalities.
 
     Designed for CITE-seq-style data (e.g. RNA vs surface protein). If
@@ -125,24 +123,41 @@ def _plot_bimodal_scatter_dataframe(
     required = [x_feature, y_feature] + ([color] if color is not None else [])
     missing = [c for c in required if c not in data.columns]
     if missing:
-        raise KeyError(
-            f"Column(s) {missing} not found in the DataFrame. "
-            f"Available: {list(data.columns)[:20]}"
-        )
+        raise KeyError(f"Column(s) {missing} not found in the DataFrame. Available: {list(data.columns)[:20]}")
 
     if add_marginal:
         from .stats_plots import plot_scatter_marginal
+
         return plot_scatter_marginal(
-            data, x=x_feature, y=y_feature, color=color, layer=None, alpha=alpha,
-            palette=palette, cmap=cmap, title=title,
-            x_label=x_label or x_feature, y_label=y_label or y_feature,
+            data,
+            x=x_feature,
+            y=y_feature,
+            color=color,
+            layer=None,
+            alpha=alpha,
+            palette=palette,
+            cmap=cmap,
+            title=title,
+            x_label=x_label or x_feature,
+            y_label=y_label or y_feature,
         )
 
     from .scatter import plot_scatter
+
     return plot_scatter(
-        data, x=x_feature, y=y_feature, color=color, size=size, stroke=stroke,
-        alpha=alpha, palette=palette, cmap=cmap, layer=None,
-        x_label=x_label or x_feature, y_label=y_label or y_feature, title=title,
+        data,
+        x=x_feature,
+        y=y_feature,
+        color=color,
+        size=size,
+        stroke=stroke,
+        alpha=alpha,
+        palette=palette,
+        cmap=cmap,
+        layer=None,
+        x_label=x_label or x_feature,
+        y_label=y_label or y_feature,
+        title=title,
     )
 
 
@@ -167,14 +182,20 @@ def _build_adt_qc_plot(
         + aes(x="expression", color="antibody")
         + geom_density(alpha=0.0, size=0.6)
         + geom_density(
-            data=iso_df, mapping=aes(x="expression"), inherit_aes=False,
-            fill="#CCCCCC", alpha=0.5, color="grey", size=0.4,
+            data=iso_df,
+            mapping=aes(x="expression"),
+            inherit_aes=False,
+            fill="#CCCCCC",
+            alpha=0.5,
+            color="grey",
+            size=0.4,
         )
         + theme_classic()
         + theme(axis_text_x=element_text(rotation=45, ha="right"))
         + labs(
             x="log1p(expression)" if log1p else "Expression",
-            y="Density", color="Antibody",
+            y="Density",
+            color="Antibody",
         )
     )
 
@@ -270,17 +291,13 @@ def _plot_adt_qc_dataframe(
     missing_features = [f for f in features if f not in data.columns]
     if missing_features:
         raise KeyError(
-            f"features not found in the DataFrame: {missing_features}. "
-            f"Available (first 20): {list(data.columns)[:20]}"
+            f"features not found in the DataFrame: {missing_features}. Available (first 20): {list(data.columns)[:20]}"
         )
     missing_iso = [f for f in isotype_controls if f not in features]
     if missing_iso:
         raise KeyError(f"isotype_controls not found among `features`: {missing_iso}.")
     if group_by is not None and group_by not in data.columns:
-        raise KeyError(
-            f"group_by {group_by!r} not found in the DataFrame. "
-            f"Available: {list(data.columns)[:20]}"
-        )
+        raise KeyError(f"group_by {group_by!r} not found in the DataFrame. Available: {list(data.columns)[:20]}")
 
     real_features = [f for f in features if f not in isotype_controls]
     if not real_features:
@@ -296,9 +313,7 @@ def _plot_adt_qc_dataframe(
         expr_df[group_by] = obs_df[group_by].to_numpy()
         id_vars.append(group_by)
 
-    real_long = expr_df[id_vars + real_features].melt(
-        id_vars=id_vars, var_name="antibody", value_name="expression"
-    )
+    real_long = expr_df[id_vars + real_features].melt(id_vars=id_vars, var_name="antibody", value_name="expression")
 
     iso_vals = expr_df[isotype_controls].to_numpy().ravel()
     iso_df = pd.DataFrame({"expression": iso_vals})

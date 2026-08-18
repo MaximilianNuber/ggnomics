@@ -87,7 +87,7 @@ matched = [(protein, gene) for protein, gene in adt.var["Alternative"].items() i
 len(matched), matched[:8]
 ```
 
-## 5. RNA QC and ADT QC
+## 5. RNA QC and ADT QC {#rna-qc-and-adt-qc}
 
 ```{python}
 rna_qc = pd.DataFrame({
@@ -115,7 +115,7 @@ except ValueError as exc:
 
 The function therefore cannot calculate an isotype-based QC summary for this
 dataset. The empty control list in the check above shows the corresponding validation
-error; the [API reference](../mkdocs) documents the required input.
+error; the [API reference](reference/index.qmd) documents the required input.
 
 A control-free library-size check can still be drawn with `plot_coldata`:
 

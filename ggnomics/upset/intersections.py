@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
+import warnings
 from itertools import chain, combinations
 from math import inf
 from types import MappingProxyType
 from typing import Literal, Sequence
-import warnings
 
 import numpy as np
 import pandas as pd
@@ -58,14 +58,12 @@ def _convert_memberships(
         values = data[name]
         if values.isna().any():
             count = int(values.isna().sum())
-            raise ValueError(
-                f"data[{name!r}] must not contain missing memberships; got {count}"
-            )
+            raise ValueError(f"data[{name!r}] must not contain missing memberships; got {count}")
         if pd.api.types.is_bool_dtype(values.dtype):
             columns[name] = values.astype(bool)
             continue
         unique = set(pd.unique(values))
-        if unique.issubset({0, 1, 0.0, 1.0}):
+        if unique.issubset({0, 1}):
             columns[name] = values.astype(bool)
             converted.append(name)
             continue
@@ -84,9 +82,7 @@ def _convert_memberships(
 
 
 def _powerset(values: tuple[str, ...]) -> list[tuple[str, ...]]:
-    return list(
-        chain.from_iterable(combinations(values, degree) for degree in range(len(values) + 1))
-    )
+    return list(chain.from_iterable(combinations(values, degree) for degree in range(len(values) + 1)))
 
 
 def _candidate_intersections(
@@ -104,8 +100,7 @@ def _candidate_intersections(
             return list(dict.fromkeys(observed))
         if intersections != "all":
             raise ValueError(
-                "intersections must be 'observed', 'all', or a sequence of set-name sequences; "
-                f"got {intersections!r}"
+                f"intersections must be 'observed', 'all', or a sequence of set-name sequences; got {intersections!r}"
             )
         candidate_n = 2 ** len(sets)
         work_n = candidate_n * max(len(memberships), 1)
@@ -124,9 +119,7 @@ def _candidate_intersections(
         requested = tuple(item)
         unknown = [name for name in requested if name not in known]
         if unknown:
-            raise KeyError(
-                f"intersections[{position}] contains names absent from intersect: {unknown}"
-            )
+            raise KeyError(f"intersections[{position}] contains names absent from intersect: {unknown}")
         if len(set(requested)) != len(requested):
             raise ValueError(f"intersections[{position}] contains duplicate set names")
         requested_set = set(requested)
@@ -159,14 +152,10 @@ def _compute_sizes(
     observed_degree = observed.sum(axis=1)
     candidate_degree = candidate_matrix.sum(axis=1)
 
-    exact = (overlap == observed_degree[:, None]) & (
-        overlap == candidate_degree[None, :]
-    )
+    exact = (overlap == observed_degree[:, None]) & (overlap == candidate_degree[None, :])
     inclusive_intersection = overlap >= candidate_degree[None, :]
     inclusive_union = overlap > 0
-    exclusive_union = (overlap == observed_degree[:, None]) & (
-        observed_degree[:, None] > 0
-    )
+    exclusive_union = (overlap == observed_degree[:, None]) & (observed_degree[:, None] > 0)
 
     empty_candidates = candidate_degree == 0
     if empty_candidates.any():
@@ -212,9 +201,7 @@ def compute_intersections(
 
     sets = _validate_frame(data, intersect)
     memberships, converted = _convert_memberships(data, sets, warn_when_converting)
-    candidates = _candidate_intersections(
-        memberships, sets, intersections, max_combinations_datapoints_n
-    )
+    candidates = _candidate_intersections(memberships, sets, intersections, max_combinations_datapoints_n)
     by_id, by_members = _encode_intersections(candidates)
     identifiers = tuple(by_id)
     sizes = _compute_sizes(memberships, candidates, sets, identifiers)
@@ -251,9 +238,7 @@ def compute_intersections(
 
 def _validate_sort(value: str | bool, name: str) -> None:
     if value not in {"ascending", "descending", False}:
-        raise ValueError(
-            f"{name} must be 'ascending', 'descending', or False; got {value!r}"
-        )
+        raise ValueError(f"{name} must be 'ascending', 'descending', or False; got {value!r}")
 
 
 def select_intersections(
@@ -267,9 +252,7 @@ def select_intersections(
     keep_empty_groups: bool = False,
     sort_sets: Literal["ascending", "descending", False] = "descending",
     sort_intersections: Literal["ascending", "descending", False] = "descending",
-    sort_intersections_by: Sequence[Literal["cardinality", "degree", "ratio"]] = (
-        "cardinality",
-    ),
+    sort_intersections_by: Sequence[Literal["cardinality", "degree", "ratio"]] = ("cardinality",),
     sort_ratio_numerator: Mode = "exclusive_intersection",
     sort_ratio_denominator: Mode = "inclusive_union",
     group_by: Literal["degree", "sets"] = "degree",
@@ -302,9 +285,7 @@ def select_intersections(
         & statistics.degrees.between(min_degree, max_degree)
     ].tolist()
     if not selected:
-        raise ValueError(
-            "No intersections remain after filtering; loosen the size or degree bounds"
-        )
+        raise ValueError("No intersections remain after filtering; loosen the size or degree bounds")
 
     if n_intersections is not None and len(selected) > n_intersections:
         selected = (
@@ -329,21 +310,15 @@ def select_intersections(
             list(table.columns), ascending=ascending, kind="stable", na_position="last"
         ).index.tolist()
 
-    participating = {
-        member
-        for identifier in selected
-        for member in statistics.intersection_members[identifier]
-    }
+    participating = {member for identifier in selected for member in statistics.intersection_members[identifier]}
     dropped = tuple(name for name in statistics.sets if name not in participating)
-    kept_sets = statistics.sets if keep_empty_groups else tuple(
-        name for name in statistics.sets if name in participating
+    kept_sets = (
+        statistics.sets if keep_empty_groups else tuple(name for name in statistics.sets if name in participating)
     )
     if sort_sets is not False:
         ascending = sort_sets == "ascending"
         kept_sets = tuple(
-            statistics.set_sizes.loc[list(kept_sets)]
-            .sort_values(ascending=ascending, kind="stable")
-            .index
+            statistics.set_sizes.loc[list(kept_sets)].sort_values(ascending=ascending, kind="stable").index
         )
 
     if group_by == "sets":
@@ -404,9 +379,7 @@ def apply_intersection_selection(
         )
 
     unknown = [
-        identifier
-        for identifier in selection.intersections
-        if identifier not in statistics.intersection_members
+        identifier for identifier in selection.intersections if identifier not in statistics.intersection_members
     ]
     if unknown:
         raise KeyError(f"selection contains unknown intersection identifiers: {unknown}")
@@ -419,44 +392,26 @@ def apply_intersection_selection(
     intersection_dtype = pd.CategoricalDtype(intersections, ordered=True)
     set_dtype = pd.CategoricalDtype(sets, ordered=True)
     sizes = statistics.sizes.loc[list(intersections)].copy()
-    sizes.index = pd.CategoricalIndex(
-        sizes.index, dtype=intersection_dtype, name="intersection"
-    )
+    sizes.index = pd.CategoricalIndex(sizes.index, dtype=intersection_dtype, name="intersection")
 
     matrix = pd.DataFrame(
         {
-            identifier: [
-                name in statistics.intersection_members[identifier] for name in sets
-            ]
+            identifier: [name in statistics.intersection_members[identifier] for name in sets]
             for identifier in intersections
         },
         index=pd.Index(sets, name="group"),
         dtype=bool,
     )
-    matrix_frame = (
-        _stack_frame(matrix.rename_axis(columns="intersection"))
-        .rename("value")
-        .reset_index()
-    )
+    matrix_frame = _stack_frame(matrix.rename_axis(columns="intersection")).rename("value").reset_index()
     matrix_frame["group"] = matrix_frame["group"].astype(set_dtype)
-    matrix_frame["intersection"] = matrix_frame["intersection"].astype(
-        intersection_dtype
-    )
+    matrix_frame["intersection"] = matrix_frame["intersection"].astype(intersection_dtype)
     set_positions = {name: position for position, name in enumerate(sets)}
-    intersection_positions = {
-        name: position for position, name in enumerate(intersections)
-    }
+    intersection_positions = {name: position for position, name in enumerate(intersections)}
     matrix_frame["group_position"] = matrix_frame["group"].map(set_positions).astype(int)
-    matrix_frame["intersection_position"] = (
-        matrix_frame["intersection"].map(intersection_positions).astype(int)
-    )
+    matrix_frame["intersection_position"] = matrix_frame["intersection"].map(intersection_positions).astype(int)
 
     presence = (
-        _stack_frame(
-            statistics.memberships.loc[:, list(sets)].rename_axis(
-                index="observation", columns="group"
-            )
-        )
+        _stack_frame(statistics.memberships.loc[:, list(sets)].rename_axis(index="observation", columns="group"))
         .rename("value")
         .reset_index()
     )
@@ -464,19 +419,13 @@ def apply_intersection_selection(
     presence["group"] = presence["group"].astype(set_dtype)
 
     with_sizes = statistics.data.copy()
-    selected_elements = statistics.element_intersections.where(
-        statistics.element_intersections.isin(intersections)
-    )
-    with_sizes["intersection"] = pd.Categorical(
-        selected_elements, dtype=intersection_dtype
-    )
+    selected_elements = statistics.element_intersections.where(statistics.element_intersections.isin(intersections))
+    with_sizes["intersection"] = pd.Categorical(selected_elements, dtype=intersection_dtype)
     with_sizes = with_sizes.loc[with_sizes["intersection"].notna()].copy()
     for canonical_mode in _CANONICAL_MODES:
         column = f"{canonical_mode}{statistics.size_columns_suffix}"
         mapping = statistics.sizes[canonical_mode]
-        with_sizes[column] = (
-            with_sizes["intersection"].astype("object").map(mapping).astype("int64")
-        )
+        with_sizes[column] = with_sizes["intersection"].astype("object").map(mapping).astype("int64")
         with_sizes[f"in_{canonical_mode}"] = True
 
     return UpSetData(
@@ -509,9 +458,7 @@ def upset_data(
     warn_when_converting: bool | Literal["auto"] = "auto",
     sort_sets: Literal["ascending", "descending", False] = "descending",
     sort_intersections: Literal["ascending", "descending", False] = "descending",
-    sort_intersections_by: Sequence[Literal["cardinality", "degree", "ratio"]] = (
-        "cardinality",
-    ),
+    sort_intersections_by: Sequence[Literal["cardinality", "degree", "ratio"]] = ("cardinality",),
     sort_ratio_numerator: Mode = "exclusive_intersection",
     sort_ratio_denominator: Mode = "inclusive_union",
     group_by: Literal["degree", "sets"] = "degree",
@@ -556,3 +503,66 @@ def upset_data(
     if warn_when_dropping_groups:
         selection = report_dropped_sets(selection)
     return apply_intersection_selection(statistics, selection=selection)
+
+
+def _mode_mask(observed: np.ndarray, target: np.ndarray, mode: str) -> np.ndarray:
+    overlap = observed @ target
+    observed_degree = observed.sum(axis=1)
+    target_degree = int(target.sum())
+    if target_degree == 0:
+        return observed_degree == 0
+    if mode == "exclusive_intersection":
+        return (overlap == observed_degree) & (overlap == target_degree)
+    if mode == "inclusive_intersection":
+        return overlap == target_degree
+    if mode == "inclusive_union":
+        return overlap > 0
+    if mode == "exclusive_union":
+        return (overlap == observed_degree) & (observed_degree > 0)
+    raise ValueError(f"unsupported canonical mode {mode!r}")
+
+
+def select_mode_observations(data: UpSetData, *, mode: Mode) -> pd.DataFrame:
+    """Select the observation rows that belong to each intersection under one mode.
+
+    ``data`` must be prepared by :func:`apply_intersection_selection` (or the
+    :func:`upset_data` wrapper). ``mode`` chooses the membership criterion
+    that decides participation, normalized by :func:`normalize_mode`: for
+    example ``"exclusive_intersection"`` keeps only observations whose
+    membership matches an intersection exactly, while ``"inclusive_union"``
+    keeps every observation that touches any of its member sets.
+
+    Returns a copy of ``data.statistics.data``, with rows repeated once per
+    matching intersection, plus one added column: ``"intersection"``, an
+    ordered categorical (categories ``data.sorted_intersections``) naming
+    which intersection each repeated row belongs to.
+
+    Produced by :func:`apply_intersection_selection` / :func:`upset_data`;
+    consumed by the annotation and matrix panel builders and by
+    :func:`~ggnomics.upset.compute_intersection_tests`.
+
+    Example
+    -------
+    >>> prepared = upset_data(data, intersect=["A", "B", "C"])
+    >>> frame = select_mode_observations(prepared, mode="exclusive_intersection")
+    """
+
+    canonical = normalize_mode(mode)
+    memberships = data.statistics.memberships.loc[:, list(data.statistics.sets)].to_numpy(dtype=np.int8, copy=False)
+    frames: list[pd.DataFrame] = []
+    for identifier in data.sorted_intersections:
+        members = data.intersection_members[identifier]
+        target = np.asarray([name in members for name in data.statistics.sets], dtype=np.int8)
+        mask = _mode_mask(memberships, target, canonical)
+        if not mask.any():
+            continue
+        frame = data.statistics.data.loc[mask].copy()
+        frame["intersection"] = identifier
+        frames.append(frame)
+    if frames:
+        result = pd.concat(frames, axis=0, ignore_index=False)
+    else:
+        result = data.statistics.data.iloc[0:0].copy()
+        result["intersection"] = pd.Series(dtype="object")
+    result["intersection"] = result["intersection"].astype(pd.CategoricalDtype(data.sorted_intersections, ordered=True))
+    return result

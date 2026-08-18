@@ -6,7 +6,6 @@ from plotnine.ggplot import ggplot as ggplot_class
 from ggnomics import plot_reduced_dim
 from ggnomics._utils import adaptive_size
 
-
 # ---------------------------------------------------------------------------
 # DataFrame
 # ---------------------------------------------------------------------------

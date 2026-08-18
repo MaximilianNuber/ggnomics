@@ -81,9 +81,7 @@ def test_global_custom_test_applies_to_all_variables(stats_example):
     def custom_test(*groups):
         return (2.0, 0.25)
 
-    result = upset.compute_intersection_tests(
-        prepared, test=custom_test, ignore=["categorical_var", "ignored_var"]
-    )
+    result = upset.compute_intersection_tests(prepared, test=custom_test, ignore=["categorical_var", "ignored_var"])
     row = result.loc[result["variable"] == "numeric_var"].iloc[0]
     assert row["statistic"] == 2.0
     assert row["p_value"] == 0.25
@@ -124,9 +122,7 @@ def test_malformed_custom_result_raises_typeerror(stats_example):
 
 def test_ignored_variables_are_excluded(stats_example):
     prepared = upset.upset_data(stats_example, ["A", "B"])
-    result = upset.compute_intersection_tests(
-        prepared, ignore=["numeric_var", "categorical_var", "ignored_var"]
-    )
+    result = upset.compute_intersection_tests(prepared, ignore=["numeric_var", "categorical_var", "ignored_var"])
     assert result.empty
 
 

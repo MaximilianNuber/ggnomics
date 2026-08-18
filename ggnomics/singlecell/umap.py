@@ -1,4 +1,5 @@
 from typing import Optional
+
 from ..scatter import plot_embedding as _plot_reduced_dim
 from .pca import build_plot_df_from_sce
 
@@ -7,13 +8,9 @@ from .pca import build_plot_df_from_sce
 # or assuming it's available. The prompt said: "Only in the singlecell module we do the same thing for UMAP."
 # Implies run_umap and plot_umap.
 
+
 def run_umap(
-    sce,
-    assay_name: str = "logcounts",
-    n_neighbors: int = 15,
-    n_components: int = 2,
-    dest_key: str = "UMAP",
-    **kwargs
+    sce, assay_name: str = "logcounts", n_neighbors: int = 15, n_components: int = 2, dest_key: str = "UMAP", **kwargs
 ):
     """
     Run UMAP for single-cell data.
@@ -21,21 +18,22 @@ def run_umap(
     """
     try:
         import umap
-    except ImportError:
-        raise ImportError("umap-learn is required for run_umap")
+    except ImportError as exc:
+        raise ImportError("umap-learn is required for run_umap") from exc
 
     mat = sce.assay(assay_name)
     # Transpose to (samples x features)
     data = mat.T
-    
+
     reducer = umap.UMAP(n_neighbors=n_neighbors, n_components=n_components, **kwargs)
     embedding = reducer.fit_transform(data)
-    
+
     # Store in reduced_dims
     if hasattr(sce, "reduced_dims") and isinstance(sce.reduced_dims, dict):
         sce.reduced_dims[dest_key] = embedding
-        
+
     return embedding
+
 
 def plot_umap(
     sce,
@@ -45,7 +43,7 @@ def plot_umap(
     color: Optional[str] = None,
     size: Optional[float] = None,
     run_if_missing: bool = True,
-    **kwargs
+    **kwargs,
 ):
     # Check if dim exists
     has_dim = False
@@ -53,16 +51,14 @@ def plot_umap(
         try:
             sce.reduced_dim(dim_name)
             has_dim = True
-        except:
+        except Exception:
             pass
     elif hasattr(sce, "reduced_dims") and dim_name in sce.reduced_dims:
         has_dim = True
-        
+
     if not has_dim and run_if_missing:
         run_umap(sce, dest_key=dim_name)
 
     plot_df = build_plot_df_from_sce(sce, dim_name=dim_name, prefix="umap")
 
-    return _plot_reduced_dim(
-        plot_df, dimred="umap", components=(x_comp, y_comp), color=color, size=size, **kwargs
-    )
+    return _plot_reduced_dim(plot_df, dimred="umap", components=(x_comp, y_comp), color=color, size=size, **kwargs)

@@ -14,9 +14,7 @@ import ggnomics.upset as upset
 plot = upset.upset(
     data,
     ["set_a", "set_b", "set_c"],
-    queries=[
-        upset.upset_query(intersect=["set_a", "set_b"], color="#CC3311")
-    ],
+    queries=[upset.upset_query(intersect=["set_a", "set_b"], color="#CC3311")],
 )
 plot.save("upset.png", width=10, height=6, dpi=150)
 ```

@@ -4,20 +4,20 @@ from __future__ import annotations
 
 import warnings
 from functools import singledispatch
-from typing import Dict, List, Optional, Sequence
+from typing import Dict, List, Optional
 
 import numpy as np
 import pandas as pd
 from plotnine import (
-    ggplot,
     aes,
-    geom_boxplot,
     coord_flip,
-    theme_classic,
-    theme,
     element_text,
+    geom_boxplot,
+    ggplot,
     ggtitle,
     labs,
+    theme,
+    theme_classic,
 )
 
 from ._utils import color_scale
@@ -89,17 +89,13 @@ def _plot_highest_exprs_dataframe(
         raise ValueError(f"n must be >= 1, got {n}.")
 
     if color_cells_by is not None and color_cells_by not in data.columns:
-        raise KeyError(
-            f"color_cells_by {color_cells_by!r} not found in the DataFrame. "
-            f"Available: {list(data.columns)}"
-        )
+        raise KeyError(f"color_cells_by {color_cells_by!r} not found in the DataFrame. Available: {list(data.columns)}")
 
     if features is not None:
         missing = [f for f in features if f not in data.columns]
         if missing:
             raise KeyError(
-                f"features not found in the DataFrame: {missing}. "
-                f"Available (first 20): {list(data.columns)[:20]}"
+                f"features not found in the DataFrame: {missing}. Available (first 20): {list(data.columns)[:20]}"
             )
         candidate_df = data[features]
     else:
@@ -160,9 +156,7 @@ def _build_highest_exprs_plot(
     """Shared plot construction, reused by every container adapter."""
 
     long_df = long_df.copy()
-    long_df["feature"] = pd.Categorical(
-        long_df["feature"], categories=feature_order[::-1], ordered=True
-    )
+    long_df["feature"] = pd.Categorical(long_df["feature"], categories=feature_order[::-1], ordered=True)
 
     aes_kwargs: dict = {"x": "feature", "y": "fraction"}
     if color_cells_by is not None:
@@ -190,7 +184,7 @@ def _build_highest_exprs_plot(
 def _sparse_aware_top_n_medians(
     matrix,
     n: int,
-) -> "tuple[np.ndarray, np.ndarray]":
+) -> tuple[np.ndarray, np.ndarray]:
     """Rank columns of an obs-by-feature matrix by exact median fraction.
 
     ``matrix`` may be dense or any SciPy sparse matrix. Per-cell library size

@@ -1,6 +1,8 @@
-from typing import Optional, Union
-import pandas as pd
+from typing import Optional
+
 import numpy as np
+import pandas as pd
+
 from ..pca.methods import run_pca_sklearn, run_pca_svd
 from ..pca.result import PcaResult
 from ..scatter import plot_embedding as _plot_reduced_dim
@@ -9,24 +11,19 @@ from ..scatter import plot_embedding as _plot_reduced_dim
 # But we treat it as an object with .assay(name) and .col_data
 # For typing, we use Any
 
-def run_pca(
-    se,
-    assay_name: str = "logcounts",
-    n_components: int = 50,
-    method: str = "sklearn",
-    **kwargs
-) -> PcaResult:
+
+def run_pca(se, assay_name: str = "logcounts", n_components: int = 50, method: str = "sklearn", **kwargs) -> PcaResult:
     """
     Run PCA for bulk data (SummarizedExperiment).
     """
     # Basic assumption: se has an assay that is (n_features, n_samples)
     # But sklearn expects (n_samples, n_features).
     # Usually bioc objects are (features x samples).
-    
+
     mat = se.assay(assay_name)
     # Transpose to (samples x features)
     data = mat.T
-    
+
     if method == "sklearn":
         res = run_pca_sklearn(data, n_components=n_components, **kwargs)
     elif method == "svd":
@@ -36,10 +33,11 @@ def run_pca(
         res = run_pca_svd(data, n_components=n_components)
     else:
         raise ValueError(f"Unknown method {method}")
-        
+
     res.sample_names = se.column_names
     res.feature_names = se.row_names
     return res
+
 
 def build_plot_df_from_result(
     se,
@@ -50,7 +48,7 @@ def build_plot_df_from_result(
     k = min(n_comps, pca_res.scores.shape[1])
     scores = pca_res.scores[:, :k]
 
-    dim_cols = [f"{prefix}_{i+1}" for i in range(k)]
+    dim_cols = [f"{prefix}_{i + 1}" for i in range(k)]
     plot_df = pd.DataFrame(scores, columns=dim_cols)
 
     if se.col_data is not None:
@@ -63,10 +61,11 @@ def build_plot_df_from_result(
             plot_df.index = se.column_names
             # Ensure meta is aligned
             if len(meta) == len(plot_df):
-                 meta.index = plot_df.index
+                meta.index = plot_df.index
         plot_df = pd.concat([plot_df, meta], axis=1)
 
     return plot_df
+
 
 def plot_pca(
     se,
@@ -79,12 +78,12 @@ def plot_pca(
     color: Optional[str] = None,
     size: Optional[float] = None,
     return_result: bool = False,
-    **kwargs
+    **kwargs,
 ):
     """
     Plot PCA for SummarizedExperiment.
     If pca_res is None, runs PCA first.
-    
+
     Parameters
     ----------
     n_top_genes : int, optional
@@ -104,7 +103,7 @@ def plot_pca(
                 top_indices = np.argsort(vars)[-n_top_genes:]
                 # Sort indices to keep original order if desired, but PCA doesn't care about gene order usually
                 top_indices = np.sort(top_indices)
-                
+
                 # Subset se. Assuming se supports slicing [rows, cols]
                 # If se is a custom object without slicing, we might need a fallback
                 # specific for the Mock object in tests, but in production this expects SummarizedExperiment
@@ -125,9 +124,7 @@ def plot_pca(
     # generic. `plot_df` columns already follow its "pca_<n>" naming
     # convention (set by build_plot_df_from_result), so `dimred="pca"`
     # resolves them directly.
-    p = _plot_reduced_dim(
-        plot_df, dimred="pca", components=(x_comp, y_comp), color=color, size=size, **kwargs
-    )
+    p = _plot_reduced_dim(plot_df, dimred="pca", components=(x_comp, y_comp), color=color, size=size, **kwargs)
 
     if return_result:
         return p, pca_res

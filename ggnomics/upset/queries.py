@@ -23,9 +23,7 @@ def upset_query(
     if passed != 1:
         raise ValueError("pass exactly one of set, intersect, or group")
     if not aesthetics:
-        raise ValueError(
-            "pass at least one highlight aesthetic, for example color='red' or fill='red'"
-        )
+        raise ValueError("pass at least one highlight aesthetic, for example color='red' or fill='red'")
     if set is not None and not isinstance(set, str):
         raise TypeError("set must be a string or None")
     if group is not None and not isinstance(group, str):

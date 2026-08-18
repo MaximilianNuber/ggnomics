@@ -1,0 +1,107 @@
+name: Publish to PyPI
+
+# ---------------------------------------------------------------------------
+# NOT YET ACTIVE.
+#
+# This workflow uses PyPI trusted publishing (OIDC) and contains no API token
+# or secret of any kind. Before the first release it still needs a trusted
+# publisher to be configured on PyPI for the ggnomics project, naming:
+#
+#   owner:      the final GitHub owner of this repository
+#   repository: ggnomics
+#   workflow:   publish-pypi.yml
+#   environment: pypi
+#
+# That configuration must wait until the repository's ownership and its final
+# location (personal account vs. the BiocPy organisation) are agreed with the
+# BiocPy maintainers - a trusted publisher is bound to a specific owner and
+# repository, so registering it now against the wrong owner would have to be
+# undone. Until then, pushing a version tag will run the build and checks and
+# then fail at the publish step, which is the intended safe behaviour.
+#
+# The `environment: pypi` below also lets a required reviewer be added in the
+# repository settings, so that publishing needs a human approval.
+# ---------------------------------------------------------------------------
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+*"
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+env:
+  MPLBACKEND: Agg
+
+jobs:
+  build:
+    name: Build and check distributions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libgl1 libglib2.0-0
+
+      - name: Install the package and its test extra
+        run: pip install -e ".[all,test]"
+
+      - name: Run the test suite
+        run: pytest tests/ -q --tb=short
+
+      - name: Verify the tag matches the version in pyproject.toml
+        if: github.event_name == 'push'
+        run: |
+          set -e
+          tag="${GITHUB_REF_NAME#v}"
+          version="$(python -c 'import tomllib,pathlib; print(tomllib.loads(pathlib.Path("pyproject.toml").read_text())["project"]["version"])')"
+          if [ "$tag" != "$version" ]; then
+            echo "tag $tag does not match pyproject version $version"
+            exit 1
+          fi
+          echo "tag and version agree: $version"
+
+      - name: Install build tooling
+        run: pip install build twine
+
+      - name: Build sdist and wheel
+        run: python -m build
+
+      - name: Validate distribution metadata
+        run: python -m twine check dist/*
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          if-no-files-found: error
+
+  publish:
+    name: Publish to PyPI (trusted publishing)
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/ggnomics
+    permissions:
+      # Required for trusted publishing. No PyPI token is stored anywhere.
+      id-token: write
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish
+        uses: pypa/gh-action-pypi-publish@release/v1

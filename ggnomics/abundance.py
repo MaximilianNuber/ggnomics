@@ -67,21 +67,11 @@ def _plot_abundance_dataframe(
 ) -> ggplot:
     obs_df = data.copy().reset_index(drop=True)
 
-    missing = [
-        column for column in (group_by, color_by) if column not in obs_df.columns
-    ]
+    missing = [column for column in (group_by, color_by) if column not in obs_df.columns]
     if missing:
-        raise KeyError(
-            f"Column(s) {missing} not found in the metadata DataFrame. "
-            f"Available: {list(obs_df.columns)}"
-        )
+        raise KeyError(f"Column(s) {missing} not found in the metadata DataFrame. Available: {list(obs_df.columns)}")
 
-    counts = (
-        obs_df.groupby([group_by, color_by], observed=True)
-        .size()
-        .rename("n")
-        .reset_index()
-    )
+    counts = obs_df.groupby([group_by, color_by], observed=True).size().rename("n").reset_index()
 
     if normalize:
         totals = counts.groupby(group_by, observed=True)["n"].transform("sum")

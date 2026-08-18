@@ -5,67 +5,77 @@ also exposing the granular ``compute_intersections`` → ``select_intersections`
 → ``apply_intersection_selection`` workflow.
 """
 
-from ._types import IntersectionMatrixSpec
-from ._types import IntersectionSelection
-from ._types import IntersectionStatistics
-from ._types import ModeSpec
-from ._types import SetSizeSpec
-from ._types import UpSetAnnotation
-from ._types import UpSetData
-from ._types import UpSetQuery
-from ._types import UpSetStripes
-from ._types import VennLayout
-
-from .intersections import compute_intersections
-from .intersections import select_intersections
-from .intersections import apply_intersection_selection
-from .intersections import report_dropped_sets
-from .intersections import upset_data
-
-from .modes import aes_percentage
-from .modes import get_size_mode
-from .modes import normalize_mode
-from .modes import reverse_log_trans
-from .modes import upset_mode
-from .modes import upset_text_percentage
-
-from .annotations import intersection_size
-from .annotations import intersection_ratio
-from .annotations import upset_annotate
-
-from .matrix import intersection_matrix
-from .set_size import upset_set_size
-from .queries import upset_query
-from .stripes import upset_stripes
-
-from .themes import upset_themes
-from .themes import upset_default_themes
-from .themes import upset_modify_themes
-
-from .plot import compose_upset
-from .plot import upset
-
-from .testing import compute_intersection_tests
-from .testing import adjust_intersection_tests
-from .testing import compare_between_intersections
-from .testing import upset_test
-
+from ._types import (
+    IntersectionMatrixSpec,
+    IntersectionSelection,
+    IntersectionStatistics,
+    MarginCorrections,
+    MarginSensitivity,
+    ModeSpec,
+    PanelEdges,
+    SetSizeSpec,
+    UpSetAnnotation,
+    UpSetData,
+    UpSetQuery,
+    UpSetStripes,
+    VennLayout,
+)
+from .alignment import (
+    apply_left_margin_corrections,
+    compute_margin_sensitivity,
+    compute_panel_edges,
+    suggest_left_margin_corrections,
+    tag_panel_role,
+)
+from .annotations import intersection_ratio, intersection_size, upset_annotate
 from .examples import create_upset_abc_example
-
-from .venn import compute_venn_layout
-from .venn import arrange_venn
-from .venn import geom_venn_circle
-from .venn import geom_venn_region
-from .venn import geom_venn_label_region
-from .venn import geom_venn_label_set
-from .venn import scale_color_venn_mix
-from .venn import scale_fill_venn_mix
+from .intersections import (
+    apply_intersection_selection,
+    compute_intersections,
+    report_dropped_sets,
+    select_intersections,
+    select_mode_observations,
+    upset_data,
+)
+from .matrix import intersection_matrix
+from .modes import (
+    aes_percentage,
+    get_size_mode,
+    normalize_mode,
+    reverse_log_trans,
+    upset_mode,
+    upset_text_percentage,
+)
+from .plot import compose_upset, upset
+from .queries import upset_query
+from .set_size import upset_set_size
+from .stripes import upset_stripes
+from .testing import (
+    adjust_intersection_tests,
+    compare_between_intersections,
+    compute_intersection_tests,
+    upset_test,
+)
+from .themes import upset_default_themes, upset_modify_themes, upset_themes
+from .venn import (
+    arrange_venn,
+    compute_venn_layout,
+    geom_venn_circle,
+    geom_venn_label_region,
+    geom_venn_label_set,
+    geom_venn_region,
+    scale_color_venn_mix,
+    scale_fill_venn_mix,
+)
 
 __all__ = [
     "IntersectionMatrixSpec",
     "IntersectionSelection",
     "IntersectionStatistics",
+    "MarginCorrections",
+    "MarginSensitivity",
     "ModeSpec",
+    "PanelEdges",
     "SetSizeSpec",
     "UpSetAnnotation",
     "UpSetData",
@@ -76,6 +86,7 @@ __all__ = [
     "select_intersections",
     "apply_intersection_selection",
     "report_dropped_sets",
+    "select_mode_observations",
     "upset_data",
     "aes_percentage",
     "get_size_mode",
@@ -93,6 +104,11 @@ __all__ = [
     "upset_themes",
     "upset_default_themes",
     "upset_modify_themes",
+    "tag_panel_role",
+    "compute_panel_edges",
+    "compute_margin_sensitivity",
+    "suggest_left_margin_corrections",
+    "apply_left_margin_corrections",
     "compose_upset",
     "upset",
     "compute_intersection_tests",

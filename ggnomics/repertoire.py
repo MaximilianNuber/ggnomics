@@ -8,16 +8,16 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 from plotnine import (
-    ggplot,
     aes,
-    geom_bar,
-    theme_classic,
-    theme,
     element_text,
+    facet_wrap,
+    geom_bar,
+    ggplot,
     ggtitle,
     labs,
-    facet_wrap,
     scale_fill_manual,
+    theme,
+    theme_classic,
 )
 
 from ._utils import HeatmapResult
@@ -35,10 +35,7 @@ def _unsupported_type(function_name: str, data: object) -> TypeError:
 def _require_columns(data: pd.DataFrame, columns: List[str], *, location: str) -> None:
     missing = [c for c in columns if c not in data.columns]
     if missing:
-        raise KeyError(
-            f"Column(s) {missing} not found in {location}. "
-            f"Available: {list(data.columns)}"
-        )
+        raise KeyError(f"Column(s) {missing} not found in {location}. Available: {list(data.columns)}")
 
 
 # Default expansion thresholds (scRepertoire-style)
@@ -352,6 +349,7 @@ def _plot_clonotype_overlap_dataframe(
     matrix_df = _overlap_matrix(obs_df, clonotype_col, sample_col, method)
 
     from .heatmap import heatmap_from_matrix
+
     p = heatmap_from_matrix(matrix_df, title=title or f"Clonotype overlap ({method})")
 
     return HeatmapResult(plot=p, matrix=matrix_df)
@@ -377,15 +375,12 @@ def _clonotype_embedding_plot(
 ) -> ggplot:
     """Shared plot construction, reused by every container adapter."""
 
-    from .scatter import plot_scatter, _strip_x_prefix
+    from .scatter import _strip_x_prefix, plot_scatter
 
     comp_cols = list(emb_df.columns)
     ci, cj = components[0] - 1, components[1] - 1
     if ci < 0 or cj < 0 or ci >= len(comp_cols) or cj >= len(comp_cols):
-        raise IndexError(
-            f"components={components} out of range for embedding with "
-            f"{len(comp_cols)} dimensions."
-        )
+        raise IndexError(f"components={components} out of range for embedding with {len(comp_cols)} dimensions.")
     x_col, y_col = comp_cols[ci], comp_cols[cj]
     x_safe, y_safe = f"__emb_{x_col}__", f"__emb_{y_col}__"
 
@@ -480,14 +475,22 @@ def _plot_clonotype_embedding_dataframe(
 ) -> ggplot:
     if clonotype_col not in data.columns:
         raise KeyError(
-            f"clonotype_col {clonotype_col!r} not found in the DataFrame. "
-            f"Available: {list(data.columns)[:20]}"
+            f"clonotype_col {clonotype_col!r} not found in the DataFrame. Available: {list(data.columns)[:20]}"
         )
 
     emb_df = _embedding_frame_from_dataframe(data, dimred)
     return _clonotype_embedding_plot(
-        emb_df, components, data[clonotype_col], dimred, expansion_thresholds,
-        non_tcell_color, palette, size, stroke, alpha, title,
+        emb_df,
+        components,
+        data[clonotype_col],
+        dimred,
+        expansion_thresholds,
+        non_tcell_color,
+        palette,
+        size,
+        stroke,
+        alpha,
+        title,
     )
 
 

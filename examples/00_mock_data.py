@@ -5,7 +5,6 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-
 # ---------------------------------------------------------------------------
 # DataFrame mock
 # ---------------------------------------------------------------------------
@@ -53,7 +52,7 @@ def make_mock_df(
     pca = pca_base + cluster_signal
 
     # Gene names
-    gene_names = [f"Gene{i+1:04d}" for i in range(n_genes)]
+    gene_names = [f"Gene{i + 1:04d}" for i in range(n_genes)]
 
     # Expression: NB-like counts per cluster with marker genes
     expr = rng.negative_binomial(2, 0.5, size=(n_cells, n_genes)).astype(float)
@@ -90,7 +89,7 @@ def make_mock_df(
     for g, col in zip(gene_names, expr.T):
         data[g] = col
 
-    return pd.DataFrame(data, index=[f"cell{i+1:05d}" for i in range(n_cells)])
+    return pd.DataFrame(data, index=[f"cell{i + 1:05d}" for i in range(n_cells)])
 
 
 # ---------------------------------------------------------------------------
@@ -122,7 +121,7 @@ def make_mock_anndata(
     import anndata
 
     df = make_mock_df(n_cells=n_cells, n_genes=n_genes, seed=seed)
-    gene_names = [f"Gene{i+1:04d}" for i in range(n_genes)]
+    gene_names = [f"Gene{i + 1:04d}" for i in range(n_genes)]
 
     X = df[gene_names].values.copy()
     obs = df.drop(columns=gene_names + ["UMAP1", "UMAP2", "PCA1", "PCA2", "PCA3", "PCA4", "PCA5"])
@@ -188,16 +187,15 @@ def make_mock_sce(
         ImportError: If ``singlecellexperiment`` is not installed.
     """
     try:
-        from singlecellexperiment import SingleCellExperiment
         import biocframe
+        from singlecellexperiment import SingleCellExperiment
     except ImportError as exc:
         raise ImportError(
-            "singlecellexperiment and biocframe are required. "
-            "Install with: pip install singlecellexperiment biocframe"
+            "singlecellexperiment and biocframe are required. Install with: pip install singlecellexperiment biocframe"
         ) from exc
 
     df = make_mock_df(n_cells=n_cells, n_genes=n_genes, seed=seed)
-    gene_names = [f"Gene{i+1:04d}" for i in range(n_genes)]
+    gene_names = [f"Gene{i + 1:04d}" for i in range(n_genes)]
 
     counts = df[gene_names].values.T.astype(np.float32)  # (genes, cells)
     lib_sizes = counts.sum(axis=0, keepdims=True).astype(float)
@@ -257,14 +255,11 @@ def make_mock_se(
         from summarizedexperiment import SummarizedExperiment
     except ImportError as exc:
         raise ImportError(
-            "summarizedexperiment and biocframe are required. "
-            "Install with: pip install summarizedexperiment biocframe"
+            "summarizedexperiment and biocframe are required. Install with: pip install summarizedexperiment biocframe"
         ) from exc
 
     rng = np.random.default_rng(seed)
-    counts = rng.negative_binomial(5, 0.4, size=(n_genes, n_samples)).astype(
-        np.float32
-    )
+    counts = rng.negative_binomial(5, 0.4, size=(n_genes, n_samples)).astype(np.float32)
     gene_names = [f"Gene{i + 1:04d}" for i in range(n_genes)]
     sample_names = [f"sample{i + 1:03d}" for i in range(n_samples)]
 
@@ -319,20 +314,22 @@ def make_large_df() -> pd.DataFrame:
 def make_mock_de_results(n_genes: int = 2000, seed: int = 42) -> pd.DataFrame:
     """DESeq2-style DataFrame with log2FoldChange, padj, baseMean, and gene names."""
     rng = np.random.default_rng(seed)
-    gene_names = [f"Gene{i+1:04d}" for i in range(n_genes)]
+    gene_names = [f"Gene{i + 1:04d}" for i in range(n_genes)]
     logfc = rng.normal(0, 1.5, n_genes)
     base_mean = rng.lognormal(4, 1.5, n_genes)
     pval_raw = rng.beta(0.5, 5, n_genes)
     # Make ~10% significant
     pval_raw[:200] = rng.uniform(0, 0.001, 200)
     padj = np.minimum(pval_raw * n_genes, 1.0)
-    df = pd.DataFrame({
-        "gene": gene_names,
-        "log2FoldChange": logfc,
-        "baseMean": base_mean,
-        "pvalue": pval_raw,
-        "padj": padj,
-    })
+    df = pd.DataFrame(
+        {
+            "gene": gene_names,
+            "log2FoldChange": logfc,
+            "baseMean": base_mean,
+            "pvalue": pval_raw,
+            "padj": padj,
+        }
+    )
     return df
 
 
@@ -342,7 +339,7 @@ def make_mock_coefs(n_features: int = 100, seed: int = 42) -> pd.DataFrame:
     About 30 % of features have non-zero coefficients.
     """
     rng = np.random.default_rng(seed)
-    features = [f"Gene{i+1:04d}" for i in range(n_features)]
+    features = [f"Gene{i + 1:04d}" for i in range(n_features)]
     coefs = np.zeros(n_features)
     nonzero_mask = rng.random(n_features) < 0.30
     coefs[nonzero_mask] = rng.normal(0, 0.5, nonzero_mask.sum())
@@ -360,29 +357,27 @@ def make_mock_mudata(
 ):
     """MuData with RNA and protein modalities sharing the same obs."""
     try:
-        import mudata
         import anndata
+        import mudata
     except ImportError as e:
-        raise ImportError(
-            "mudata and anndata are required. Install with: pip install mudata anndata"
-        ) from e
+        raise ImportError("mudata and anndata are required. Install with: pip install mudata anndata") from e
 
     rng = np.random.default_rng(seed)
 
     # RNA modality
-    rna_names = [f"Gene{i+1:04d}" for i in range(n_rna)]
+    rna_names = [f"Gene{i + 1:04d}" for i in range(n_rna)]
     X_rna = rng.negative_binomial(2, 0.5, (n_cells, n_rna)).astype(np.float32)
     adata_rna = anndata.AnnData(X=X_rna)
     adata_rna.var_names = rna_names
 
     # Protein modality
-    prot_names = [f"Prot{i+1:02d}" for i in range(n_prot)]
+    prot_names = [f"Prot{i + 1:02d}" for i in range(n_prot)]
     X_prot = np.abs(rng.normal(3, 1, (n_cells, n_prot))).astype(np.float32)
     adata_prot = anndata.AnnData(X=X_prot)
     adata_prot.var_names = prot_names
 
     # Shared obs
-    cell_names = [f"cell{i+1:05d}" for i in range(n_cells)]
+    cell_names = [f"cell{i + 1:05d}" for i in range(n_cells)]
     cluster_ids = rng.integers(0, 5, n_cells)
     clusters = np.array([f"C{i}" for i in cluster_ids])
 
@@ -420,7 +415,7 @@ def make_mock_repertoire(
     About 40 % of cells have a clonotype (rest are NaN).
     """
     rng = np.random.default_rng(seed)
-    samples = [f"S{i+1}" for i in range(n_samples)]
+    samples = [f"S{i + 1}" for i in range(n_samples)]
     sample_col = np.choose(rng.integers(0, n_samples, n_cells), samples)
 
     clonotype_ids = np.array(
@@ -433,11 +428,13 @@ def make_mock_repertoire(
     cluster_ids = rng.integers(0, 5, n_cells)
     clusters = np.array([f"C{i}" for i in cluster_ids])
 
-    df = pd.DataFrame({
-        "clonotype_id": clonotype_ids,
-        "sample": sample_col,
-        "cluster": clusters,
-    })
+    df = pd.DataFrame(
+        {
+            "clonotype_id": clonotype_ids,
+            "sample": sample_col,
+            "cluster": clusters,
+        }
+    )
     return df
 
 

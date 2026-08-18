@@ -10,7 +10,6 @@ from __future__ import annotations
 from importlib import import_module
 from importlib.util import find_spec
 
-
 _BACKENDS = {
     "anndata": "ggnomics._backends.anndata",
     "singlecellexperiment": "ggnomics._backends.singlecellexperiment",

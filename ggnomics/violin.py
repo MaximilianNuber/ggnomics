@@ -1,45 +1,44 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from functools import singledispatch
-from typing import Optional, Sequence, Any
+from typing import Any, Optional
 
 import numpy as np
 import pandas as pd
 from plotnine import (
-    ggplot,
     aes,
-    geom_violin,
     geom_boxplot,
     geom_jitter,
-    theme_classic,
+    geom_violin,
+    ggplot,
     ggtitle,
     labs,
+    theme_classic,
 )
 
 
 @singledispatch
 def expression_violin(data: Any, *args, **kwargs):  # pragma: no cover - dispatch entry
-    raise TypeError(
-        "Unsupported data type for expression_violin. Pass a pandas DataFrame, or use the sce/se wrappers."
-    )
+    raise TypeError("Unsupported data type for expression_violin. Pass a pandas DataFrame, or use the sce/se wrappers.")
 
 
 @expression_violin.register(pd.DataFrame)
-def _(df: pd.DataFrame,
-      value: str,
-      group: str,
-      *,
-      fill: Optional[str] = None,
-      log1p: bool = False,
-      add_box: bool = False,
-      add_points: bool = True,
-      point_alpha: float = 0.25,
-      point_size: float = 0.2,
-      jitter_width: float = 0.15,
-      palette: Optional[dict] = None,
-      title: Optional[str] = None,
-      y_label: Optional[str] = None):
+def _(
+    df: pd.DataFrame,
+    value: str,
+    group: str,
+    *,
+    fill: Optional[str] = None,
+    log1p: bool = False,
+    add_box: bool = False,
+    add_points: bool = True,
+    point_alpha: float = 0.25,
+    point_size: float = 0.2,
+    jitter_width: float = 0.15,
+    palette: Optional[dict] = None,
+    title: Optional[str] = None,
+    y_label: Optional[str] = None,
+):
     d = df.copy()
     ycol = "__expr__"
     d[ycol] = np.log1p(d[value]) if log1p else d[value]
@@ -48,12 +47,7 @@ def _(df: pd.DataFrame,
     if fill is not None:
         aes_kwargs["fill"] = fill
 
-    p = (
-        ggplot(d)
-        + aes(**aes_kwargs)
-        + geom_violin(scale="width", trim=True)
-        + theme_classic()
-    )
+    p = ggplot(d) + aes(**aes_kwargs) + geom_violin(scale="width", trim=True) + theme_classic()
 
     if add_box:
         p = p + geom_boxplot(width=0.12, outlier_alpha=0.0)
@@ -73,6 +67,7 @@ def _(df: pd.DataFrame,
 # -------------------------------
 # Optional BiocPy adapters (dynamic)
 # -------------------------------
+
 
 def _get_assay_matrix(obj, assay: str):
     if hasattr(obj, "assay"):
