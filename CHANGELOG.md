@@ -22,6 +22,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `CODE_OF_CONDUCT.md`, plus pull-request and issue templates.
 - GitHub Actions workflows for documentation validation and for PyPI trusted
   publishing (the trusted publisher itself is not yet configured).
+- Automatic versioning with `setuptools_scm`: the version is derived from the
+  git tag, written to the generated `ggnomics/_version.py` at build time, and
+  exposed as `ggnomics.__version__`. `MANIFEST.in` keeps the sdist to the
+  package plus its test suite, since setuptools_scm's file finder would
+  otherwise ship the whole documentation tree.
 
 ### Changed
 
@@ -33,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Coverage configuration added; the full suite covers about 83% of `ggnomics/`
   and CI enforces a floor of 80%.
 - The test workflow matrix now covers Python 3.10, 3.12, and 3.13.
+- `pyproject.toml` no longer carries a static `version`; it is `dynamic`.
 
 ### Removed
 

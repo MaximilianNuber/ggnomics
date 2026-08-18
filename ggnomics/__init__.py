@@ -1,6 +1,19 @@
 """ggnomics — plotnine-based genomics / single-cell plotting library."""
 
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as _metadata_version
+
+try:
+    # Written by setuptools_scm at build time from the git tag.
+    from ._version import __version__
+except ImportError:  # pragma: no cover - running from a source tree
+    try:
+        __version__ = _metadata_version("ggnomics")
+    except PackageNotFoundError:
+        __version__ = "0.0.0+unknown"
+
 __all__ = [
+    "__version__",
     # Significance brackets
     "geom_signif",
     "run_comparisons",

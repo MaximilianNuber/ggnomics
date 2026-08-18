@@ -1,0 +1,37 @@
+# setuptools_scm's file finder would otherwise put every git-tracked file into
+# the sdist, including the Quarto freeze cache (~16 MB) and the executed
+# tutorial notebooks (~6 MB). Neither is needed to build or use the package.
+
+include LICENSE
+include README.md
+include CHANGELOG.md
+include CONTRIBUTING.md
+include AUTHORS.md
+include CODE_OF_CONDUCT.md
+
+# Documentation sources and their build inputs.
+prune docs
+prune vignettes
+prune tools
+prune .github
+
+# Ship the test suite so the sdist is self-testable (conda-forge and distro
+# packagers run it from there). tests/conftest.py loads the mock-data factory
+# from examples/, so that one file has to come along; everything else there is
+# notebooks, Quarto sources, and ~1.4 MB of rendered images.
+#
+# Directives apply in order, so examples/ is pruned first and the one required
+# file added back afterwards.
+graft tests
+prune examples
+include examples/00_mock_data.py
+
+exclude .pre-commit-config.yaml
+exclude .readthedocs.yml
+exclude .gitattributes
+exclude environment-docs.yml
+exclude environment-upset.yml
+exclude tox.ini
+
+global-exclude *.py[cod]
+global-exclude __pycache__

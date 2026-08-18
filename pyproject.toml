@@ -1,10 +1,12 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=68", "setuptools_scm[toml]>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "ggnomics"
-version = "0.1.0"
+# Derived from the git tag by setuptools_scm; see [tool.setuptools_scm] below.
+# Do not add a static `version` here - it would silently shadow the tag.
+dynamic = ["version"]
 description = "Composable genomics visualization with plotnine"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -127,6 +129,27 @@ where = ["."]
 include = ["ggnomics*"]
 
 # ---------------------------------------------------------------------------
+# Versioning
+#
+# The version comes from the git tag, so there is exactly one place to bump it:
+# the tag itself. `v0.1.0` produces 0.1.0; a commit after it produces
+# 0.1.1.dev1+g<sha> under the no-guess-dev scheme (the same scheme BiocSetup
+# scaffolds use).
+#
+# setuptools_scm writes the resolved version to ggnomics/_version.py at build
+# time. That file is generated and gitignored - never edit or commit it.
+#
+# fallback_version covers builds from an unpacked sdist or a shallow checkout,
+# where no git metadata is available. Keep it at the most recent release so a
+# tag-less build is never silently newer than reality.
+# ---------------------------------------------------------------------------
+[tool.setuptools_scm]
+version_file = "ggnomics/_version.py"
+version_scheme = "no-guess-dev"
+local_scheme = "node-and-date"
+fallback_version = "0.1.0"
+
+# ---------------------------------------------------------------------------
 # Ruff
 # ---------------------------------------------------------------------------
 [tool.ruff]
@@ -143,6 +166,7 @@ extend-exclude = [
   "vignettes/reference",
   "docs/tutorials/*.ipynb",
   "docs/api",
+  "ggnomics/_version.py",
   "docs/_build",
   "examples/*.ipynb",
   "build",
@@ -220,7 +244,7 @@ branch = true
 # site-packages, and a plain `source = ["ggnomics"]` would measure the
 # uninstalled working copy instead and report 0%.
 source_pkgs = ["ggnomics"]
-omit = ["ggnomics/*/__init__.py"]
+omit = ["ggnomics/*/__init__.py", "ggnomics/_version.py"]
 
 [tool.coverage.paths]
 # Report installed and in-tree paths as the same files.

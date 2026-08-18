@@ -5,6 +5,9 @@ __pycache__/
 *.so
 
 # --- Packaging / build ----------------------------------------------------
+# Written by setuptools_scm at build time from the git tag. Generated, never
+# edited or committed.
+ggnomics/_version.py
 build/
 dist/
 sdist/

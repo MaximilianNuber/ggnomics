@@ -22,6 +22,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # setuptools_scm derives the version from git tags; the default
+          # shallow clone has none.
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -42,6 +46,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # setuptools_scm derives the version from git tags; the default
+          # shallow clone has none.
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -94,6 +102,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          # setuptools_scm derives the version from git tags; the default
+          # shallow clone has none.
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -129,6 +141,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          # setuptools_scm derives the version from git tags; the default
+          # shallow clone has none.
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -153,6 +169,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # setuptools_scm derives the version from git tags; the default
+          # shallow clone has none.
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -181,6 +201,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # setuptools_scm derives the version from git tags; the default
+          # shallow clone has none.
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:

@@ -42,6 +42,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # setuptools_scm derives the version from git tags; the default
+          # shallow clone has none.
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -59,23 +63,37 @@ jobs:
       - name: Run the test suite
         run: pytest tests/ -q --tb=short
 
-      - name: Verify the tag matches the version in pyproject.toml
-        if: github.event_name == 'push'
-        run: |
-          set -e
-          tag="${GITHUB_REF_NAME#v}"
-          version="$(python -c 'import tomllib,pathlib; print(tomllib.loads(pathlib.Path("pyproject.toml").read_text())["project"]["version"])')"
-          if [ "$tag" != "$version" ]; then
-            echo "tag $tag does not match pyproject version $version"
-            exit 1
-          fi
-          echo "tag and version agree: $version"
-
       - name: Install build tooling
         run: pip install build twine
 
       - name: Build sdist and wheel
         run: python -m build
+
+      - name: Verify the built version is a clean release matching the tag
+        if: github.event_name == 'push'
+        # setuptools_scm derives the version from the tag, so the two cannot
+        # drift the way a hand-maintained `version =` could. What can still go
+        # wrong is publishing a *dev* version: if the checkout is shallow, the
+        # tag is unannotated, or the tree is dirty, setuptools_scm produces
+        # something like 0.1.0.post1.dev1+g1234567 instead of 0.1.0. Those must
+        # never reach PyPI, so fail loudly here.
+        run: |
+          set -e
+          tag="${GITHUB_REF_NAME#v}"
+          built="$(ls dist/*.tar.gz | sed -E 's|dist/ggnomics-(.*)\.tar\.gz|\1|')"
+          echo "tag=$tag built=$built"
+          case "$built" in
+            *dev*|*+*)
+              echo "refusing to publish a development version: $built"
+              echo "check that the tag is annotated and the checkout is complete (fetch-depth: 0)"
+              exit 1
+              ;;
+          esac
+          if [ "$tag" != "$built" ]; then
+            echo "tag $tag does not match the built version $built"
+            exit 1
+          fi
+          echo "OK: publishing $built"
 
       - name: Validate distribution metadata
         run: python -m twine check dist/*

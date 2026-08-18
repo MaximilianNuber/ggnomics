@@ -226,6 +226,52 @@ python -m twine check dist/*
 
 or `tox -e build`, which cleans `dist/` first.
 
+## Versioning and releases
+
+The version is **not** written anywhere in the source tree. `setuptools_scm`
+derives it from the git tag, so the tag is the single source of truth:
+
+| State | Version |
+|---|---|
+| clean tree, exactly at `v0.1.0` | `0.1.0` |
+| one commit later | `0.1.0.post1.dev1+g84d03a2d` |
+| dirty working tree | ...`+g84d03a2d.d20260818` |
+| no git metadata (unpacked sdist) | `fallback_version`, currently `0.1.0` |
+
+At build time setuptools_scm writes `ggnomics/_version.py`. That file is
+generated and gitignored — never edit or commit it. At runtime,
+`ggnomics.__version__` reads it, falling back to the installed distribution
+metadata when running from a source checkout.
+
+Check what the current tree would produce:
+
+```bash
+python -m setuptools_scm
+python -c "import ggnomics; print(ggnomics.__version__)"
+```
+
+### Cutting a release
+
+```bash
+# 1. Land everything, update the CHANGELOG's Unreleased section, commit.
+# 2. Tag. It must be annotated and the tree must be clean.
+git tag -a v0.2.0 -m "ggnomics 0.2.0"
+
+# 3. Confirm the version resolves cleanly - no "dev", no "+" local part.
+python -m setuptools_scm
+
+# 4. Push the tag. This triggers .github/workflows/publish-pypi.yml.
+git push origin v0.2.0
+```
+
+The publish workflow refuses to upload anything containing `dev` or a local
+version segment, so a shallow checkout, an unannotated tag, or a dirty tree
+fails the build rather than shipping a broken version to PyPI.
+
+Anything that resolves the version needs the full history. `fetch-depth: 0` is
+set on every `actions/checkout` step, and `.readthedocs.yml` unshallows in
+`post_checkout` for the same reason.
+
 ## The optional-backend architecture
 
 This is the part of the codebase most worth understanding before changing it.
