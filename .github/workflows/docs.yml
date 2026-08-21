@@ -1,195 +1,95 @@
-name: Documentation
+name: CI Docs
 
-# Validates both documentation builds. It does NOT publish: nothing here
-# touches the gh-pages branch.
-#
-#   sphinx  - the published site (BiocPy style: furo, MyST, sphinx-apidoc,
-#             nbsphinx). Never executes a notebook, so no network access and no
-#             analysis stack is needed.
-#   quarto  - the Quarto project in vignettes/, which is the authoring format
-#             for the tutorials and also builds its own site. Rendered with
-#             --no-execute against the committed freeze cache.
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-  workflow_dispatch:
-
-permissions:
-  contents: read
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
-
-env:
-  MPLBACKEND: Agg
 
 jobs:
-  sphinx:
-    name: Sphinx site (published)
+  build-docs:
+    name: "Build Docs"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
-          # setuptools_scm derives the version from git tags; the default
-          # shallow clone has none.
-          fetch-depth: 0
+          fetch-depth: 0 # Full history for accurate page timestamps
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
-          cache: pip
+          python-version: "3.11"
 
-      - name: Install pandoc
-        # nbsphinx converts notebook markdown cells with pandoc.
+      - name: Install package and dependencies
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y pandoc
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[all,dev,docs,test]"
+          python -m pip install great-docs
 
-      - name: Install the package and the docs extra
-        run: pip install -e ".[docs]"
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
 
-      - name: Confirm the tutorial notebooks carry their outputs
-        # docs/conf.py sets nbsphinx_execute = "never", so a notebook committed
-        # without outputs would silently render as a figure-less page.
-        run: |
-          python - <<'PY'
-          import json
-          import pathlib
-          import sys
+      - name: Build docs
+        run: great-docs build
 
-          missing = []
-          for path in sorted(pathlib.Path("docs/tutorials").glob("*.ipynb")):
-              nb = json.loads(path.read_text())
-              images = sum(
-                  1
-                  for cell in nb["cells"]
-                  for out in cell.get("outputs", [])
-                  if "image/png" in out.get("data", {})
-              )
-              print(f"{path}: {images} embedded figure(s)")
-              if images == 0:
-                  missing.append(str(path))
-
-          if missing:
-              print("\nnotebooks committed without outputs:", *missing, sep="\n  ")
-              sys.exit(1)
-          PY
-
-      - name: Build the Sphinx site
-        run: sphinx-build --color -b html -d docs/_build/doctrees docs docs/_build/html
-
-      - name: Check that the expected pages were produced
-        run: |
-          set -e
-          for page in \
-            docs/_build/html/index.html \
-            docs/_build/html/readme.html \
-            docs/_build/html/tutorials/index.html \
-            docs/_build/html/tutorials/getting-started.html \
-            docs/_build/html/tutorials/upset.html \
-            docs/_build/html/tutorials/plot-gallery.html \
-            docs/_build/html/api/modules.html \
-            docs/_build/html/api/ggnomics.html
-          do
-            test -f "$page" || { echo "missing: $page"; exit 1; }
-          done
-          echo "all expected Sphinx pages rendered"
-
-      - name: Validate internal links in the Sphinx output
-        run: python tools/check_internal_links.py docs/_build/html
-
-      - name: Upload the Sphinx site
-        uses: actions/upload-artifact@v4
+      - name: Save docs artifact
+        uses: actions/upload-artifact@v7
         with:
-          name: sphinx-site
-          path: docs/_build/html
-          if-no-files-found: error
-          retention-days: 7
+          name: docs-html
+          path: great-docs/_site
+          include-hidden-files: true
 
-  quarto:
-    name: Quarto site (authoring source)
+      - name: How to preview this build locally
+        if: github.event_name == 'pull_request'
+        run: great-docs ci notice --run ${{ github.run_id }} --pr ${{ github.event.number }}
+
+      - name: Upload build timings
+        uses: actions/upload-artifact@v7
+        with:
+          name: build-timings
+          path: great-docs/_site/build-timings.json
+
+  publish-docs:
+    name: "Publish Docs"
     runs-on: ubuntu-latest
+    needs: "build-docs"
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v7
         with:
-          # setuptools_scm derives the version from git tags; the default
-          # shallow clone has none.
-          fetch-depth: 0
+          name: docs-html
+          path: great-docs/_site
 
-      - uses: actions/setup-python@v5
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
         with:
-          python-version: "3.12"
-          cache: pip
+          path: great-docs/_site
+          include-hidden-files: true
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y libgl1 libglib2.0-0
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
 
-      - name: Install the package with the plotting and quarto extras
-        run: pip install -e ".[all,quarto]"
-
-      - uses: quarto-dev/quarto-actions/setup@v2
-
-      - name: Resolve the interpreter Quarto should use
-        # No Jupyter kernel is registered. Quarto talks to this interpreter
-        # directly through QUARTO_PYTHON.
-        run: echo "QUARTO_PYTHON=$(python -c 'import sys; print(sys.executable)')" >> "$GITHUB_ENV"
-
-      - name: Generate the quartodoc API reference
-        working-directory: vignettes
-        run: quartodoc build
-
-      - name: Check that the generated reference is complete
-        working-directory: vignettes
-        run: |
-          test -f reference/index.qmd
-          test -f reference/_sidebar.yml
-          test -f reference/plot_umap.qmd
-
-      - name: Render the Quarto site
-        working-directory: vignettes
-        # --no-execute uses the committed vignettes/_freeze results. The
-        # workflow guides analyse real public datasets via scranpy, PyDESeq2,
-        # and the BiocPy data-access packages; re-executing them here would
-        # need network access to Bioconductor/BiocPy services and a much
-        # heavier environment. The freeze cache keeps this reproducible and
-        # keeps the real examples real - it is not a synthetic substitute.
-        run: quarto render --no-execute
-
-      - name: Check that the expected pages were produced
-        working-directory: vignettes
-        run: |
-          set -e
-          for page in \
-            _site/index.html \
-            _site/getting-started.html \
-            _site/plot-gallery.html \
-            _site/bulk-rnaseq.html \
-            _site/single-cell-scranpy.html \
-            _site/multimodal.html \
-            _site/specialized-plots.html \
-            _site/upset.html \
-            _site/reference/index.html \
-            _site/reference/plot_umap.html
-          do
-            test -f "$page" || { echo "missing: $page"; exit 1; }
-          done
-          echo "all expected Quarto pages rendered"
-
-      - name: Check that the UpSet vignette is in the navigation
-        working-directory: vignettes
-        run: grep -q "UpSet plots" _site/index.html
-
-      - name: Validate internal links
-        run: python tools/check_internal_links.py vignettes/_site
-
-      - name: Upload the rendered Quarto site
-        uses: actions/upload-artifact@v4
-        with:
-          name: quarto-site
-          path: vignettes/_site
-          if-no-files-found: error
-          retention-days: 7
+  preview-docs:
+    name: "Preview Docs"
+    runs-on: ubuntu-latest
+    needs: "build-docs"
+    if: github.event_name == 'pull_request'
+    permissions:
+      pull-requests: write
+    steps:
+      # Post (and keep updated) a sticky PR comment with the local-preview
+      # command, pinned to this run so it reproduces the build under review.
+      # Runs the released great-docs via pipx (no install step needed); kept as
+      # its own minimal job so the docs build never holds a pull-requests:write
+      # token. continue-on-error so fork PRs (read-only token) don't fail the run.
+      - name: Post preview instructions to the PR
+        continue-on-error: true
+        run: pipx run great-docs ci pr-comment --run ${{ github.run_id }} --pr ${{ github.event.number }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
