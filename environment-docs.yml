@@ -102,4 +102,6 @@ dependencies:
       #   TypeError: parse_numpy() got an unexpected keyword argument
       #              'allow_section_blank_line'
       - quartodoc>=0.7
-      - griffe>=1.5,<2
+      # - griffe>=1.5,<2
+
+      - great-docs

@@ -40,27 +40,20 @@ env/
 ENV/
 
 # --- Documentation --------------------------------------------------------
-# Quarto build output (rendered HTML; regenerate with `quarto render vignettes`).
-# vignettes/_freeze/ is intentionally NOT ignored - Quarto's freeze cache is
-# committed so the docs site can be rebuilt/deployed without re-fetching every
-# real dataset (network access to Bioconductor/BiocPy services) on every build.
-vignettes/_site/
-vignettes/.quarto/
-vignettes/_freeze_assets/
-vignettes/*.quarto_ipynb
-
-# quartodoc output. Generated from docstrings by `quartodoc build`; regenerate
-# rather than editing by hand.
-vignettes/reference/
-vignettes/objects.json
-
-# Sphinx build output and the sphinx-apidoc pages, which docs/conf.py
-# regenerates from the package on every build.
-docs/_build/
-docs/api/
-
 # Legacy MkDocs output (MkDocs is no longer the site renderer).
 /site/
+
+# Retired documentation systems (Sphinx + quartodoc/Quarto), superseded by
+# great-docs. Kept on disk, prefixed with __old_, and excluded from version
+# control rather than deleted outright.
+_old_docs/
+__old_docs/
+__old_vignettes/
+__old_readthedocs.yml
+.github/workflows/__old_docs.yml
+.github/workflows/__old_publish-docs.yml
+.github/workflows/__old_readme_plots.yml
+tools/__old_build_tutorial_notebooks.py
 
 # --- Editors and OS -------------------------------------------------------
 .vscode/
@@ -70,3 +63,12 @@ docs/api/
 *~
 .DS_Store
 Thumbs.db
+
+# Great Docs build directory (ephemeral, do not commit)
+great-docs/
+
+# Great Docs versioned-build artifacts
+_great_docs_build/
+.great-docs-build/
+.great-docs-cache/
+.great-docs/

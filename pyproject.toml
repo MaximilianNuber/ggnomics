@@ -85,15 +85,24 @@ test = [
 ]
 # Sphinx documentation site (the published one, BiocPy style).
 docs = [
-  "sphinx>=7.2",
-  "furo",
-  "myst-parser[linkify]",
-  "nbsphinx",
-  "sphinx-autodoc-typehints",
-  "sphinx-copybutton",
-  "ipykernel>=6",
-  "nbformat>=5.9",
+    "sphinx",
+    "myst-nb",
+    "jupyter-cache",
+    "pydata-sphinx-theme",
+    "sphinx-autobuild",
+    "sphinx-copybutton",
+    "sphinx-design",
 ]
+# docs = [
+#   "sphinx>=7.2",
+#   "furo",
+#   "myst-parser[linkify]",
+#   "nbsphinx",
+#   "sphinx-autodoc-typehints",
+#   "sphinx-copybutton",
+#   "ipykernel>=6",
+#   "nbformat>=5.9",
+# ]
 # Quarto vignette sources + the quartodoc API site, kept alongside Sphinx.
 # Also what produces docs/tutorials/*.ipynb via `quarto render --to ipynb`.
 quarto = [
