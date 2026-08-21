@@ -118,7 +118,7 @@ quarto = [
   "pyyaml>=6.0",
 ]
 dev = [
-  "ggnomics[all,test,docs,quarto]",
+  "ggnomics[all,test]",
   "ruff>=0.14",
   "pre-commit>=4.0",
   "tox>=4.11",
