@@ -10,7 +10,6 @@ from plotnine import (
     geom_point,
     ggplot,
     ggtitle,
-    scale_color_gradient,
     theme_classic,
 )
 
@@ -35,10 +34,8 @@ def qc_scatter(
     QC scatter (e.g., n_counts vs n_genes), optionally colored by numeric metric (e.g., mito_fraction).
     """
     aes_kwargs = {"x": x, "y": y}
-    is_numeric_color = False
     if color is not None and color in df.columns:
         aes_kwargs["color"] = color
-        is_numeric_color = pd.api.types.is_numeric_dtype(df[color])
 
     if size is None:
         size = _autosize(len(df))
@@ -46,8 +43,6 @@ def qc_scatter(
     p = ggplot(df) + aes(**aes_kwargs) + geom_point(size=size, alpha=alpha) + theme_classic()
     if title:
         p = p + ggtitle(title)
-    if color is not None and is_numeric_color:
-        p = p + scale_color_gradient(low="#f7f7f7", high="#08306B")
     return p
 
 

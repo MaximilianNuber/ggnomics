@@ -21,7 +21,7 @@ from plotnine import (
     theme_classic,
 )
 
-from ._utils import adaptive_size, color_scale
+from ._utils import adaptive_size, add_scale, color_scale
 
 
 def _unsupported_type(function_name: str, data: object) -> TypeError:
@@ -112,7 +112,7 @@ def _plot_coldata_dataframe(
             size = adaptive_size(len(obs_df))
         plot = ggplot(obs_df) + aes(**aes_kwargs) + geom_point(size=size, alpha=0.7) + theme_classic()
         if color_by is not None:
-            plot += color_scale(obs_df[color_by], palette=palette, type_="color")
+            plot = add_scale(plot, color_scale(obs_df[color_by], palette=palette, type_="color"))
     else:
         shape = shape.lower()
         if shape not in {"point", "violin", "box", "bar"}:
@@ -156,7 +156,7 @@ def _plot_coldata_dataframe(
                 + rotated_labels
             )
 
-        plot += color_scale(obs_df[fill_column], palette=palette, type_="fill")
+        plot = add_scale(plot, color_scale(obs_df[fill_column], palette=palette, type_="fill"))
 
     if facet_by is not None:
         plot += facet_wrap(facet_by)
@@ -215,8 +215,6 @@ def _plot_rowdata_dataframe(
         aes_kwargs["color"] = color_by
 
     plot = ggplot(var_df) + aes(**aes_kwargs) + geom_point(size=size, alpha=0.7) + theme_classic()
-    if color_by is not None:
-        plot += color_scale(var_df[color_by], palette=None, type_="color")
     if title is not None:
         plot += ggtitle(title)
     return plot

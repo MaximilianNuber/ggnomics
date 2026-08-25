@@ -33,7 +33,7 @@ particular figure, or read about the native
 
 ![[Differential expression after 24 hours of salt stress in rice](bulk-rnaseq.qmd).](bulk-rnaseq_files/figure-html/cell-16-output-1.png)
 
-![[Pancreatic cell-type composition across donors](specialized-plots.qmd).](specialized-plots_files/figure-html/cell-4-output-2.png)
+![[Pancreatic cell-type composition across donors](specialized-plots.qmd).](specialized-plots_files/figure-html/cell-4-output-1.png)
 
 ![[RNA and protein abundance on a shared CITE-seq embedding](multimodal.qmd).](multimodal_files/figure-html/cell-23-output-1.png)
 

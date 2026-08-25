@@ -13,6 +13,8 @@ from plotnine import (
     theme_classic,
 )
 
+from ._utils import resolve_manual_colors
+
 
 def volcano_plot(
     df: pd.DataFrame,
@@ -47,8 +49,7 @@ def volcano_plot(
 
     d["__status__"] = d.apply(_status, axis=1)
 
-    if palette is None:
-        palette = {"ns": "#bdbdbd", "up": "#e41a1c", "down": "#377eb8"}
+    color_pal = resolve_manual_colors(["ns", "up", "down"], palette)
 
     # Auto point size similar to reduced-dim plots
     n = len(d)
@@ -60,9 +61,10 @@ def volcano_plot(
         + geom_point(alpha=alpha, size=size)
         + geom_vline(xintercept=[-lfc_thresh, lfc_thresh], linetype="dashed", alpha=0.6)
         + geom_hline(yintercept=-np.log10(fdr_thresh), linetype="dashed", alpha=0.6)
-        + scale_color_manual(values=palette)
         + theme_classic()
     )
+    if color_pal is not None:
+        p = p + scale_color_manual(values=color_pal)
 
     if title:
         p = p + ggtitle(title)

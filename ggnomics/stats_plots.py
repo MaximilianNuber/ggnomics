@@ -17,14 +17,12 @@ from plotnine import (
     ggplot,
     ggtitle,
     labs,
-    scale_fill_brewer,
-    scale_fill_manual,
     scale_y_continuous,
     theme,
     theme_classic,
 )
 
-from ._utils import adaptive_size
+from ._utils import adaptive_size, add_scale, color_scale, display_categorical
 from .signif._geom import geom_signif
 
 if TYPE_CHECKING:
@@ -81,7 +79,7 @@ def _build_violin_data(
         groups_order = unique_groups
 
     df["__group__"] = df["__group__"].astype(str)
-    df["__group__"] = pd.Categorical(df["__group__"], categories=groups_order, ordered=True)
+    df["__group__"] = display_categorical(df["__group__"], groups_order)
 
     return df, groups_order
 
@@ -113,10 +111,7 @@ def _build_stat_annotated_plot(
         + labs(x=x_label or group_by, y=y_label or feature, fill=group_by)
     )
 
-    if palette is not None:
-        p = p + scale_fill_manual(breaks=list(palette.keys()), values=list(palette.values()))
-    else:
-        p = p + scale_fill_brewer(type="qual", palette="Set2")
+    p = add_scale(p, color_scale(df["__group__"], palette=palette, type_="fill"))
 
     if title is not None:
         p = p + ggtitle(title)
@@ -408,7 +403,7 @@ def plot_scatter_marginal(
     stroke: Optional[float] = None,
     alpha: float = 0.7,
     palette: Optional[Dict] = None,
-    cmap: str = "viridis",
+    cmap: Optional[str] = None,
     title: Optional[str] = None,
     x_label: Optional[str] = None,
     y_label: Optional[str] = None,
@@ -461,7 +456,7 @@ def _plot_scatter_marginal_dataframe(
     stroke: Optional[float] = None,
     alpha: float = 0.7,
     palette: Optional[Dict] = None,
-    cmap: str = "viridis",
+    cmap: Optional[str] = None,
     title: Optional[str] = None,
     x_label: Optional[str] = None,
     y_label: Optional[str] = None,
@@ -576,7 +571,7 @@ def plot_embedding_panel(
     stroke: Optional[float] = None,
     alpha: float = 0.8,
     shared_scale: bool = True,
-    cmap: str = "viridis",
+    cmap: Optional[str] = None,
     palette: Optional[Dict] = None,
     title: Optional[str] = None,
 ) -> Union[Compose, ggplot]:
@@ -631,7 +626,7 @@ def _plot_embedding_panel_dataframe(
     stroke: Optional[float] = None,
     alpha: float = 0.8,
     shared_scale: bool = True,
-    cmap: str = "viridis",
+    cmap: Optional[str] = None,
     palette: Optional[Dict] = None,
     title: Optional[str] = None,
 ):

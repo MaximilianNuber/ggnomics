@@ -61,7 +61,17 @@ gg.plot_umap(zeisel_final, color="clusters") + theme_bw() + labs(title="plot_uma
 p_reduced = gg.plot_reduced_dim(zeisel_final, dimred="X_pca", color="clusters") + theme_bw() + labs(title="plot_reduced_dim")
 p_dim = gg.dim_plot(zeisel_final, dimred="X_umap", color="clusters") + theme_bw() + labs(title="dim_plot (alias)")
 p_tsne = gg.plot_tsne(zeisel_final, color="clusters") + theme_bw() + labs(title="plot_tsne")
-p_reduced / p_dim / p_tsne
+
+from plotnine.composition import plot_annotation
+
+(
+  (p_reduced / p_dim / p_tsne)
+  + plot_annotation(
+    theme=theme(
+      figure_size=(4, 7)
+    )
+  )
+)
 ```
 
 `ggnomics.sc_pca` and `ggnomics.sc_umap` provide PCA and UMAP through

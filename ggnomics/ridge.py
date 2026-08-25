@@ -32,7 +32,7 @@ def ridge_density(
     bandwidth: Optional[float] = None,
     gridsize: int = 200,
     scale: float = 1.0,
-    palette: Optional[str] = "Set3",
+    palette: Optional[str] = None,
     title: Optional[str] = None,
 ):
     """

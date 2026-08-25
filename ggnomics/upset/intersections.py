@@ -11,6 +11,7 @@ from typing import Literal, Sequence
 import numpy as np
 import pandas as pd
 
+from .._utils import display_dtype
 from ._types import IntersectionSelection, IntersectionStatistics, UpSetData
 from .modes import Mode, normalize_mode
 
@@ -389,8 +390,8 @@ def apply_intersection_selection(
 
     intersections = selection.intersections
     sets = selection.sets
-    intersection_dtype = pd.CategoricalDtype(intersections, ordered=True)
-    set_dtype = pd.CategoricalDtype(sets, ordered=True)
+    intersection_dtype = display_dtype(intersections)
+    set_dtype = display_dtype(sets)
     sizes = statistics.sizes.loc[list(intersections)].copy()
     sizes.index = pd.CategoricalIndex(sizes.index, dtype=intersection_dtype, name="intersection")
 
@@ -564,5 +565,5 @@ def select_mode_observations(data: UpSetData, *, mode: Mode) -> pd.DataFrame:
     else:
         result = data.statistics.data.iloc[0:0].copy()
         result["intersection"] = pd.Series(dtype="object")
-    result["intersection"] = result["intersection"].astype(pd.CategoricalDtype(data.sorted_intersections, ordered=True))
+    result["intersection"] = result["intersection"].astype(display_dtype(data.sorted_intersections))
     return result

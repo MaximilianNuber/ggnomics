@@ -20,7 +20,7 @@ from plotnine import (
     theme_classic,
 )
 
-from ._utils import color_scale
+from ._utils import add_scale, color_scale, display_categorical
 
 
 def _unsupported_type(data: object) -> TypeError:
@@ -156,7 +156,7 @@ def _build_highest_exprs_plot(
     """Shared plot construction, reused by every container adapter."""
 
     long_df = long_df.copy()
-    long_df["feature"] = pd.Categorical(long_df["feature"], categories=feature_order[::-1], ordered=True)
+    long_df["feature"] = display_categorical(long_df["feature"], feature_order[::-1])
 
     aes_kwargs: dict = {"x": "feature", "y": "fraction"}
     if color_cells_by is not None:
@@ -173,7 +173,7 @@ def _build_highest_exprs_plot(
     )
 
     if color_cells_by is not None:
-        p = p + color_scale(long_df[color_cells_by], palette=palette, type_="fill")
+        p = add_scale(p, color_scale(long_df[color_cells_by], palette=palette, type_="fill"))
 
     if title is not None:
         p = p + ggtitle(title)

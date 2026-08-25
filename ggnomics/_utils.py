@@ -3,16 +3,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Dict, List, Optional
 
 import numpy as np
 import pandas as pd
 from plotnine import (
-    scale_color_brewer,
-    scale_color_cmap,
     scale_color_manual,
-    scale_fill_brewer,
-    scale_fill_cmap,
     scale_fill_manual,
 )
 
@@ -84,17 +80,67 @@ def adaptive_stroke(
     return float(np.clip(computed, 0.0, stroke_max))
 
 
+def display_dtype(categories) -> pd.CategoricalDtype:
+    """Categorical dtype that pins display order without declaring an ordinal variable.
+
+    plotnine chooses a default scale from the column's dtype: an **ordered**
+    Categorical gets ``scale_*_ordinal`` (a viridis ramp), an unordered one
+    gets ``scale_*_discrete`` (plotnine's own hue palette). ggnomics builds
+    categoricals only to fix the order categories appear in on axes, facets
+    and legends -- never to claim the variable is genuinely ordinal -- so
+    using ``ordered=True`` here would silently replace the user's default
+    palette with viridis. An unordered Categorical preserves the declared
+    ``categories`` order in every place plotnine uses it, so ordering costs
+    nothing.
+
+    Args:
+        categories: Categories in the order they should be displayed.
+
+    Returns:
+        An unordered :class:`pandas.CategoricalDtype`.
+    """
+    return pd.CategoricalDtype(list(categories), ordered=False)
+
+
+def display_categorical(values, categories) -> pd.Categorical:
+    """Build a display-ordered :class:`pandas.Categorical`.
+
+    The :class:`pandas.Categorical` counterpart of :func:`display_dtype`;
+    see there for why the result is deliberately unordered.
+
+    Args:
+        values: Values to encode.
+        categories: Categories in the order they should be displayed.
+
+    Returns:
+        An unordered :class:`pandas.Categorical`.
+    """
+    return pd.Categorical(values, dtype=display_dtype(categories))
+
+
+def add_scale(plot: ggplot, scale) -> ggplot:
+    """Add ``scale`` to ``plot`` if it is not ``None``, else return ``plot`` unchanged.
+
+    Pairs with :func:`color_scale` and other helpers that return ``None`` to
+    mean "impose nothing here" rather than a scale object.
+    """
+    return plot if scale is None else plot + scale
+
+
 def color_scale(
     col: pd.Series,
     palette=None,
     type_: str = "color",
 ):
-    """Return the most appropriate plotnine color scale for ``col``.
+    """Return an explicit plotnine color scale for ``col``, or ``None``.
 
-    Decision logic:
-    - Numeric column → continuous viridis scale.
-    - Categorical/object column + ``palette`` dict → ``scale_*_manual``.
-    - Categorical/object column without palette → qualitative Brewer "Set2".
+    ggnomics never imposes its own color scheme: this only returns a scale
+    when the caller supplied a ``palette``, resolved against the column's
+    own observed categories (declared order for a pandas Categorical,
+    first-appearance order otherwise). In every other case — a numeric
+    column, or a categorical column with no ``palette`` — it returns
+    ``None`` so the caller adds no scale at all and plotnine's own default
+    (continuous or discrete) applies untouched.
 
     Args:
         col: The Series being mapped to color.
@@ -102,33 +148,60 @@ def color_scale(
         type_: ``"color"`` or ``"fill"`` — selects which scale family to use.
 
     Returns:
-        A plotnine scale object.
+        A plotnine scale object, or ``None`` if there is nothing to impose.
     """
     is_numeric = pd.api.types.is_numeric_dtype(col)
 
-    if is_numeric:
-        if type_ == "fill":
-            return scale_fill_cmap(cmap_name="viridis")
-        return scale_color_cmap(cmap_name="viridis")
+    if is_numeric or palette is None:
+        return None
 
-    # Categorical path: an explicit palette is resolved against the column's
-    # own observed categories (declared order for a pandas Categorical,
-    # first-appearance order otherwise), filling any gaps rather than
-    # silently producing a broken legend for uncovered categories.
-    if palette is not None:
-        from .palettes import resolve_palette
+    # An explicit palette is resolved against the column's own observed
+    # categories, filling any gaps rather than silently producing a broken
+    # legend for uncovered categories.
+    from .palettes import resolve_palette
 
-        resolved = resolve_palette(col, palette=palette)
-        breaks = list(resolved.keys())
-        values = list(resolved.values())
-        if type_ == "fill":
-            return scale_fill_manual(breaks=breaks, values=values)
-        return scale_color_manual(breaks=breaks, values=values)
-
-    # Default qualitative palette
+    resolved = resolve_palette(col, palette=palette)
+    breaks = list(resolved.keys())
+    values = list(resolved.values())
     if type_ == "fill":
-        return scale_fill_brewer(type="qual", palette="Set2")
-    return scale_color_brewer(type="qual", palette="Set2")
+        return scale_fill_manual(breaks=breaks, values=values)
+    return scale_color_manual(breaks=breaks, values=values)
+
+
+def resolve_manual_colors(
+    categories: List,
+    overrides: Optional[Dict] = None,
+) -> Optional[Dict]:
+    """Resolve a ``{category: color}`` mapping for a fixed set of categories.
+
+    Used where a plot has semantic per-category colors (e.g. up/down/ns)
+    exposed as individual keyword arguments rather than a single ``palette``
+    dict. Categories the caller didn't override fall back to the same hue
+    colors plotnine's default discrete scale would assign them, so a partial
+    override doesn't degrade the rest into flat grey placeholders.
+
+    Args:
+        categories: Ordered, complete list of category values.
+        overrides: ``{category: color}`` for any subset of ``categories``.
+            Entries with a ``None`` value are treated as not overridden
+            (this lets callers pass a fixed set of keys defaulting to
+            ``None`` without pre-filtering).
+
+    Returns:
+        ``None`` if no override value is set — the caller should skip
+        adding an explicit manual scale and let plotnine's default apply.
+        Otherwise a complete ``{category: color}`` mapping.
+    """
+    if not overrides or not any(value is not None for value in overrides.values()):
+        return None
+
+    from mizani.palettes import hue_pal
+
+    defaults = hue_pal()(len(categories))
+    return {
+        category: (overrides.get(category) if overrides.get(category) is not None else default)
+        for category, default in zip(categories, defaults)
+    }
 
 
 def to_long(

@@ -20,8 +20,8 @@ def heatmap_long(
     x: str,
     y: str,
     value: str,
-    low: str = "#F7FBFF",
-    high: str = "#082B6B",
+    low: Optional[str] = None,
+    high: Optional[str] = None,
     title: Optional[str] = None,
     x_text_angle: int = 90,
 ):
@@ -32,10 +32,11 @@ def heatmap_long(
         ggplot(df_long)
         + aes(x=x, y=y, fill=value)
         + geom_tile()
-        + scale_fill_gradient(low=low, high=high)
         + theme_classic()
         + theme(axis_text_x=element_text(rotation=x_text_angle, ha="right"))
     )
+    if low is not None and high is not None:
+        p = p + scale_fill_gradient(low=low, high=high)
     if title:
         p = p + ggtitle(title)
     return p

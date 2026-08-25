@@ -30,8 +30,8 @@ def _(
     pct_col: str = "pct",
     *,
     size_range: tuple[float, float] = (0.5, 4.0),
-    color_low: str = "#f0f0f0",
-    color_high: str = "#67000d",
+    color_low: Optional[str] = None,
+    color_high: Optional[str] = None,
     title: Optional[str] = None,
 ):
     p = (
@@ -39,9 +39,10 @@ def _(
         + aes(x=group, y=gene, size=pct_col, color=mean_col)
         + geom_point()
         + scale_size_continuous(range=size_range)
-        + scale_color_gradient(low=color_low, high=color_high)
         + theme_classic()
     )
+    if color_low is not None and color_high is not None:
+        p = p + scale_color_gradient(low=color_low, high=color_high)
     if title:
         p = p + ggtitle(title)
     return p

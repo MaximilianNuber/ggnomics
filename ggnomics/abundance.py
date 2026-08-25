@@ -20,7 +20,7 @@ from plotnine import (
     theme_classic,
 )
 
-from ._utils import color_scale
+from ._utils import add_scale, color_scale
 
 
 @singledispatch
@@ -91,8 +91,8 @@ def _plot_abundance_dataframe(
         + theme_classic()
         + theme(axis_text_x=element_text(rotation=45, ha="right"))
         + labs(y=y_label, x=group_by, fill=color_by)
-        + color_scale(obs_df[color_by], palette=palette, type_="fill")
     )
+    plot = add_scale(plot, color_scale(obs_df[color_by], palette=palette, type_="fill"))
 
     if normalize:
         plot += scale_y_continuous(labels=lambda values: [f"{v:.0%}" for v in values])

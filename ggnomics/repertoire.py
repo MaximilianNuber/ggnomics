@@ -20,7 +20,7 @@ from plotnine import (
     theme_classic,
 )
 
-from ._utils import HeatmapResult
+from ._utils import HeatmapResult, display_categorical, resolve_manual_colors
 from .scatter import _embedding_frame_from_dataframe
 
 
@@ -45,15 +45,6 @@ _DEFAULT_THRESHOLDS: Dict[int, str] = {
     6: "Medium (6-20)",
     21: "Large (21-100)",
     101: "Hyperexpanded (>100)",
-}
-
-_EXPANSION_PALETTE: Dict[str, str] = {
-    "Single": "#BDD7EE",
-    "Small (2-5)": "#9DC3E6",
-    "Medium (6-20)": "#2E75B6",
-    "Large (21-100)": "#1F4E79",
-    "Hyperexpanded (>100)": "#FF0000",
-    "None": "#DDDDDD",
 }
 
 _EXPANSION_ORDER = [
@@ -176,8 +167,8 @@ def plot_clonotype_abundance(
             ``None``, categories are computed from clone sizes.
         expansion_thresholds: ``{min_clone_size: category_label}`` mapping.
             Defaults to the scRepertoire-style thresholds.
-        palette: ``{category: hex}`` fill color mapping. Defaults to the
-            built-in expansion palette.
+        palette: ``{category: hex}`` fill color mapping. Categories left
+            unspecified fall back to plotnine's default discrete scale.
         facet_by: Column used to facet the plot (and to rank within each
             facet). Defaults to ``sample_col`` when omitted.
         title: Plot title.
@@ -219,26 +210,21 @@ def _plot_clonotype_abundance_dataframe(
     facet_col = facet_by if facet_by is not None else sample_col
 
     plot_df = _abundance_table(obs_df, clonotype_col, top_n, expansion_col, thresholds, facet_col)
-    plot_df["expansion"] = pd.Categorical(
-        plot_df["expansion"],
-        categories=[c for c in _EXPANSION_ORDER if c in plot_df["expansion"].values],
-        ordered=True,
-    )
+    order_cats = [c for c in _EXPANSION_ORDER if c in plot_df["expansion"].values]
+    plot_df["expansion"] = display_categorical(plot_df["expansion"], order_cats)
 
-    pal = palette or _EXPANSION_PALETTE
+    color_pal = resolve_manual_colors(order_cats, palette)
 
     p = (
         ggplot(plot_df)
         + aes(x="rank", y="n_cells", fill="expansion")
         + geom_bar(stat="identity")
-        + scale_fill_manual(
-            breaks=[k for k in _EXPANSION_ORDER if k in pal],
-            values=[pal.get(k, "#AAAAAA") for k in _EXPANSION_ORDER if k in pal],
-        )
         + theme_classic()
         + theme(axis_text_x=element_text(rotation=45, ha="right"))
         + labs(x="Clonotype rank", y="Cell count", fill="Expansion")
     )
+    if color_pal is not None:
+        p = p + scale_fill_manual(breaks=order_cats, values=[color_pal[c] for c in order_cats])
 
     if facet_col is not None:
         p = p + facet_wrap(facet_col)
@@ -366,7 +352,7 @@ def _clonotype_embedding_plot(
     clonotype_series: pd.Series,
     dimred: str,
     expansion_thresholds: Optional[Dict[int, str]],
-    non_tcell_color: str,
+    non_tcell_color: Optional[str],
     palette: Optional[Dict],
     size: Optional[float],
     stroke: Optional[float],
@@ -392,10 +378,10 @@ def _clonotype_embedding_plot(
 
     order_cats = [c for c in _EXPANSION_ORDER if c in work_df["__expansion__"].values]
 
-    pal = dict(palette) if palette is not None else {}
-    pal.setdefault("None", non_tcell_color)
-    for cat, col in _EXPANSION_PALETTE.items():
-        pal.setdefault(cat, col)
+    overrides = dict(palette) if palette is not None else {}
+    if non_tcell_color is not None:
+        overrides.setdefault("None", non_tcell_color)
+    color_pal = resolve_manual_colors(order_cats, overrides)
 
     base = _strip_x_prefix(dimred).upper()
     return plot_scatter(
@@ -406,7 +392,7 @@ def _clonotype_embedding_plot(
         size=size,
         stroke=stroke,
         alpha=alpha,
-        palette={k: pal[k] for k in order_cats if k in pal},
+        palette=color_pal,
         order=order_cats,
         color_label="Expansion",
         x_label=f"{base} {components[0]}",
@@ -422,7 +408,7 @@ def plot_clonotype_embedding(
     dimred: str = "X_umap",
     components: Tuple[int, int] = (1, 2),
     expansion_thresholds: Optional[Dict[int, str]] = None,
-    non_tcell_color: str = "#DDDDDD",
+    non_tcell_color: Optional[str] = None,
     palette: Optional[Dict] = None,
     size: Optional[float] = None,
     stroke: Optional[float] = None,
@@ -442,8 +428,10 @@ def plot_clonotype_embedding(
         components: One-indexed ``(x, y)`` component pair to plot.
         expansion_thresholds: ``{min_clone_size: category_label}`` mapping.
         non_tcell_color: Fill color for cells without a clonotype.
-        palette: ``{category: hex}`` mapping overriding the default
-            expansion palette.
+            Defaults to plotnine's default discrete scale, same as any
+            other expansion category.
+        palette: ``{category: hex}`` mapping. Categories left unspecified
+            fall back to plotnine's default discrete scale.
         size: Point size (``None`` -> adaptive).
         stroke: Point stroke width (``None`` -> adaptive).
         alpha: Point transparency.
@@ -466,7 +454,7 @@ def _plot_clonotype_embedding_dataframe(
     dimred: str = "X_umap",
     components: Tuple[int, int] = (1, 2),
     expansion_thresholds: Optional[Dict[int, str]] = None,
-    non_tcell_color: str = "#DDDDDD",
+    non_tcell_color: Optional[str] = None,
     palette: Optional[Dict] = None,
     size: Optional[float] = None,
     stroke: Optional[float] = None,

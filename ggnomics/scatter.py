@@ -14,13 +14,11 @@ from plotnine import (
     ggplot,
     ggtitle,
     labs,
-    scale_color_brewer,
     scale_color_cmap,
-    scale_color_manual,
     theme_classic,
 )
 
-from ._utils import adaptive_size, adaptive_stroke
+from ._utils import adaptive_size, adaptive_stroke, add_scale, color_scale
 
 
 def _strip_x_prefix(key: str) -> str:
@@ -87,7 +85,7 @@ def _scatter_ggplot(
     stroke: float = 0.1,
     alpha: float = 0.8,
     palette: Optional[Dict] = None,
-    cmap: str = "viridis",
+    cmap: Optional[str] = None,
     vmin: Optional[float] = None,
     vmax: Optional[float] = None,
     color_label: Optional[str] = None,
@@ -118,19 +116,19 @@ def _scatter_ggplot(
 
     p = ggplot(df) + aes(**aes_kwargs) + geom_point(size=size, stroke=stroke, alpha=alpha) + theme_classic()
 
-    # Color scale
+    # Color scale: only ever added when the caller actually customized
+    # something. Otherwise plotnine's own default (continuous or discrete)
+    # scale applies untouched.
     if color is not None:
         if color_is_continuous:
-            lim = [vmin, vmax] if (vmin is not None or vmax is not None) else None
-            p = p + scale_color_cmap(cmap_name=cmap, limits=lim)
+            if cmap is not None or vmin is not None or vmax is not None:
+                lim = [vmin, vmax] if (vmin is not None or vmax is not None) else None
+                p = p + scale_color_cmap(cmap_name=cmap or "viridis", limits=lim)
         else:
-            if palette is not None:
-                p = p + scale_color_manual(
-                    breaks=list(palette.keys()),
-                    values=list(palette.values()),
-                )
-            else:
-                p = p + scale_color_brewer(type="qual", palette="Set2")
+            # ``color_scale`` returns None when there is nothing to impose, and
+            # resolves a partial palette against the column's own categories so
+            # unlisted ones keep a real color instead of collapsing to grey.
+            p = add_scale(p, color_scale(df[color], palette=palette, type_="color"))
 
     # Facets
     if facet_by is not None:
@@ -170,7 +168,7 @@ def plot_scatter(
     stroke: Optional[float] = None,
     alpha: float = 0.8,
     palette: Optional[Dict] = None,
-    cmap: str = "viridis",
+    cmap: Optional[str] = None,
     vmin: Optional[float] = None,
     vmax: Optional[float] = None,
     layer: Optional[str] = None,
@@ -219,7 +217,7 @@ def _plot_scatter_dataframe(
     stroke: Optional[float] = None,
     alpha: float = 0.8,
     palette: Optional[Dict] = None,
-    cmap: str = "viridis",
+    cmap: Optional[str] = None,
     vmin: Optional[float] = None,
     vmax: Optional[float] = None,
     layer: Optional[str] = None,
@@ -295,7 +293,7 @@ def plot_embedding(
     stroke: Optional[float] = None,
     alpha: float = 0.8,
     palette: Optional[Dict] = None,
-    cmap: str = "viridis",
+    cmap: Optional[str] = None,
     vmin: Optional[float] = None,
     vmax: Optional[float] = None,
     facet_by: Optional[str] = None,
@@ -330,7 +328,7 @@ def _plot_embedding_dataframe(
     stroke: Optional[float] = None,
     alpha: float = 0.8,
     palette: Optional[Dict] = None,
-    cmap: str = "viridis",
+    cmap: Optional[str] = None,
     vmin: Optional[float] = None,
     vmax: Optional[float] = None,
     facet_by: Optional[str] = None,

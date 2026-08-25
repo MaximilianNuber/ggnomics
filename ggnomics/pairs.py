@@ -18,7 +18,7 @@ from plotnine import (
     theme_classic,
 )
 
-from ._utils import adaptive_size, color_scale
+from ._utils import adaptive_size, add_scale, color_scale, display_categorical
 from .scatter import _embedding_frame_from_dataframe
 
 
@@ -67,8 +67,8 @@ def _pairs_plot_from_embedding(
             records.append(tmp)
 
     long_df = pd.concat(records, ignore_index=True)
-    long_df["row_dim"] = pd.Categorical(long_df["row_dim"], categories=comp_cols, ordered=True)
-    long_df["col_dim"] = pd.Categorical(long_df["col_dim"], categories=comp_cols, ordered=True)
+    long_df["row_dim"] = display_categorical(long_df["row_dim"], comp_cols)
+    long_df["col_dim"] = display_categorical(long_df["col_dim"], comp_cols)
 
     n_panels = k * k
     effective_n = n * n_panels
@@ -93,7 +93,7 @@ def _pairs_plot_from_embedding(
     )
 
     if color_by is not None:
-        p = p + color_scale(long_df[color_by], palette=palette, type_="color")
+        p = add_scale(p, color_scale(long_df[color_by], palette=palette, type_="color"))
 
     if title is not None:
         p = p + ggtitle(title)

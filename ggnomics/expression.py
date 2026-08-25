@@ -26,7 +26,7 @@ from plotnine import (
     theme_classic,
 )
 
-from ._utils import adaptive_size, color_scale, to_long
+from ._utils import adaptive_size, add_scale, color_scale, display_categorical, to_long
 
 
 def _unsupported_type(function_name: str, data: object) -> TypeError:
@@ -143,7 +143,7 @@ def _plot_expression_dataframe(
         axis=1,
     )
     long = to_long(wide, id_vars=id_cols, value_vars=features)
-    long["feature"] = pd.Categorical(long["feature"], categories=features, ordered=True)
+    long["feature"] = display_categorical(long["feature"], features)
 
     if log1p:
         long["expression"] = np.log1p(long["expression"].to_numpy())
@@ -163,7 +163,7 @@ def _plot_expression_dataframe(
         ps = point_size if point_size is not None else adaptive_size(len(obs_df), size_max=1.0)
         p = p + geom_jitter(width=0.2, height=0.0, size=ps, alpha=0.4)
 
-    p = p + color_scale(obs_df[fill_col], palette=palette, type_="fill")
+    p = add_scale(p, color_scale(obs_df[fill_col], palette=palette, type_="fill"))
 
     if title is not None:
         p = p + ggtitle(title)
@@ -187,7 +187,7 @@ def plot_dot(
     dot_min: float = 0.0,
     col_min: float = -2.5,
     col_max: float = 2.5,
-    palette: str = "viridis",
+    palette: Optional[str] = None,
     title: Optional[str] = None,
 ) -> ggplot:
     """Classic dot plot: mean expression (color) and fraction expressing (size).
@@ -210,7 +210,9 @@ def plot_dot(
         dot_min: Minimum dot size.
         col_min: Clip scaled expression below this value.
         col_max: Clip scaled expression above this value.
-        palette: Matplotlib colormap name for the color scale.
+        palette: Matplotlib colormap name for the color scale. ``None``
+            (default) imposes no scale — plotnine's own default continuous
+            scale applies.
         title: Plot title.
 
     Returns:
@@ -236,7 +238,7 @@ def _plot_dot_dataframe(
     dot_min: float = 0.0,
     col_min: float = -2.5,
     col_max: float = 2.5,
-    palette: str = "viridis",
+    palette: Optional[str] = None,
     title: Optional[str] = None,
 ) -> ggplot:
     _validate_features(features)
@@ -276,19 +278,20 @@ def _plot_dot_dataframe(
         stats["mean_expr"] = stats["mean_expr"].clip(col_min, col_max)
 
     stats["frac_expr"] = stats["frac_expr"].clip(dot_min, dot_max)
-    stats["feature"] = pd.Categorical(stats["feature"], categories=features, ordered=True)
-    stats["group"] = pd.Categorical(stats["group"], categories=list(dict.fromkeys(groups)), ordered=True)
+    stats["feature"] = display_categorical(stats["feature"], features)
+    stats["group"] = display_categorical(stats["group"], dict.fromkeys(groups))
 
     p = (
         ggplot(stats)
         + aes(x="group", y="feature", size="frac_expr", color="mean_expr")
         + geom_point()
-        + scale_color_cmap(cmap_name=palette)
         + scale_size_continuous(range=(1.0, 6.0))
         + theme_classic()
         + theme(axis_text_x=element_text(rotation=45, ha="right"))
         + labs(size="Fraction\nexpressing", color="Mean\nexpression")
     )
+    if palette is not None:
+        p = p + scale_color_cmap(cmap_name=palette)
 
     if title is not None:
         p = p + ggtitle(title)
@@ -310,7 +313,7 @@ def plot_heatmap(
     scale: bool = True,
     cluster_rows: bool = True,
     cluster_cols: bool = False,
-    palette: str = "RdBu_r",
+    palette: Optional[str] = None,
     title: Optional[str] = None,
     show_colnames: bool = False,
 ) -> ggplot:
@@ -331,7 +334,9 @@ def plot_heatmap(
         cluster_rows: Hierarchically cluster rows (features). Requires SciPy.
         cluster_cols: Hierarchically cluster columns (cells/groups). Requires
             SciPy.
-        palette: Diverging Matplotlib colormap name (default ``"RdBu_r"``).
+        palette: Matplotlib colormap name for the fill scale. ``None``
+            (default) imposes no scale — plotnine's own default continuous
+            scale applies.
         title: Plot title.
         show_colnames: Whether to render column axis text.
 
@@ -356,7 +361,7 @@ def _plot_heatmap_dataframe(
     scale: bool = True,
     cluster_rows: bool = True,
     cluster_cols: bool = False,
-    palette: str = "RdBu_r",
+    palette: Optional[str] = None,
     title: Optional[str] = None,
     show_colnames: bool = False,
 ) -> ggplot:
@@ -397,8 +402,8 @@ def _plot_heatmap_dataframe(
         .melt(id_vars="feature", var_name="sample", value_name="value")
     )
 
-    df_long["feature"] = pd.Categorical(df_long["feature"], categories=row_labels, ordered=True)
-    df_long["sample"] = pd.Categorical(df_long["sample"], categories=col_labels, ordered=True)
+    df_long["feature"] = display_categorical(df_long["feature"], row_labels)
+    df_long["sample"] = display_categorical(df_long["sample"], col_labels)
 
     col_text = element_text(rotation=90, ha="right", size=7) if show_colnames else element_blank()
 
@@ -406,7 +411,6 @@ def _plot_heatmap_dataframe(
         ggplot(df_long)
         + aes(x="sample", y="feature", fill="value")
         + geom_tile()
-        + scale_fill_cmap(cmap_name=palette)
         + theme_classic()
         + theme(
             axis_text_x=col_text,
@@ -414,6 +418,8 @@ def _plot_heatmap_dataframe(
         )
         + labs(x="", y="", fill="Z-score" if scale else "Expression")
     )
+    if palette is not None:
+        p = p + scale_fill_cmap(cmap_name=palette)
 
     if title is not None:
         p = p + ggtitle(title)

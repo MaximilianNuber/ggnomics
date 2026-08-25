@@ -18,6 +18,7 @@ from plotnine import (
     scale_color_manual,
 )
 
+from .._utils import display_dtype
 from ._types import ThemeCollection, UpSetAnnotation, UpSetData, UpSetQuery, copy_plot
 from ._utils_query import find_query_intersection, query_applies
 from ._utils_theme import apply_component_theme
@@ -146,7 +147,7 @@ def upset_annotate(y: str, geom: Any | Sequence[Any]) -> UpSetAnnotation:
 def _annotation_summary(data: UpSetData, mode: str) -> pd.DataFrame:
     canonical = normalize_mode(mode)
     table = data.sizes.copy().reset_index()
-    table["intersection"] = table["intersection"].astype(pd.CategoricalDtype(data.sorted_intersections, ordered=True))
+    table["intersection"] = table["intersection"].astype(display_dtype(data.sorted_intersections))
     table["size"] = table[canonical].astype(float)
     return table
 
@@ -256,9 +257,7 @@ def build_ratio_annotation(
     numerator = normalize_mode(annotation.mode)
     denominator = normalize_mode(annotation.options["denominator_mode"])
     summary = data.sizes.reset_index().copy()
-    summary["intersection"] = summary["intersection"].astype(
-        pd.CategoricalDtype(data.sorted_intersections, ordered=True)
-    )
+    summary["intersection"] = summary["intersection"].astype(display_dtype(data.sorted_intersections))
     summary["ratio"] = np.divide(
         summary[numerator],
         summary[denominator],

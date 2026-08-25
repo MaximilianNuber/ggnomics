@@ -5,7 +5,6 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import Callable, Sequence
 
-import pandas as pd
 from plotnine import (
     aes,
     coord_flip,
@@ -16,6 +15,7 @@ from plotnine import (
     scale_y_reverse,
 )
 
+from .._utils import display_dtype
 from ._types import SetSizeSpec, ThemeCollection, UpSetData, UpSetQuery
 from ._utils_query import query_applies
 from ._utils_theme import apply_component_theme
@@ -66,7 +66,7 @@ def build_set_sizes(
     else:
         sizes = data.statistics.set_sizes.loc[list(data.sorted_sets)]
     frame = sizes.rename("size").rename_axis("group").reset_index()
-    frame["group"] = frame["group"].astype(pd.CategoricalDtype(data.sorted_sets, ordered=True))
+    frame["group"] = frame["group"].astype(display_dtype(data.sorted_sets))
     mapping = {**dict(spec.mapping), "x": "group", "y": "size"}
     plot = ggplot(frame, aes(**mapping)) + deepcopy(spec.geom)
     for query in queries:

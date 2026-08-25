@@ -21,7 +21,7 @@ from plotnine import (
     theme_classic,
 )
 
-from ._utils import HeatmapResult
+from ._utils import HeatmapResult, resolve_manual_colors
 
 # ---------------------------------------------------------------------------
 # Helpers shared by volcano/MA
@@ -95,9 +95,9 @@ def plot_volcano(
     label_top_n: int = 10,
     label_genes: Optional[List[str]] = None,
     label_col: Optional[str] = None,
-    up_color: str = "#E41A1C",
-    down_color: str = "#377EB8",
-    ns_color: str = "#AAAAAA",
+    up_color: Optional[str] = None,
+    down_color: Optional[str] = None,
+    ns_color: Optional[str] = None,
     point_size: float = 1.2,
     alpha: float = 0.7,
     x_label: str = "log2 Fold Change",
@@ -117,7 +117,10 @@ def plot_volcano(
     df["__neg_log_p__"] = -np.log10(df[pval_col])
     df["__status__"] = _assign_status(df, logfc_col, pval_col, logfc_threshold, pval_threshold)
 
-    color_pal = {"ns": ns_color, "up": up_color, "down": down_color}
+    color_pal = resolve_manual_colors(
+        ["ns", "up", "down"],
+        {"ns": ns_color, "up": up_color, "down": down_color},
+    )
 
     df["__label__"] = _get_gene_labels(df, gene_col, pval_col, "__status__", label_top_n, label_genes)
 
@@ -127,10 +130,11 @@ def plot_volcano(
         + geom_point(size=point_size, alpha=alpha)
         + geom_vline(xintercept=[-logfc_threshold, logfc_threshold], linetype="dashed", alpha=0.5)
         + geom_hline(yintercept=-np.log10(pval_threshold), linetype="dashed", alpha=0.5)
-        + scale_color_manual(values=color_pal)
         + theme_classic()
         + labs(x=x_label, y=y_label, color="")
     )
+    if color_pal is not None:
+        p = p + scale_color_manual(values=color_pal)
 
     # Label layer (only rows with non-empty label)
     label_df = df[df["__label__"] != ""].copy()
@@ -179,9 +183,9 @@ def plot_ma(
     logfc_threshold: float = 0.0,
     label_top_n: int = 10,
     label_genes: Optional[List[str]] = None,
-    up_color: str = "#E41A1C",
-    down_color: str = "#377EB8",
-    ns_color: str = "#AAAAAA",
+    up_color: Optional[str] = None,
+    down_color: Optional[str] = None,
+    ns_color: Optional[str] = None,
     point_size: float = 1.0,
     alpha: float = 0.7,
     title: Optional[str] = None,
@@ -198,7 +202,10 @@ def plot_ma(
     df[pval_col] = df[pval_col].clip(lower=np.finfo(float).tiny)
     df["__status__"] = _assign_status(df, logfc_col, pval_col, logfc_threshold, pval_threshold)
 
-    color_pal = {"ns": ns_color, "up": up_color, "down": down_color}
+    color_pal = resolve_manual_colors(
+        ["ns", "up", "down"],
+        {"ns": ns_color, "up": up_color, "down": down_color},
+    )
 
     df["__label__"] = _get_gene_labels(df, gene_col, pval_col, "__status__", label_top_n, label_genes)
 
@@ -207,10 +214,11 @@ def plot_ma(
         + aes(x="__log_mean__", y=logfc_col, color="__status__")
         + geom_point(size=point_size, alpha=alpha)
         + geom_hline(yintercept=0, linetype="dashed", alpha=0.5)
-        + scale_color_manual(values=color_pal)
         + theme_classic()
         + labs(x="log2(Mean Expression)", y="log2 Fold Change", color="")
     )
+    if color_pal is not None:
+        p = p + scale_color_manual(values=color_pal)
 
     label_df = df[df["__label__"] != ""]
     if not label_df.empty:
@@ -237,8 +245,8 @@ def plot_coef_lollipop(
     top_n: int = 20,
     coef_col: str = "coefficient",
     se_col: Optional[str] = None,
-    pos_color: str = "#E41A1C",
-    neg_color: str = "#377EB8",
+    pos_color: Optional[str] = None,
+    neg_color: Optional[str] = None,
     zero_line: bool = True,
     title: Optional[str] = None,
     x_label: str = "Coefficient",
@@ -268,16 +276,19 @@ def plot_coef_lollipop(
     df["__feature__"] = pd.Categorical(df["__feature__"], categories=df["__feature__"].tolist())
     df["__direction__"] = df[coef_col].apply(lambda v: "positive" if v >= 0 else "negative")
 
+    color_pal = resolve_manual_colors(["positive", "negative"], {"positive": pos_color, "negative": neg_color})
+
     p = (
         ggplot(df)
         + aes(x="__feature__", y=coef_col, color="__direction__")
         + geom_segment(aes(xend="__feature__", yend=0), size=0.8)
         + geom_point(size=2.5)
-        + scale_color_manual(values={"positive": pos_color, "negative": neg_color})
         + coord_flip()
         + theme_classic()
         + labs(x=feature_label, y=x_label, color="")
     )
+    if color_pal is not None:
+        p = p + scale_color_manual(values=color_pal)
 
     if zero_line:
         p = p + geom_vline(xintercept=0, linetype="dashed", alpha=0.5)

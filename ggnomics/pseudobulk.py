@@ -18,13 +18,12 @@ from plotnine import (
     ggtitle,
     labs,
     position_stack,
-    scale_fill_brewer,
-    scale_fill_manual,
     theme,
     theme_classic,
 )
 
 from ._compose import annotate_composition
+from ._utils import add_scale, color_scale
 
 if TYPE_CHECKING:
     from plotnine.composition import Compose
@@ -131,10 +130,7 @@ def _counts_panel_plot(
         + theme(axis_text_x=element_text(rotation=45, ha="right"))
         + labs(x="Sample", y="Cell count", fill=group_by, title="Cells per sample-group")
     )
-    if palette is not None:
-        p = p + scale_fill_manual(breaks=list(palette.keys()), values=list(palette.values()))
-    else:
-        p = p + scale_fill_brewer(type="qual", palette="Set2")
+    p = add_scale(p, color_scale(counts_df[group_by], palette=palette, type_="fill"))
     return p
 
 
@@ -172,10 +168,8 @@ def _libsize_panel_plot(
         + theme(axis_text_x=element_text(rotation=45, ha="right"))
         + labs(x="Sample", y="log10(total counts)", title="Library size per sample")
     )
-    if palette is not None and condition_by is not None:
-        p = p + scale_fill_manual(breaks=list(palette.keys()), values=list(palette.values()))
-    else:
-        p = p + scale_fill_brewer(type="qual", palette="Set2")
+    if condition_by is not None:
+        p = add_scale(p, color_scale(libsize_df[condition_by], palette=palette, type_="fill"))
     return p
 
 
@@ -444,7 +438,6 @@ def plot_pseudobulk_de(
             + aes(x="cluster", y="n", fill="direction")
             + geom_bar(stat="identity", position="identity", alpha=0.85)
             + geom_hline(yintercept=0, linetype="solid", color="black")
-            + scale_fill_manual(values={"up": "#E41A1C", "down": "#377EB8"})
             + theme_classic()
             + theme(axis_text_x=element_text(rotation=45, ha="right"))
             + labs(x="Cluster", y="# Significant genes", fill="Direction")

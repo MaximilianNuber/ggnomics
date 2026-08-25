@@ -467,7 +467,7 @@ def _plot_clonotype_embedding_sce(
     dimred: str = "X_umap",
     components=(1, 2),
     expansion_thresholds=None,
-    non_tcell_color: str = "#DDDDDD",
+    non_tcell_color: Optional[str] = None,
     palette=None,
     size: Optional[float] = None,
     stroke: Optional[float] = None,

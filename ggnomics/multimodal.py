@@ -15,11 +15,11 @@ from plotnine import (
     ggplot,
     ggtitle,
     labs,
-    scale_color_brewer,
-    scale_color_manual,
     theme,
     theme_classic,
 )
+
+from ._utils import add_scale, color_scale
 
 if TYPE_CHECKING:
     from plotnine.composition import Compose
@@ -53,7 +53,7 @@ def plot_bimodal_scatter(
     layer_y: Optional[str] = None,
     add_marginal: bool = False,
     palette: Optional[Dict] = None,
-    cmap: str = "viridis",
+    cmap: Optional[str] = None,
     title: Optional[str] = None,
     x_label: Optional[str] = None,
     y_label: Optional[str] = None,
@@ -113,7 +113,7 @@ def _plot_bimodal_scatter_dataframe(
     layer_y: Optional[str] = None,
     add_marginal: bool = False,
     palette: Optional[Dict] = None,
-    cmap: str = "viridis",
+    cmap: Optional[str] = None,
     title: Optional[str] = None,
     x_label: Optional[str] = None,
     y_label: Optional[str] = None,
@@ -199,10 +199,7 @@ def _build_adt_qc_plot(
         )
     )
 
-    if palette is not None:
-        p = p + scale_color_manual(breaks=list(palette.keys()), values=list(palette.values()))
-    else:
-        p = p + scale_color_brewer(type="qual", palette="Set3")
+    p = add_scale(p, color_scale(real_long["antibody"], palette=palette, type_="color"))
 
     if group_by is not None:
         p = p + facet_wrap(group_by, ncol=ncol)
