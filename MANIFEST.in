@@ -12,6 +12,8 @@ include CODE_OF_CONDUCT.md
 # Documentation sources and their build inputs.
 prune docs
 prune vignettes
+prune articles
+prune _freeze
 prune tools
 prune .github
 
