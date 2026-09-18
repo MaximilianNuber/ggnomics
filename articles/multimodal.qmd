@@ -209,6 +209,7 @@ Because both embeddings are returned as `ggplot` objects, they can be placed
 side by side with plotnine's composition operator:
 
 ```{python}
+#| label: readme-cite-seq-rna-protein-umap
 umap_rna = gg.plot_umap(adata_final, color="CD3E", layer="counts") + theme_bw() + labs(title="RNA: CD3E")
 umap_adt = gg.plot_umap(adata_final, color="ADT_CD3") + theme_bw() + labs(title="Protein: CD3")
 umap_rna | umap_adt

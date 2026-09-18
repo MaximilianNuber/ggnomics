@@ -26,6 +26,7 @@ MANIFEST
 coverage.xml
 htmlcov/
 nosetests.xml
+dev/
 
 # --- Linting / type checking ----------------------------------------------
 .ruff_cache/

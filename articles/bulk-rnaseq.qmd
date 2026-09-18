@@ -169,6 +169,7 @@ gg.bulk_pca.plot_pca(vst_se, assay_name="vst", color="growth_condition", n_compo
 ## 8. Volcano and MA plots
 
 ```{python}
+#| label: readme-emtab1625-volcano
 gg.plot_volcano(results, label_top_n=8) + theme_bw() + labs(title="24h salt vs. control (rice shoot, E-MTAB-1625)")
 ```
 

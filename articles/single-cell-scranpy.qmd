@@ -188,6 +188,7 @@ gg.plot_pca(final, color="clusters") + labs(title="PCA, colored by graph cluster
 ```
 
 ```{python}
+#| label: readme-zeisel-umap-level1class
 gg.plot_umap(final, color="level1class") + labs(title="UMAP, colored by the original level1class annotation")
 ```
 
@@ -246,6 +247,7 @@ variation below the broad `level1class` annotation.
 ## 10. Expression violins and dot plots
 
 ```{python}
+#| label: readme-zeisel-marker-violins
 markers = ["Gfap", "Mog", "Gad2", "Snap25", "Aif1", "Cldn5"]
 gg.plot_expression(final, features=markers, group_by="level1class", layer="logcounts", log1p=False, ncol=2) + theme_bw() + theme(axis_text_x=element_text(rotation=45, hjust=1))
 ```

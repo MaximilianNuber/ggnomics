@@ -35,6 +35,7 @@ baron.shape
 ### Abundance by donor and cell type
 
 ```{python}
+#| label: readme-baron-composition
 baron_cd = baron.get_column_data().to_pandas()
 gg.plot_abundance(baron_cd, group_by="donor", color_by="label") + theme_bw() + labs(title="Pancreatic cell-type composition per donor (fraction)", x="Donor", y="Fraction of cells")
 ```
@@ -85,6 +86,7 @@ interpreted as inference across independent animals; a biological-replicate
 analysis would require sample-level observations.
 
 ```{python}
+#| label: readme-significance-brackets
 cd = final.column_data.to_pandas()
 gfap_idx = list(final.get_row_names()).index("Gfap")
 cd["Gfap"] = np.asarray(final.get_assay("logcounts")[gfap_idx, :]).ravel()
@@ -204,6 +206,7 @@ dendrograms. Marsilea is used alongside ggnomics here rather than wrapped by
 it.
 
 ```{python}
+#| label: readme-marsilea-heatmap
 import marsilea as ma
 
 sig_top = results.loc[results["padj"] < 0.05].sort_values("padj").head(25)
@@ -217,13 +220,17 @@ h.add_dendrogram("top")
 h.add_left(ma.plotter.Labels(z.T.index.tolist()), pad=0.1)
 h.add_top(ma.plotter.Labels(z.T.columns.tolist()), pad=0.1)
 h.render()
-# h.save(str(pathlib.Path("_freeze_assets") / "marsilea_emtab1625.png"))
-# import os
-# os.mkdir("_freeze_assets")
-# h.save(str(pathlib.Path("_freeze_assets") / "marsilea_emtab1625.png"))
+
+# Marsilea renders through matplotlib but does not return a figure Quarto can
+# capture automatically, so the README copy is written out explicitly. This
+# is the only one of the README images not captured via Quarto's normal
+# figure-html output.
+readme_img_dir = pathlib.Path("..") / "docs" / "img" / "readme"
+readme_img_dir.mkdir(parents=True, exist_ok=True)
+h.save(str(readme_img_dir / "marsilea_heatmap.png"))
 ```
 
-<!-- ![Marsilea heatmap of the top 25 significant genes, 24h salt vs. control](_freeze_assets/marsilea_emtab1625.png) -->
+![Marsilea heatmap of the top 25 significant genes, 24h salt vs. control](../docs/img/readme/marsilea_heatmap.png)
 
 ## ECCITE-seq TCR repertoire (EH4616 CTCL, EH4621 control)
 
@@ -243,6 +250,7 @@ cell_level.shape
 ### Clonotype abundance
 
 ```{python}
+#| label: readme-tcr-clonotype-abundance
 gg.plot_clonotype_abundance(cell_level, clonotype_col="clonotype_id", sample_col="condition", top_n=15) + theme_bw() + theme(axis_text_x=element_text(rotation=45, hjust=1))
 ```
 
