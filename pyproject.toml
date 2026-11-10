@@ -83,33 +83,16 @@ test = [
   "pytest-cov>=4.1",
   "matplotlib>=3.8",
 ]
-# Sphinx documentation site (the published one, BiocPy style).
-docs = [
-    "sphinx",
-    "myst-nb",
-    "jupyter-cache",
-    "pydata-sphinx-theme",
-    "sphinx-autobuild",
-    "sphinx-copybutton",
-    "sphinx-design",
-]
-# docs = [
-#   "sphinx>=7.2",
-#   "furo",
-#   "myst-parser[linkify]",
-#   "nbsphinx",
-#   "sphinx-autodoc-typehints",
-#   "sphinx-copybutton",
-#   "ipykernel>=6",
-#   "nbformat>=5.9",
-# ]
-# Quarto vignette sources + the quartodoc API site, kept alongside Sphinx.
-# Also what produces docs/tutorials/*.ipynb via `quarto render --to ipynb`.
+# Published site, matching .github/workflows/docs.yml. Quarto is installed
+# separately; see CONTRIBUTING.md. Analysis/data-access packages are optional.
+docs = ["great-docs"]
+# Retained for users of the legacy quartodoc toolchain. Do not combine with
+# the current docs extra: quartodoc requires griffe<2, while great-docs uses 2.x.
 quarto = [
   "quartodoc>=0.7",
   # quartodoc 0.11 passes `allow_section_blank_line` to griffe's numpy parser;
   # that keyword was only added in griffe 1.x and removed again in griffe 2.x,
-  # so the upper bound is load-bearing. See CONTRIBUTING.md.
+  # so the upper bound is load-bearing for this legacy extra.
   "griffe>=1.5,<2",
   "jupyter-client>=8",
   "ipykernel>=6",
@@ -165,18 +148,11 @@ fallback_version = "0.1.0"
 line-length = 120  # matches the BiocSetup scaffold default
 target-version = "py310"
 extend-exclude = [
-  # Generated documentation. vignettes/reference/ comes from quartodoc,
-  # docs/tutorials/*.ipynb from `quarto render --to ipynb`, and docs/api/ from
-  # sphinx-apidoc; all three are rewritten on every docs build, so linting or
-  # reformatting them just creates churn. Edit the sources instead.
-  "vignettes/_site",
-  "vignettes/_freeze",
-  "vignettes/.quarto",
-  "vignettes/reference",
-  "docs/tutorials/*.ipynb",
-  "docs/api",
+  # Generated great-docs output and Quarto execution caches. Edit articles/
+  # and package docstrings instead of files overwritten by a docs build.
+  "great-docs",
+  "_freeze",
   "ggnomics/_version.py",
-  "docs/_build",
   "examples/*.ipynb",
   "build",
   "dist",
@@ -218,9 +194,6 @@ ignore = [
 # Quarto's _includes helpers set cache environment variables before the
 # data-access packages are imported, so imports cannot all sit at the top.
 "vignettes/_includes/*" = ["E402"]
-# matplotlib.use("Agg") must run before anything imports pyplot, and the repo
-# root has to be on sys.path before `ggnomics` is importable from this script.
-"docs/generate_readme_plots.py" = ["E402"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["ggnomics"]

@@ -12,7 +12,7 @@ page is HTML.
 
 Usage::
 
-    python tools/check_internal_links.py vignettes/_site
+    python tools/check_internal_links.py great-docs/_site
 
 Exits non-zero if any internal link cannot be resolved.
 """
@@ -147,9 +147,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "site",
         nargs="?",
-        default="vignettes/_site",
+        default="great-docs/_site",
         type=Path,
-        help="Path to the rendered site directory (default: vignettes/_site)",
+        help="Path to the rendered site directory (default: great-docs/_site)",
     )
     args = parser.parse_args(argv)
 

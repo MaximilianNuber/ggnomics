@@ -5,8 +5,8 @@ setup and the checks that run in CI.
 
 ## Development environment
 
-ggnomics targets Python 3.10–3.13. The vignettes additionally need a handful of
-analysis and data-access packages that are easiest to install through conda.
+ggnomics targets Python 3.10–3.13. The workflow articles additionally need
+analysis and data-access packages when their code is re-executed.
 
 ### Testing and linting only (pip)
 
@@ -20,19 +20,24 @@ source .venv/bin/activate
 pip install -e ".[dev]"
 ```
 
-The `dev` extra pulls in `all`, `test`, `docs`, and `quarto`, plus Ruff,
-pre-commit, tox, build, and twine.
+The `dev` extra pulls in `all` and `test`, plus Ruff, pre-commit, tox, build,
+and twine. Documentation dependencies are installed separately with `docs`.
 
-### Building the documentation (conda)
+### Documentation tools
+
+Use Python 3.11 or newer for the documentation tools (Python 3.12 is used in
+`environment-docs.yml`). Install [Quarto](https://quarto.org/docs/get-started/)
+and make sure `quarto` is on `PATH`. From the repository root, install the
+Python dependencies:
 
 ```bash
-mamba env create -f environment-docs.yml
-mamba run -n ggnomics-docs python -m pip install -e ".[docs,quarto]"
+python -m pip install -e ".[all,docs]"
+quarto --version
 ```
 
-`environment-docs.yml` pins the vignette dependencies (`scranpy`, `scrnaseq`,
-`pyexpressionatlas`, `experimenthub`, `pydeseq2`, `marsilea`) that the worked
-examples execute against real public datasets.
+The `docs` extra installs `great-docs`, the site generator used by
+`.github/workflows/docs.yml`. See [Documentation](#documentation) below for
+building the site and re-executing the public-data articles.
 
 ## Running the checks
 
@@ -57,15 +62,13 @@ tox -e core      # core-only install; proves the backends stay lazy
 tox -e lint      # ruff check
 tox -e format    # ruff format --check (read-only)
 tox -e build     # python -m build + twine check
-tox -e docs       # Sphinx site (the published one)
-tox -e notebooks  # regenerate docs/tutorials/*.ipynb from the Quarto sources
-tox -e quartosite # quartodoc build + quarto render
-tox -e linkcheck  # internal-link validation of the rendered Quarto site
+tox -e docs      # great-docs build, as in the documentation CI workflow
+tox -e linkcheck # internal-link validation of great-docs/_site
 ```
 
 The documentation environments are deliberately excluded from the default
-envlist. `notebooks` and `quartosite` execute real analyses against public
-genomics datasets and need network access.
+envlist. Build the site before running `linkcheck`. Re-executing the workflow
+articles requires their analysis dependencies and network access on first use.
 
 ### Ruff
 
@@ -79,7 +82,7 @@ ruff format --check . # verify formatting without writing
 Configuration lives in `[tool.ruff]` in `pyproject.toml`. The line length is
 120, matching the BiocSetup scaffold default. `Optional[...]` and `List[...]`
 are kept deliberately in public signatures (the `UP006`/`UP007`/`UP035`/`UP045`
-rules are disabled) so that the annotations quartodoc renders match what
+rules are disabled) so that the annotations in the generated reference match what
 Python 3.10 users see.
 
 ### pre-commit
@@ -90,9 +93,9 @@ pre-commit install       # install the git hook
 pre-commit run --all-files
 ```
 
-Generated documentation (`vignettes/reference/`, `vignettes/_freeze/`,
-`vignettes/_site/`) is excluded from the hooks, since reformatting it would
-create diffs that the next docs build immediately reverts.
+Generated site output (`great-docs/`) and the committed execution cache
+(`_freeze/`) are excluded from the hooks. Edit the article sources under
+`articles/`, not generated reference pages or cached outputs.
 
 ### Coverage
 
@@ -103,119 +106,82 @@ lower it to make a change pass.
 
 ## Documentation
 
-ggnomics publishes a **Sphinx** site in the BiocPy house style (furo theme,
-MyST Markdown, `sphinx-apidoc`), the same shape as
-[scranpy](https://libscran.github.io/scranpy/). The workflow guides are
-included as executed Jupyter notebooks through `nbsphinx`.
+The published site uses [great-docs](https://posit-dev.github.io/great-docs/),
+configured by `great-docs.yml`. Workflow sources live in `articles/*.qmd`;
+shared data/setup helpers live in `articles/_includes/`. API pages are generated
+from package docstrings. The generated project and HTML are under `great-docs/`
+and `great-docs/_site/`, respectively, and are gitignored.
 
-The Quarto project in `vignettes/` is retained: it is the authoring format for
-those guides, and it also builds its own site.
+### Building the site
 
-```
-vignettes/*.qmd  --(tox -e notebooks)-->  docs/tutorials/*.ipynb  --.
-                 --(tox -e quartosite)--> vignettes/_site/         |
-                                                                   +--> tox -e docs
-ggnomics/*.py    --(sphinx-apidoc, from docs/conf.py)--> docs/api/ --'   docs/_build/html/
-```
-
-### Building the Sphinx site
+After installing the documentation tools above, run from the repository root:
 
 ```bash
-pip install -e ".[docs]"
-tox -e docs                 # or: sphinx-build -b html docs docs/_build/html
+great-docs build
+# or use an isolated tox environment:
+tox -e docs
 ```
 
-This never executes a notebook. `docs/conf.py` sets
-`nbsphinx_execute = "never"` because the committed notebooks already carry
-their outputs, so the build needs neither network access nor the analysis
-stack. That is what makes the ReadTheDocs build (see `.readthedocs.yml`)
-viable.
+These use the same site generator and output location as
+`.github/workflows/docs.yml`. The retired Sphinx/quartodoc site, `vignettes/`,
+and `tools/build_tutorial_notebooks.py` are no longer build entry points.
+Do not edit files in `great-docs/`; the next build regenerates them.
 
-`docs/api/` is generated by `sphinx-apidoc`, which `docs/conf.py` invokes on
-every build. It is gitignored — do not edit it by hand.
+### Re-executing workflow articles
 
-### Regenerating the tutorial notebooks
-
-The notebooks under `docs/tutorials/` are produced from the Quarto sources:
+`great-docs.yml` sets `freeze.mode: auto`, and the committed Quarto cache
+lives under `_freeze/articles/`. Unchanged pages can reuse cached outputs;
+changed code may trigger execution during a build. A cached page is not a
+fresh execution of its analysis. After changing article code, explicitly
+re-execute the affected article and review its results before updating its
+cache; do not treat a cached HTML build as proof that changed code ran. For
+example, after installing the analysis dependencies below:
 
 ```bash
-mamba run -n ggnomics-docs python tools/build_tutorial_notebooks.py
-# or one at a time
-mamba run -n ggnomics-docs python tools/build_tutorial_notebooks.py upset
+great-docs freeze articles/bulk-rnaseq.qmd
+great-docs build
 ```
 
-or `tox -e notebooks`. This runs `quarto render <vignette>.qmd --to ipynb`,
-which **executes** the guides against the real public datasets and embeds the
-resulting figures. Commit the regenerated notebooks together with whatever
-change prompted them.
+Review and commit the refreshed `_freeze/articles/bulk-rnaseq/` outputs along
+with the source change. `great-docs freeze --info` shows the cache status.
 
-Do not hand-edit `docs/tutorials/*.ipynb` — edit the `.qmd` source and
-regenerate.
-
-### Building the Quarto site
+The analysis/data-access dependencies are additional to `ggnomics[all,docs]`:
 
 ```bash
-cd vignettes
-mamba run -n ggnomics-docs quartodoc build
-DOCS_PYTHON="$(mamba run -n ggnomics-docs python -c 'import sys; print(sys.executable)')"
-QUARTO_PYTHON="$DOCS_PYTHON" quarto render
+python -m pip install scranpy scrnaseq pyexpressionatlas experimenthub pydeseq2 marsilea
 ```
 
-or `tox -e quartosite`. Quarto talks to the documentation environment's
-interpreter through `QUARTO_PYTHON`; **do not** register a Jupyter kernel with
-`jupyter kernelspec install`.
-
-`quartodoc build` reads the `quartodoc:` block in `vignettes/_quarto.yml` and
-writes `vignettes/reference/*.qmd`, `vignettes/reference/_sidebar.yml`, and
-`vignettes/objects.json`. Those are generated; regenerate rather than editing.
-
-### The freeze cache
-
-`vignettes/_freeze/` is committed on purpose, and `_quarto.yml` sets
-`execute: freeze: auto`. It is Quarto's execution cache, and it is what keeps
-the HTML site and the tutorial notebooks consistent from a single execution.
-It also lets CI validate the Quarto site with `quarto render --no-execute`
-without re-fetching every dataset from Bioconductor and BiocPy services.
-
-When you change a vignette's code, the freeze entry for that page is refreshed
-automatically on the next render. To force a refresh, delete
-`vignettes/_freeze/<page>/` and render again.
-
-### Checking links
-
-```bash
-python tools/check_internal_links.py vignettes/_site
-```
-
-or `tox -e linkcheck`. Walks the rendered Quarto HTML and verifies every
-internal link and fragment; external HTTP links are skipped so the check is
-deterministic and works offline. `tox -e doclinks` does the equivalent
-consistency pass for Sphinx.
-
-### Documentation environment
+Alternatively, `environment-docs.yml` provides a Python 3.12 conda environment
+with the documentation and analysis dependencies. Install ggnomics itself
+editable after creating it:
 
 ```bash
 mamba env create -f environment-docs.yml
-mamba run -n ggnomics-docs python -m pip install -e ".[docs,quarto]"
+mamba run -n ggnomics-docs python -m pip install -e ".[all,docs]"
 ```
 
-`environment-docs.yml` pins the vignette dependencies (`scranpy`, `scrnaseq`,
-`pyexpressionatlas`, `experimenthub`, `pydeseq2`, `marsilea`) that the worked
-examples execute against real public datasets.
+The helper imports at the start of each article resolve `_includes` relative
+to the article directory. If copying cells into a notebook or Python session,
+start it from `articles/`, or explicitly add `articles/_includes` to `sys.path`.
+Initialize matplotlib before importing the dataset loaders, as shown in the
+articles. Their first run fetches public data; `GGNOMICS_DATA_CACHE` overrides
+the cache root (default: `~/.cache/ggnomics-docs`). Download/proxy failures must
+be distinguished from plotting errors, and cached output must not be reported
+as a successful fresh run.
 
-### A note on griffe
+### Checking links
 
-quartodoc 0.11 calls griffe's numpy docstring parser with
-`allow_section_blank_line`, a keyword that exists only in griffe 1.x. With
-griffe 2.x installed, `quartodoc build` fails with:
+After building the site:
 
+```bash
+python tools/check_internal_links.py great-docs/_site
+# or:
+tox -e linkcheck
 ```
-TypeError: parse_numpy() got an unexpected keyword argument 'allow_section_blank_line'
-```
 
-The `quarto` extra therefore pins `griffe>=1.5,<2`. Remove the cap only once
-quartodoc supports griffe 2. This does not affect the Sphinx build, which does
-not use griffe.
+The checker verifies local links and HTML fragments. External HTTP links are
+skipped so this check is deterministic and works offline. A missing site or a
+site containing no HTML files is an error, not a successful check.
 
 ## Distributions
 
@@ -268,9 +234,8 @@ The publish workflow refuses to upload anything containing `dev` or a local
 version segment, so a shallow checkout, an unannotated tag, or a dirty tree
 fails the build rather than shipping a broken version to PyPI.
 
-Anything that resolves the version needs the full history. `fetch-depth: 0` is
-set on every `actions/checkout` step, and `.readthedocs.yml` unshallows in
-`post_checkout` for the same reason.
+Anything that resolves the version needs the full history. The GitHub Actions
+workflows use `fetch-depth: 0`; use a full checkout for local release builds too.
 
 ## The optional-backend architecture
 

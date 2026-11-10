@@ -48,6 +48,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Align contributor setup, documentation extras, tox targets, and internal-link
+  defaults with the published great-docs site (`articles/`, `great-docs/_site/`).
 - Two bare `except:` clauses in `ggnomics/singlecell/` narrowed to
   `except Exception:` so `KeyboardInterrupt` and `SystemExit` propagate.
 - `run_umap` now chains the original `ImportError` when `umap-learn` is missing.

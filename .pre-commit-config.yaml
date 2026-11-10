@@ -4,16 +4,12 @@
 #   pre-commit install
 #   pre-commit run --all-files
 #
-# Generated documentation is excluded on purpose: vignettes/reference/ is
-# written by `quartodoc build`, vignettes/_freeze/ is Quarto's committed
-# execution cache, and vignettes/_site/ is rendered output. Reformatting any
-# of them would create diffs that the next docs build immediately reverts.
+# Generated great-docs output and the committed Quarto execution cache are
+# excluded: reformatting them would be overwritten by the next docs build.
 exclude: |
   (?x)^(
-    vignettes/_freeze/.*|
-    vignettes/_site/.*|
-    vignettes/reference/.*|
-    vignettes/objects\.json|
+    great-docs/.*|
+    _freeze/.*|
     docs/img/.*|
     .*\.ipynb
   )$
